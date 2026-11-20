@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+    <title>Brain Defense — jeu éducatif</title>
+    <link rel="stylesheet" href="style.css?v=bd-20261120-e">
+</head>
+<body>
+
+    <!-- HUD vertical à gauche : contrôles puis ressources et score -->
+    <div id="hud" class="hud">
+        <div class="hud-card hud-controls">
+            <button id="pause-btn" onclick="pauseGame()" title="Pause" aria-label="Pause">⏸️</button>
+        </div>
+        <div class="hud-card hud-controls">
+            <button id="sound-btn" onclick="toggleMute()" title="Son" aria-label="Son">🔊</button>
+        </div>
+        <div class="hud-card hud-score">
+            <span class="hud-label" data-i18n="hud-score">SCORE</span>
+            <span class="hud-value" id="score">0</span>
+            <span class="hud-sub" id="hud-best">Record: 0</span>
+        </div>
+        <div class="hud-card hud-stars">
+            <span class="hud-label">⭐</span>
+            <span class="hud-value" id="hud-stars">0</span>
+        </div>
+        <div class="hud-card hud-lives">
+            <span class="hud-label" data-i18n="hud-wanted">WANTED</span>
+            <span class="hud-value" id="lives">❤️❤️❤️</span>
+        </div>
+        <div class="hud-card hud-combo">
+            <span class="hud-label" data-i18n="hud-combo">COMBO</span>
+            <span class="hud-value" id="streak-tag">0</span>
+        </div>
+        <div class="hud-card hud-retry">
+            <span class="hud-label" data-i18n="hud-retry">RETRY</span>
+            <span class="hud-value" id="hud-retry-keys">0</span>
+        </div>
+        <div id="level-badge" class="badge">Basique</div>
+    </div>
+
+    <!-- Zone de jeu + Modales -->
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Boutons tactiles QCM (cachés à l'accueil, affichés uniquement pendant la partie) -->
+        <div id="controls" class="hidden">
+            <button class="ans-btn" onclick="checkAnswer(0)" id="btn0">-</button>
+            <button class="ans-btn" onclick="checkAnswer(1)" id="btn1">-</button>
+            <button class="ans-btn" onclick="checkAnswer(2)" id="btn2">-</button>
+        </div>
+    </div>
+
+    <!-- Écran d'accueil -->
+    <div id="start-screen" class="overlay">
+        <button class="settings-gear" onclick="openSettings()" aria-label="Paramètres" title="Paramètres">⚙</button>
+        <div class="game-logo">
+            <svg class="game-logo-mark" viewBox="0 0 64 64" aria-hidden="true">
+                <defs>
+                    <linearGradient id="logoShield" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#6ee7ff"/>
+                        <stop offset="1" stop-color="#2563eb"/>
+                    </linearGradient>
+                </defs>
+                <path d="M32 4 55 13v17c0 15-9 24-23 30C18 54 9 45 9 30V13Z" fill="#101b39" stroke="#facc15" stroke-width="3"/>
+                <path d="M32 10 49 17v13c0 11-6 18-17 23-11-5-17-12-17-23V17Z" fill="url(#logoShield)" stroke="#a5f3fc" stroke-width="1.5"/>
+                <path d="M31 21c-2-5-10-4-10 2-5 1-5 8-1 10-2 5 2 9 7 8l5-4V20Zm2 0c2-5 10-4 10 2 5 1 5 8 1 10 2 5-2 9-7 8l-5-4V20Z" fill="#fff2a6" stroke="#17306e" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M25 25c4 0 4 4 2 6m10-6c-4 0-4 4-2 6m-9 5c3-1 5 1 5 4m6-4c-3-1-5 1-5 4M32 20v20" fill="none" stroke="#17306e" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <h1 class="game-logo-title">
+                <span class="logo-brain">BRAIN</span>
+                <span class="logo-defense">DEFENSE</span>
+                <span class="logo-tagline">RÉFLÉCHIS • VISE • DÉFENDS</span>
+            </h1>
+        </div>
+        <p id="home-subtitle">Choisis ton arsenal mental et défends ta base.</p>
+
+        <div class="theme-grid" id="home-theme-grid" role="group" aria-label="Choisir un thème">
+            <button class="theme-btn theme-maths" aria-pressed="false" onclick="selectTheme('maths', this)">
+                <span class="theme-icon" aria-hidden="true">🧮</span>
+                <span class="theme-copy"><span class="theme-name">Maths</span><span class="record-pill" id="rec-maths"><span data-i18n="record-prefix">Record</span> : 0</span><span class="theme-win-badge hidden" id="won-maths" data-i18n="theme-won">★ GAGNÉ</span></span>
+            </button>
+            <button class="theme-btn theme-geo" aria-pressed="false" onclick="selectTheme('geo', this)">
+                <span class="theme-icon" aria-hidden="true">🌍</span>
+                <span class="theme-copy"><span class="theme-name">Géographie</span><span class="record-pill" id="rec-geo"><span data-i18n="record-prefix">Record</span> : 0</span><span class="theme-win-badge hidden" id="won-geo" data-i18n="theme-won">★ GAGNÉ</span></span>
+            </button>
+            <button class="theme-btn theme-anglais" aria-pressed="false" onclick="selectTheme('anglais', this)">
+                <span class="theme-icon" aria-hidden="true">🌐</span>
+                <span class="theme-copy"><span class="theme-name">Traduction</span><span class="record-pill" id="rec-anglais"><span data-i18n="record-prefix">Record</span> : 0</span><span class="theme-win-badge hidden" id="won-anglais" data-i18n="theme-won">★ GAGNÉ</span></span>
+            </button>
+            <button class="theme-btn theme-culture" aria-pressed="false" onclick="selectTheme('culture', this)">
+                <span class="theme-icon" aria-hidden="true">🧠</span>
+                <span class="theme-copy"><span class="theme-name">Culture G.</span><span class="record-pill" id="rec-culture"><span data-i18n="record-prefix">Record</span> : 0</span><span class="theme-win-badge hidden" id="won-culture" data-i18n="theme-won">★ GAGNÉ</span></span>
+            </button>
+            <button class="theme-btn theme-random full-width selected" aria-pressed="true" onclick="selectTheme('random', this)">
+                <span class="theme-icon" aria-hidden="true">🔀</span>
+                <span class="theme-copy"><span class="theme-name">Mode Aléatoire</span><span class="record-pill" id="rec-random"><span data-i18n="record-prefix">Record</span> : 0</span><span class="theme-win-badge hidden" id="won-random" data-i18n="theme-won">★ GAGNÉ</span></span>
+            </button>
+        </div>
+
+        <div class="home-actions">
+            <button class="btn-main btn-secondary garage-open-btn" onclick="openGarage()"><span>🛠️</span> Garage Défense</button>
+            <button id="resume-run-btn" class="btn-main resume-run-btn hidden" onclick="resumeSavedGame()">▶ Reprendre la partie</button>
+            <button class="btn-main campaign-btn" onclick="startGame('tours')"><span>⚔️</span> Mode Parcours <small>6 niveaux · 2 tours chacun</small></button>
+            <button class="btn-main survival-btn" onclick="openSurvivalSetup()"><span>🚀</span> Mode Survival <small>240 questions · difficulté fixe</small></button>
+        </div>
+
+        <!-- Décor & Personnage SVG Animé -->
+        <div class="hero-scene">
+            <svg viewBox="0 0 320 175" class="mascot-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#1f6feb" stop-opacity="0.45"/>
+                        <stop offset="70%" stop-color="#8957e5" stop-opacity="0.2"/>
+                        <stop offset="100%" stop-color="#0d1117" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="bulbGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#fef08a"/>
+                        <stop offset="65%" stop-color="#facc15"/>
+                        <stop offset="100%" stop-color="#eab308"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="160" cy="92" r="82" fill="url(#bgGlow)" class="scene-glow"/>
+                <ellipse cx="160" cy="158" rx="115" ry="12" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+                <g class="float-slow">
+                    <circle cx="46" cy="52" r="11" fill="#38bdf8"/>
+                    <ellipse cx="46" cy="52" rx="18" ry="4" fill="none" stroke="#bae6fd" stroke-width="2" transform="rotate(-18 46 52)"/>
+                </g>
+                <g transform="translate(36, 134)">
+                    <path d="M0,12 Q12,6 24,12 L24,22 Q12,16 0,22 Z" fill="#f8fafc"/>
+                    <path d="M24,12 Q36,6 48,12 L48,22 Q36,16 24,22 Z" fill="#e2e8f0"/>
+                    <path d="M0,22 Q12,16 24,22 Q36,16 48,22" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+                </g>
+                <text x="262" y="54" fill="#a78bfa" font-size="18" font-weight="bold" class="float-slow">π</text>
+                <polygon points="274,118 277,125 285,125 279,130 281,137 274,133 267,137 269,130 263,125 271,125" fill="#fbbf24" class="float-slow"/>
+                <circle cx="72" cy="108" r="3" fill="#34d399"/>
+                <circle cx="248" cy="88" r="3.5" fill="#f472b6"/>
+                <g class="character-body">
+                    <path d="M122,156 C122,126 198,126 198,156 Z" fill="#2563eb"/>
+                    <path d="M146,130 L160,144 L174,130" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linecap="round"/>
+                    <rect x="151" y="112" width="18" height="18" rx="6" fill="#d99b66"/>
+                    <path d="M126,138 Q114,148 122,156" fill="none" stroke="#d99b66" stroke-width="11" stroke-linecap="round"/>
+                    <rect x="131" y="56" width="58" height="62" rx="28" fill="#e5a973"/>
+                    <circle cx="130" cy="88" r="7" fill="#d99b66"/>
+                    <circle cx="190" cy="88" r="7" fill="#d99b66"/>
+                    <g class="growing-hair">
+                        <path d="M129,78 C128,46 192,46 191,78 C186,62 174,58 160,58 C146,58 134,62 129,78 Z" fill="#1e293b"/>
+                        <path d="M148,54 Q160,42 172,54" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+                        <path class="hair-lock hair-lock-left" d="M132,64 Q126,78 134,92" fill="none" stroke="#1e293b" stroke-width="7" stroke-linecap="round"/>
+                        <path class="hair-lock hair-lock-right" d="M188,64 Q194,78 186,92" fill="none" stroke="#1e293b" stroke-width="7" stroke-linecap="round"/>
+                    </g>
+                    <circle cx="147" cy="85" r="11" fill="rgba(255,255,255,0.15)" stroke="#1e293b" stroke-width="2.5"/>
+                    <circle cx="173" cy="85" r="11" fill="rgba(255,255,255,0.15)" stroke="#1e293b" stroke-width="2.5"/>
+                    <line x1="158" y1="85" x2="162" y2="85" stroke="#1e293b" stroke-width="2.5"/>
+                    <circle cx="147" cy="85" r="3.5" fill="#0f172a"/>
+                    <circle cx="173" cy="85" r="3.5" fill="#0f172a"/>
+                    <circle cx="148.5" cy="83.5" r="1.3" fill="#ffffff" class="happy-element"/>
+                    <circle cx="174.5" cy="83.5" r="1.3" fill="#ffffff" class="happy-element"/>
+                    <g class="thinking-element">
+                        <line x1="138" y1="71" x2="154" y2="74" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="182" y1="71" x2="166" y2="74" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M152,104 Q160,100 168,105" fill="none" stroke="#7c2d12" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+                    <g class="happy-element">
+                        <path d="M138,71 Q147,65 155,71" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M165,71 Q173,65 182,71" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                        <ellipse cx="139" cy="96" rx="5" ry="3" fill="#fb7185" opacity="0.6"/>
+                        <ellipse cx="181" cy="96" rx="5" ry="3" fill="#fb7185" opacity="0.6"/>
+                        <path d="M148,100 Q160,115 172,100 Z" fill="#ffffff" stroke="#7c2d12" stroke-width="2" stroke-linejoin="round"/>
+                    </g>
+                    <g class="thinking-arm">
+                        <path d="M192,136 Q213,116 184,99" fill="none" stroke="#e5a973" stroke-width="11" stroke-linecap="round"/>
+                        <circle cx="184" cy="99" r="7" fill="#e5a973"/>
+                    </g>
+                    <g class="happy-arm">
+                        <path d="M194,138 Q215,123 211,99" fill="none" stroke="#e5a973" stroke-width="11" stroke-linecap="round"/>
+                        <circle cx="211" cy="96" r="7" fill="#e5a973"/>
+                    </g>
+                </g>
+                <g class="thinking-questions">
+                    <text x="108" y="48" fill="#38bdf8" font-size="24" font-weight="bold" transform="rotate(-15 108 48)">?</text>
+                    <text x="155" y="34" fill="#f472b6" font-size="28" font-weight="bold">?</text>
+                    <text x="202" y="48" fill="#fbbf24" font-size="24" font-weight="bold" transform="rotate(15 202 48)">?</text>
+                </g>
+                <g class="eureka-bulbs">
+                    <g transform="translate(102, 46)">
+                        <circle cx="0" cy="0" r="22" fill="#fef08a" opacity="0.35" class="bulb-halo"/>
+                        <path d="M-9,-4 A11,11 0 1,1 9,-4 C9,3 5,6 5,10 L-5,10 C-5,6 -9,3 -9,-4 Z" fill="url(#bulbGlow)" stroke="#ca8a04" stroke-width="1.5"/>
+                        <rect x="-4" y="10" width="8" height="5" rx="1.5" fill="#94a3b8"/>
+                        <line x1="0" y1="-20" x2="0" y2="-15" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="-17" y1="-10" x2="-13" y2="-7" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="17" y1="-10" x2="13" y2="-7" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="-19" y1="3" x2="-14" y2="3" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                    <g transform="translate(218, 46)">
+                        <circle cx="0" cy="0" r="22" fill="#fef08a" opacity="0.35" class="bulb-halo"/>
+                        <path d="M-9,-4 A11,11 0 1,1 9,-4 C9,3 5,6 5,10 L-5,10 C-5,6 -9,3 -9,-4 Z" fill="url(#bulbGlow)" stroke="#ca8a04" stroke-width="1.5"/>
+                        <rect x="-4" y="10" width="8" height="5" rx="1.5" fill="#94a3b8"/>
+                        <line x1="0" y1="-20" x2="0" y2="-15" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="-17" y1="-10" x2="-13" y2="-7" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="17" y1="-10" x2="13" y2="-7" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="19" y1="3" x2="14" y2="3" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <section class="home-resource-station" aria-label="Ressources et publicités récompensées">
+            <div class="resource-count"><span>⭐</span><small>ÉTOILES</small><strong id="home-stars">0</strong></div>
+            <div class="resource-count retry-resource"><span>🔑</span><small>CLÉS RETRY</small><strong id="home-retry-keys">0</strong></div>
+            <button class="resource-ad-btn" onclick="watchAdForReward('stars')"><span>▶</span> Pub récompensée <b>+3 ⭐</b></button>
+            <button class="resource-ad-btn retry-ad-btn" onclick="watchAdForReward('retry')"><span>▶</span> Pub récompensée <b>+1 🔑</b></button>
+        </section>
+
+    </div>
+
+    <div id="survival-setup" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="survival-title">
+        <section class="modal-panel survival-panel">
+            <button class="dialog-close" type="button" onclick="closeSurvivalSetup()" aria-label="Fermer">×</button>
+            <span class="panel-kicker">CONFIGURATION SURVIVAL</span>
+            <h1 id="survival-title">Prépare ta défense</h1>
+            <p>Choisis le thème et ta difficulté fixe pour les 240 questions.</p>
+            <div class="setup-label">Thème</div>
+            <div class="theme-grid survival-theme-grid" role="group" aria-label="Choisir un thème pour le Survival">
+                <button class="theme-btn theme-maths survival-theme-choice" onclick="selectTheme('maths', this)"><span class="theme-icon">🧮</span><span class="theme-copy"><span class="theme-name">Maths</span></span></button>
+                <button class="theme-btn theme-geo survival-theme-choice" onclick="selectTheme('geo', this)"><span class="theme-icon">🌍</span><span class="theme-copy"><span class="theme-name">Géographie</span></span></button>
+                <button class="theme-btn theme-anglais survival-theme-choice" onclick="selectTheme('anglais', this)"><span class="theme-icon">🌐</span><span class="theme-copy"><span class="theme-name">Traduction</span></span></button>
+                <button class="theme-btn theme-culture survival-theme-choice" onclick="selectTheme('culture', this)"><span class="theme-icon">🧠</span><span class="theme-copy"><span class="theme-name">Culture G.</span></span></button>
+                <button class="theme-btn theme-random full-width survival-theme-choice" onclick="selectTheme('random', this)"><span class="theme-icon">🔀</span><span class="theme-copy"><span class="theme-name">Aléatoire</span></span></button>
+            </div>
+            <div class="setup-label">Difficulté fixe</div>
+            <div class="difficulty-grid" id="survival-difficulties" role="group" aria-label="Choisir une difficulté">
+                <button class="difficulty-choice selected" data-difficulty="basique" onclick="selectSurvivalDifficulty('basique', this)">Basique</button>
+                <button class="difficulty-choice" data-difficulty="facile" onclick="selectSurvivalDifficulty('facile', this)">Facile</button>
+                <button class="difficulty-choice" data-difficulty="moyen" onclick="selectSurvivalDifficulty('moyen', this)">Moyen</button>
+                <button class="difficulty-choice" data-difficulty="difficile" onclick="selectSurvivalDifficulty('difficile', this)">Difficile</button>
+                <button class="difficulty-choice" data-difficulty="tres_difficile" onclick="selectSurvivalDifficulty('tres_difficile', this)">Très difficile</button>
+                <button class="difficulty-choice" data-difficulty="master" onclick="selectSurvivalDifficulty('master', this)">Master</button>
+            </div>
+            <div class="survival-record"><span id="home-survival-record-label">RECORD · ALÉATOIRE · BASIQUE</span><strong id="home-survival-record">0</strong></div>
+            <div class="dialog-actions">
+                <button class="btn-main btn-secondary dialog-back" onclick="closeSurvivalSetup()">← Retour</button>
+                <button class="btn-main survival-launch" onclick="startGame('survival')">Lancer le Survival <span>▶</span></button>
+            </div>
+        </section>
+    </div>
+
+    <div id="settings-screen" class="overlay hidden">
+        <div class="modal-panel settings-panel">
+            <span class="panel-kicker">CONFIGURATION</span>
+            <h1>Paramètres</h1>
+            <p>Personnalise ta défense avant le lancement.</p>
+            <label class="setting-row"><span><b>🔊 Son</b><small>Effets audio du jeu</small></span><input id="setting-sound" type="checkbox" checked onchange="setSoundEnabled(this.checked)"><i></i></label>
+            <label class="setting-row"><span><b>📳 Vibrations</b><small>Retour tactile sur mobile</small></span><input id="setting-vibration" type="checkbox" onchange="setVibrationEnabled(this.checked)"><i></i></label>
+            <label class="setting-row"><span><b>📱 Interface mobile</b><small>Commandes tactiles agrandies</small></span><input id="setting-mobile" type="checkbox" checked onchange="setMobileMode(this.checked)"><i></i></label>
+            <label class="setting-row setting-language"><span><b>🌐 Langue cible</b><small>Pour les questions de traduction</small></span>
+                <select id="setting-language-target" onchange="setTargetLanguage(this.value)">
+                    <option value="en">Anglais</option><option value="fr">Français</option><option value="es">Espagnol</option><option value="de">Allemand</option><option value="zh">Chinois</option><option value="ru">Russe</option>
+                </select>
+            </label>
+            <label class="setting-row setting-ui-language"><span><b>🌍 Langue de l’interface</b><small>Automatique selon la langue du mobile, ou choix manuel</small></span>
+                <select id="setting-ui-language" onchange="UI18n.setLanguage(this.value)">
+                    <option value="auto">Automatique (langue du mobile)</option><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option><option value="ru">Русский</option>
+                </select>
+            </label>
+            <button class="btn-main" onclick="closeSettings()">Terminé</button>
+        </div>
+    </div>
+
+    <!-- Pause entre les tours -->
+    <div id="pause-screen" class="overlay hidden">
+        <div class="king-quote" aria-live="polite">
+            <svg class="king-viking" viewBox="0 0 100 100" role="img" aria-label="Le Roi Paresse, Viking barbu, réfléchit la main sur la joue">
+                <path d="M17 36 7 17Q23 16 31 30M83 36l10-19Q77 16 69 30" fill="#f8d477" stroke="#653a22" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M20 38Q17 21 32 19Q50 10 68 19Q83 23 80 40L74 50H26Z" fill="#9c542b" stroke="#45291f" stroke-width="4"/>
+                <path d="M27 39Q22 51 27 67Q30 79 50 86Q70 79 73 67Q78 51 73 39Q66 27 50 29Q34 27 27 39Z" fill="#f0bd88" stroke="#533323" stroke-width="3"/>
+                <path d="M24 55Q29 54 34 58M76 55Q71 54 66 58" fill="none" stroke="#35251f" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="38" cy="55" rx="3" ry="2.5" fill="#172033"/><ellipse cx="62" cy="55" rx="3" ry="2.5" fill="#172033"/>
+                <path d="M46 57Q43 66 50 68Q57 66 54 57" fill="#d99764" stroke="#9a6043" stroke-width="2"/>
+                <path d="M29 64Q37 67 44 64Q50 70 56 64Q63 68 71 63Q70 80 50 89Q30 81 29 64Z" fill="#493129" stroke="#241c1b" stroke-width="3"/>
+                <path d="M39 75Q50 80 61 74M43 81l-2 5m10-5v7m9-10 3 6" fill="none" stroke="#c6a079" stroke-width="2"/>
+                <path d="M15 100Q18 81 35 78L48 91 64 77Q83 81 87 100Z" fill="#355078" stroke="#17213d" stroke-width="3"/>
+                <path d="M71 96Q77 83 70 73L66 64Q66 59 70 59Q73 59 76 68L80 73Q85 68 88 72Q90 75 86 79Q91 77 93 81Q94 85 88 87Q90 92 83 97Z" fill="#f0bd88" stroke="#885c44" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M20 34Q50 24 80 34L77 43Q50 36 23 44Z" fill="#e5b844" stroke="#653a22" stroke-width="3"/>
+                <circle cx="50" cy="34" r="4" fill="#68e1ff" stroke="#fff2a6" stroke-width="2"/>
+            </svg>
+            <div class="king-quote-copy"><span>LE ROI PARESSE DIT</span><p id="king-message-pause">Le Roi Paresse prépare sa prochaine vanne…</p></div>
+        </div>
+        <h1 id="pause-title">🏁 Tour terminé !</h1>
+        <p>Score actuel : <strong id="pause-score">0</strong> points.</p>
+        <p id="pause-tour-progress" class="tour-progress-message">Basique — tour 1/2 terminé. Prochaine étape : Basique, tour 2/2.</p>
+        <p>Prends quelques secondes pour souffler avant la suite.</p>
+        <div class="breathe-circle"></div>
+        <button id="continue-tour-btn" class="btn-main" onclick="resumeFromPause()">Continuer · Basique</button>
+        <div id="campaign-complete-actions" class="campaign-complete-actions hidden">
+            <button class="btn-main" onclick="startGame('tours')">Rejouer le parcours</button>
+            <button class="btn-main btn-secondary" onclick="chooseAnotherTheme()">Choisir un autre thème</button>
+            <button class="btn-main btn-secondary" onclick="showMenu()">Menu principal</button>
+        </div>
+    </div>
+
+    <!-- Pause manuelle -->
+    <div id="pause-menu" class="overlay hidden">
+        <h1>⏸️ Pause</h1>
+        <p>Le jeu est en pause. Que veux-tu faire ?</p>
+        <button class="btn-main" onclick="resumeGame()">▶️ Reprendre</button>
+        <button class="btn-main btn-secondary" onclick="quitGame()">❌ Quitter au menu</button>
+    </div>
+
+    <div id="interruption-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="interruption-title">
+        <div class="modal-panel interruption-panel">
+            <span class="panel-kicker">REPRISE DE PARTIE</span>
+            <h1 id="interruption-title">Partie interrompue</h1>
+            <p id="interruption-message">La partie a été mise en pause pendant ton absence. Ta progression est conservée.</p>
+            <button class="btn-main" onclick="resumeInterruptedGame()">▶ Reprendre la partie</button>
+            <button class="btn-main btn-secondary" onclick="showMenu()">Retour au menu</button>
+        </div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="gameover-screen" class="overlay hidden">
+        <div class="king-quote" aria-live="polite">
+            <svg class="king-viking" viewBox="0 0 100 100" role="img" aria-label="Le Roi Paresse, Viking barbu, réfléchit la main sur la joue">
+                <path d="M17 36 7 17Q23 16 31 30M83 36l10-19Q77 16 69 30" fill="#f8d477" stroke="#653a22" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M20 38Q17 21 32 19Q50 10 68 19Q83 23 80 40L74 50H26Z" fill="#9c542b" stroke="#45291f" stroke-width="4"/>
+                <path d="M27 39Q22 51 27 67Q30 79 50 86Q70 79 73 67Q78 51 73 39Q66 27 50 29Q34 27 27 39Z" fill="#f0bd88" stroke="#533323" stroke-width="3"/>
+                <path d="M24 55Q29 54 34 58M76 55Q71 54 66 58" fill="none" stroke="#35251f" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="38" cy="55" rx="3" ry="2.5" fill="#172033"/><ellipse cx="62" cy="55" rx="3" ry="2.5" fill="#172033"/>
+                <path d="M46 57Q43 66 50 68Q57 66 54 57" fill="#d99764" stroke="#9a6043" stroke-width="2"/>
+                <path d="M29 64Q37 67 44 64Q50 70 56 64Q63 68 71 63Q70 80 50 89Q30 81 29 64Z" fill="#493129" stroke="#241c1b" stroke-width="3"/>
+                <path d="M39 75Q50 80 61 74M43 81l-2 5m10-5v7m9-10 3 6" fill="none" stroke="#c6a079" stroke-width="2"/>
+                <path d="M15 100Q18 81 35 78L48 91 64 77Q83 81 87 100Z" fill="#355078" stroke="#17213d" stroke-width="3"/>
+                <path d="M71 96Q77 83 70 73L66 64Q66 59 70 59Q73 59 76 68L80 73Q85 68 88 72Q90 75 86 79Q91 77 93 81Q94 85 88 87Q90 92 83 97Z" fill="#f0bd88" stroke="#885c44" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M20 34Q50 24 80 34L77 43Q50 36 23 44Z" fill="#e5b844" stroke="#653a22" stroke-width="3"/>
+                <circle cx="50" cy="34" r="4" fill="#68e1ff" stroke="#fff2a6" stroke-width="2"/>
+            </svg>
+            <div class="king-quote-copy"><span>LE ROI PARESSE DIT</span><p id="king-message-gameover">Le Roi Paresse a une remarque pour toi…</p></div>
+        </div>
+        <h1 id="gameover-title">💥 Base Détruite</h1>
+        <div class="result-panel">
+            <div class="result-mode" id="end-mode">MODE PARCOURS</div>
+            <div class="result-score"><span>SCORE FINAL</span><strong id="final-score">0</strong></div>
+            <div class="result-stats"><div><span>THÈME</span><strong id="end-theme">Aléatoire</strong></div><div><span>NIVEAU</span><strong id="end-difficulty">Basique</strong></div><div><span>PROGRESSION</span><strong id="end-progress">0 / 20</strong></div><div><span>RECORD</span><strong id="best-score">0</strong></div></div>
+        </div>
+        <button id="retry-key-btn" class="btn-main retry-key-btn" onclick="useRetryKey()">🔑 Continuer avec une clé Retry</button>
+        <button id="revive-video-btn" class="btn-main revive-video-btn" onclick="watchAdForReward('revive')">Regarder une vid&#233;o pour revivre</button>
+        <p id="retry-empty-message" class="retry-empty-message">Aucune clé Retry. Tu peux en gagner à l’accueil avec une pub récompensée.</p>
+        <p id="retry-status" class="retry-status hidden"></p>
+        <button class="btn-main" onclick="startGame(gameMode)">Rejouer ce thème</button>
+        <button class="btn-main btn-secondary" onclick="shareGame()">📤 Défier un ami</button>
+        <button class="btn-main btn-secondary" onclick="showMenu()">Changer de thème</button>
+    </div>
+
+    <div id="retry-challenge-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="retry-figure-title">
+        <div class="modal-panel retry-challenge-panel">
+            <span class="panel-kicker">ÉPREUVE DE REPRISE</span>
+            <h1 id="retry-figure-title">Trace la figure</h1>
+            <p id="retry-instructions">Une clé est en jeu. Le Roi Paresse te met à l’épreuve.</p>
+            <div class="retry-level-chip" id="retry-level-chip">ÉPREUVE RETRY</div>
+            <canvas id="retry-trace-canvas" aria-label="Tracer la figure sans lever le doigt"></canvas>
+            <button class="btn-main btn-secondary retry-abandon" onclick="cancelRetryChallenge()">Abandonner cette reprise</button>
+        </div>
+    </div>
+
+    <!-- Overlay bloquant pendant la demande de publicit? SDK -->
+    <div id="ad-screen" class="overlay hidden" role="status" aria-live="polite">
+        <h1 id="ad-title">Rewarded ad</h1>
+        <p id="ad-message">Preparing the ad request...</p>
+    </div>
+
+    <!-- Garage -->
+    <div id="garage-screen" class="overlay hidden">
+        <div class="modal-panel garage-panel">
+            <span class="panel-kicker">ATELIER DE DÉFENSE</span>
+            <h1>Garage Défense</h1>
+            <p>Équipe ton canon et personnalise ta base.</p>
+            <div class="garage-wallet"><span>RESSOURCES DISPONIBLES</span><strong><b id="garage-stars">0</b> ⭐</strong></div>
+            <div id="garage-skins" class="garage-skins-grid"></div>
+            <button class="btn-main btn-secondary back-menu-btn" onclick="closeGarage()"><span>←</span> Retour au menu</button>
+        </div>
+    </div>
+
+    <!-- Chargement des modules dans l'ordre -->
+    <script src="audio.js"></script>
+    <script src="questions.js"></script>
+    <script src="background.js?v=bd-20261120-e"></script>
+    <script src="retry.js?v=bd-20261120-e"></script>
+    <script src="king-dialogue.js"></script>
+    <script src="i18n.js?v=bd-20261120-e"></script>
+    <script src="game.js?v=bd-20261120-e"></script>
+</body>
+</html>
