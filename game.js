@@ -1,5 +1,9 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+let canvasPixelRatio = 1;
+
+function canvasLogicalWidth() { return canvas.clientWidth || canvas.width; }
+function canvasLogicalHeight() { return canvas.clientHeight || canvas.height; }
 
 const THEME_LABELS = {
     maths: "Maths",
@@ -230,13 +234,20 @@ const turret = {
 };
 
 function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
-    turret.x = canvas.width / 2;
+    const width = canvas.parentElement.clientWidth;
+    const height = canvas.parentElement.clientHeight;
+    canvasPixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * canvasPixelRatio);
+    canvas.height = Math.round(height * canvasPixelRatio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(canvasPixelRatio, 0, 0, canvasPixelRatio, 0, 0);
+    turret.x = width / 2;
     turret.y = getDefenseLineY() - 2;
     if (typeof BackgroundEngine !== 'undefined') {
-        BackgroundEngine.init(canvas.width, canvas.height);
+        BackgroundEngine.init(width, height);
     }
+    if (enemies.length) updateButtons();
 }
 
 function getDefenseLineY() {
@@ -244,9 +255,10 @@ function getDefenseLineY() {
     if (controls && !controls.classList.contains('hidden')) {
         const canvasRect = canvas.getBoundingClientRect();
         const controlsRect = controls.getBoundingClientRect();
-        return Math.max(90, controlsRect.top - canvasRect.top - 9);
+        const bottomOffset = canvasRect.bottom - controlsRect.bottom;
+        return Math.max(90, canvasLogicalHeight() - bottomOffset - controlsRect.height - 9);
     }
-    return canvas.height - 24;
+    return canvasLogicalHeight() - 24;
 }
 
 function updateDifficultyBadge() {
@@ -333,7 +345,7 @@ function handleRuntimeFailure(error) {
     document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
     document.getElementById('pause-menu').classList.remove('hidden');
     try {
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.setTransform(canvasPixelRatio, 0, 0, canvasPixelRatio, 0, 0);
         ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
     } catch (_) {}
@@ -674,27 +686,42 @@ function showMenu() {
     document.getElementById('controls').classList.add('hidden');
 }
 
-function drawWrappedText(text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    if (words.length === 0) return;
-    let lines = [];
-    let currentLine = words[0];
-
-    for (let i = 1; i < words.length; i++) {
-        const testLine = currentLine + " " + words[i];
-        if (ctx.measureText(testLine).width < maxWidth) {
-            currentLine = testLine;
-        } else {
-            lines.push(currentLine);
-            currentLine = words[i];
+function wrapCanvasText(text, maxWidth) {
+    const lines = [];
+    let currentLine = '';
+    const words = String(text).trim().split(/\s+/).filter(Boolean);
+    for (const word of words) {
+        const pieces = [];
+        let piece = '';
+        for (const character of Array.from(word)) {
+            if (piece && ctx.measureText(piece + character).width > maxWidth) {
+                pieces.push(piece);
+                piece = character;
+            } else piece += character;
+        }
+        if (piece) pieces.push(piece);
+        for (let partIndex = 0; partIndex < pieces.length; partIndex++) {
+            const part = pieces[partIndex];
+            const candidate = currentLine ? `${currentLine} ${part}` : part;
+            if (ctx.measureText(candidate).width <= maxWidth) currentLine = candidate;
+            else {
+                if (currentLine) lines.push(currentLine);
+                currentLine = part;
+            }
+            if (partIndex < pieces.length - 1) {
+                lines.push(currentLine);
+                currentLine = '';
+            }
         }
     }
-    lines.push(currentLine);
+    if (currentLine) lines.push(currentLine);
+    return lines;
+}
 
+function drawWrappedText(text, x, y, maxWidth, lineHeight, lines = wrapCanvasText(text, maxWidth)) {
     const startY = y - ((lines.length - 1) * lineHeight) / 2;
-    lines.forEach((line, index) => {
-        ctx.fillText(line, x, startY + index * lineHeight);
-    });
+    lines.forEach((line, index) => ctx.fillText(line, x, startY + index * lineHeight));
+    return lines.length;
 }
 
 function getMeteorSpawnX(radius) {
@@ -703,7 +730,7 @@ function getMeteorSpawnX(radius) {
     const hudRect = hud.getBoundingClientRect();
     const sideRailRight = Math.max(0, hudRect.right - canvasRect.left);
     const minX = Math.max(radius * 1.1, sideRailRight + radius + 10);
-    const maxX = Math.max(radius * 1.1, canvas.width - radius * 1.1);
+    const maxX = Math.max(radius * 1.1, canvasLogicalWidth() - radius * 1.1);
     const safeMin = Math.min(minX, maxX);
     return safeMin + Math.random() * Math.max(0, maxX - safeMin);
 }
@@ -719,7 +746,10 @@ function spawnEnemy() {
     updateDifficultyBadge();
 
     const isText = data.question.length > 9;
-    const radius = isText ? 56 : 38;
+    const maxTextRadius = Math.min(180, canvasLogicalWidth() * 0.42);
+    const radius = isText
+        ? Math.min(maxTextRadius, 48 + Math.sqrt(Math.max(0, data.question.length - 20)) * 7.2)
+        : 38;
     const x = getMeteorSpawnX(radius);
     const survivalBaseSpeed = ((isText ? 35 : 44) + difficultyIndex * 8) * 1.12;
     const survivalRamp = Math.min(survivalQuestionsAnswered * 0.055, 13);
@@ -785,7 +815,26 @@ function updateButtons() {
     if (!target) return;
     currentOptions = target.options;
     for (let i = 0; i < 3; i++) {
-        document.getElementById(`btn${i}`).innerText = currentOptions[i];
+        const button = document.getElementById(`btn${i}`);
+        const answer = String(currentOptions[i] ?? '');
+        let label = button.querySelector('.answer-label');
+        if (!label) {
+            button.replaceChildren();
+            label = document.createElement('span');
+            label.className = 'answer-label';
+            button.appendChild(label);
+        }
+        label.textContent = answer;
+        button.title = answer;
+        button.setAttribute('aria-label', answer);
+        const baseSize = canvasLogicalWidth() <= 520 ? 15 : 17;
+        let fontSize = Math.max(7, baseSize - Math.max(0, answer.length - 13) * 0.16);
+        label.style.fontSize = `${fontSize}px`;
+        const availableHeight = Math.max(0, button.clientHeight - 12);
+        while (label.scrollHeight > availableHeight && fontSize > 6) {
+            fontSize = Math.max(6, fontSize - 0.5);
+            label.style.fontSize = `${fontSize}px`;
+        }
     }
 }
 
@@ -920,7 +969,7 @@ function checkAnswer(btnIndex) {
         saveGameProgress();
     } else {
         AudioEngine.playWrong();
-        target.y += canvas.height / 2;
+        target.y += canvasLogicalHeight() / 2;
         if (vibrationEnabled) navigator.vibrate?.(80);
         // Réinitialiser le combo sur mauvaise réponse
         combo = 0;
@@ -935,7 +984,7 @@ function checkAnswer(btnIndex) {
 function createExplosion(x, y, color, kind = 'normal', tier = 0) {
     const specialBurst = kind === 'star' || kind === 'retry';
     // Fewer independent glow particles on narrow/mobile canvases keeps Survival smooth.
-    const density = canvas.width <= 520 ? 0.58 : 1;
+    const density = canvasLogicalWidth() <= 520 ? 0.58 : 1;
     const count = Math.ceil((16 + tier * 5 + (specialBurst ? 12 : 0)) * density);
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -991,19 +1040,19 @@ function applySpecialEffect(type) {
     if (type === 'ice') {
         // Gel : ralentir tous les ennemis pendant 3s
         AudioEngine.playFreeze();
-        addFloatingText(canvas.width / 2, canvas.height / 2, '❄️ GEL 3s', '#8be9ff');
+        addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '❄️ GEL 3s', '#8be9ff');
         enemies.forEach(e => { e.speed *= 0.35; e.frozen = true; setTimeout(() => { e.speed = e.speed / 0.35; e.frozen = false; }, 3000); });
-        stars += 1; localStorage.setItem('chrono_stars', stars); addFloatingText(canvas.width / 2, canvas.height / 2, '⭐ +1', '#8be9ff');
+        stars += 1; localStorage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +1', '#8be9ff');
     } else if (type === 'life') {
         if (lives < 3) {
             lives = Math.min(3, lives + 1);
             AudioEngine.playLifeGain();
-            addFloatingText(canvas.width / 2, canvas.height / 2, `💖 +1 VIE · ${lives}/3`, '#ff7eb6');
+            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `💖 +1 VIE · ${lives}/3`, '#ff7eb6');
             updateHUD();
         } else {
-            addFloatingText(canvas.width / 2, canvas.height / 2, '💖 VIE MAX', '#ff7eb6');
+            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '💖 VIE MAX', '#ff7eb6');
         }
-        stars += 2; localStorage.setItem('chrono_stars', stars); addFloatingText(canvas.width / 2, canvas.height / 2, '⭐ +2', '#ff7eb6');
+        stars += 2; localStorage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +2', '#ff7eb6');
     } else if (type === 'gold') {
         const bonus = 30 * comboMultiplier;
         score += bonus;
@@ -1011,7 +1060,7 @@ function applySpecialEffect(type) {
         stars += goldStars;
         localStorage.setItem('chrono_stars', stars);
         AudioEngine.playLaserHit();
-        addFloatingText(canvas.width / 2, canvas.height / 2, `⭐ +${goldStars}  +${bonus} PTS`, '#fef08a');
+        addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `⭐ +${goldStars}  +${bonus} PTS`, '#fef08a');
         updateHUD();
     }
 }
@@ -1021,7 +1070,7 @@ function updateAndDrawTurret(ctx, dt, target) {
     const skin = SKINS[selectedSkin] || SKINS.blue;
     const cannonRank = getSelectedCannonRank();
     const defenseY = getDefenseLineY();
-    turret.x = canvas.width / 2;
+    turret.x = canvasLogicalWidth() / 2;
     turret.y = defenseY - 2;
 
     const desiredAngle = target
@@ -1055,13 +1104,13 @@ function updateAndDrawTurret(ctx, dt, target) {
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(0, defenseY);
-    ctx.lineTo(canvas.width, defenseY);
+    ctx.lineTo(canvasLogicalWidth(), defenseY);
     ctx.stroke();
     ctx.restore();
 
     // Le canon du garage pointe vers le haut dans son SVG : on le tourne vers la cible.
     if (canvasCannonImage && canvasCannonImage.complete) {
-        const cannonWidth = Math.min(72, canvas.width * 0.18);
+        const cannonWidth = Math.min(72, canvasLogicalWidth() * 0.18);
         const cannonHeight = cannonWidth * 1.3;
         ctx.save();
         ctx.translate(turret.x, turret.y);
@@ -1104,7 +1153,7 @@ function updateAndDrawTurret(ctx, dt, target) {
         ctx.restore();
     }
 
-    drawCannonLoader(ctx, turret.x + Math.min(42, canvas.width * 0.11), turret.y - 7, skin, dt);
+    drawCannonLoader(ctx, turret.x + Math.min(42, canvasLogicalWidth() * 0.11), turret.y - 7, skin, dt);
 
     if (turret.muzzleFlash > 0) {
         ctx.save();
@@ -1713,9 +1762,9 @@ lastTime = timestamp;
 ctx.save();
 // 1. Arrière-plan évolutif
 if (typeof BackgroundEngine !== 'undefined') {
-BackgroundEngine.updateAndDraw(ctx, canvas.width, canvas.height, dt, score);
+BackgroundEngine.updateAndDraw(ctx, canvasLogicalWidth(), canvasLogicalHeight(), dt, score);
 } else {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.clearRect(0, 0, canvasLogicalWidth(), canvasLogicalHeight());
 }
 spawnTimer += dt;
 if (enemies.length === 0 || (score > 140 && enemies.length < 2 && spawnTimer > 3.8)) {
@@ -1731,7 +1780,7 @@ spawnTimer = 0;
             feverActive = false;
             feverTimer = 0;
             comboMultiplier = 1;
-            addFloatingText(canvas.width / 2, canvas.height / 2, 'FEVER TERMINÉ', '#fef08a');
+            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, 'FEVER TERMINÉ', '#fef08a');
         }
     }
 // 2. Mise à jour et dessin des météorites
@@ -1774,19 +1823,30 @@ ctx.fill();
 ctx.lineWidth = 3;
 ctx.strokeStyle = e.color;
 ctx.shadowColor = e.color;
-ctx.shadowBlur = canvas.width <= 520
+ctx.shadowBlur = canvasLogicalWidth() <= 520
     ? (e.specialType === 'life' ? 9 : (e.isRetryMeteor || e.isStarMeteor ? 10 : Math.min(5, getSelectedCannonRank())))
     : (e.specialType === 'life' ? 20 : (e.isRetryMeteor ? 21 : (e.isStarMeteor ? 16 : getSelectedCannonRank() * 2)));
 ctx.stroke();
 ctx.shadowBlur = 0;
 // Texte de la question
 ctx.fillStyle = '#ffffff';
-ctx.font = e.isText ? 'bold 13px sans-serif' : 'bold 18px sans-serif';
+let meteorFontSize = e.isText ? Math.max(7, 13.5 - Math.max(0, e.question.length - 35) * 0.018) : 18;
 ctx.textAlign = 'center';
 ctx.textBaseline = 'middle';
 if (e.isText) {
-drawWrappedText(e.question, e.x, e.y, e.radius * 1.65, 16);
+const meteorMaxWidth = e.radius * 1.38;
+let meteorLines;
+let meteorLineHeight;
+do {
+    ctx.font = `bold ${meteorFontSize}px sans-serif`;
+    meteorLineHeight = meteorFontSize * 1.12;
+    meteorLines = wrapCanvasText(e.question, meteorMaxWidth);
+    if (meteorLines.length * meteorLineHeight <= e.radius * 1.25 || meteorFontSize <= 6) break;
+    meteorFontSize = Math.max(6, meteorFontSize - 0.5);
+} while (true);
+drawWrappedText(e.question, e.x, e.y, meteorMaxWidth, meteorLineHeight, meteorLines);
 } else {
+ctx.font = `bold ${meteorFontSize}px sans-serif`;
 ctx.fillText(e.question, e.x, e.y);
 }
 // Collision avec la ligne de défense / vaisseau en bas
@@ -1827,7 +1887,7 @@ if (p.ring) {
     ctx.strokeStyle = p.color;
     ctx.lineWidth = 2 + getSelectedCannonRank() * 0.45;
     ctx.shadowColor = p.color;
-    ctx.shadowBlur = canvas.width <= 520 ? 3 : 9 + getSelectedCannonRank() * 3;
+    ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 3 : 9 + getSelectedCannonRank() * 3;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.stroke();
     ctx.shadowBlur = 0;
 } else if (p.shape === 'star' || p.shape === 'spark') {
@@ -1837,7 +1897,7 @@ if (p.ring) {
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate((1 - p.life / (p.maxLife || 0.5)) * 2.5);
-    ctx.shadowColor = p.color; ctx.shadowBlur = canvas.width <= 520 ? 1.5 : 5 + getSelectedCannonRank() * 2;
+    ctx.shadowColor = p.color; ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 1.5 : 5 + getSelectedCannonRank() * 2;
     ctx.beginPath();
     for (let point = 0; point < points * 2; point++) {
         const angle = -Math.PI / 2 + point * Math.PI / points;
@@ -1849,11 +1909,11 @@ if (p.ring) {
 } else if (p.shape === 'diamond') {
     const size = p.size || 5;
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.PI / 4);
-    ctx.shadowColor = p.color; ctx.shadowBlur = canvas.width <= 520 ? 2 : 7 + getSelectedCannonRank() * 2;
+    ctx.shadowColor = p.color; ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 2 : 7 + getSelectedCannonRank() * 2;
     ctx.fillRect(-size / 2, -size / 2, size, size); ctx.restore();
 } else {
     const size = p.size || 5;
-    ctx.shadowColor = p.color; ctx.shadowBlur = canvas.width <= 520 ? 1 : getSelectedCannonRank() * 2;
+    ctx.shadowColor = p.color; ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 1 : getSelectedCannonRank() * 2;
     ctx.fillRect(p.x, p.y, size, size);
     ctx.shadowBlur = 0;
 }

@@ -182,38 +182,53 @@ canvas {
 /* Réponses placées sous la ligne de défense. */
 #controls {
     position: absolute;
-    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    padding: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
     background: rgba(22, 38, 34, 0.95);
     border: 2px solid #30363d;
     border-radius: 16px;
     z-index: 30;
     width: 92%;
     max-width: 480px;
-    min-height: 68px;
-    align-items: center;
+    height: 82px;
+    min-height: 82px;
+    max-height: 82px;
+    align-items: stretch;
+    overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.7);
 }
 
 @media (max-width: 520px) {
     #controls {
         gap: 8px;
-        padding: 9px;
-        min-height: 62px;
+        padding: 7px;
+        height: 82px;
+        min-height: 82px;
+        max-height: 82px;
     }
 
     #controls .ans-btn {
-        padding: 7px 4px;
-        font-size: 12px;
+        min-height: 0;
+        padding: 5px 3px;
+        font-size: var(--answer-font-size, 12px);
     }
 }
 
 .ans-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
     padding: 8px 6px;
     background: rgba(55, 65, 81, 0.92) !important;
     border: 2px solid rgba(255,255,255,0.5) !important;
@@ -223,6 +238,21 @@ canvas {
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     box-shadow: 0 4px 12px rgba(0,0,0,0.45);
     transition: all 0.08s;
+    overflow: hidden;
+    line-height: 1.12;
+    text-align: center;
+}
+
+.ans-btn .answer-label {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.12;
+    text-align: center;
 }
 
 .ans-btn:active {
@@ -368,10 +398,11 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(5px, 2vw, 12px);
-    width: min(100%, 370px);
+    gap: clamp(5px, 1vw, 12px);
+    
+    width: min(50%, 370px);
     min-height: 112px;
-    padding: 12px clamp(12px, 4vw, 24px) 14px;
+    padding: 12px clamp(12px, 2vw, 24px) 14px;
     margin: 0 auto 12px;
     transform: rotate(-1deg);
     filter: drop-shadow(0 9px 0 #101b39) drop-shadow(0 13px 12px rgba(0, 0, 0, 0.55));
@@ -485,39 +516,43 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     backdrop-filter: blur(8px);
 }
 
+.home-topbar { display:flex; justify-content:flex-end; align-items:center; width:min(100%,370px); min-height:38px; margin:0 auto 4px; }
 .settings-gear {
-    position: fixed;
-    top: max(14px, env(safe-area-inset-top));
-    right: max(14px, env(safe-area-inset-right));
-    z-index: 45;
-    display: grid;
-    width: 46px;
-    height: 46px;
-    place-items: center;
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 42px;
+    height: 38px;
+    padding: 0 11px;
     border: 1px solid rgba(125, 211, 252, 0.62);
-    border-bottom: 4px solid #102750;
-    border-radius: 14px;
+    border-bottom: 3px solid #102750;
+    border-radius: 12px;
     background: linear-gradient(145deg, #243c68, #0b1631);
     color: #a5f3fc;
-    font-size: 25px;
+    font-size: 18px;
     box-shadow: 0 0 18px rgba(56, 189, 248, 0.22), inset 0 1px 0 rgba(255,255,255,.22);
     cursor: pointer;
     transition: transform .18s ease, box-shadow .18s ease;
 }
-.settings-gear:hover { transform: rotate(32deg) translateY(-2px); box-shadow: 0 0 24px rgba(56,189,248,.45); }
+.home-settings-label { color:#dbeafe; font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.settings-gear:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(56,189,248,.45); }
 
-#start-screen { justify-content: flex-start; padding: 22px 16px 28px; }
+#start-screen { justify-content: flex-start; padding: max(14px, env(safe-area-inset-top)) 16px 18px; }
 #start-screen > p { margin-bottom: 10px; color: #b8c8e5; font-weight: 600; }
-.game-logo { margin-top: 8px; }
+.game-logo { margin-top: 0; }
 .hero-scene { max-width: 280px; margin: 0 auto 4px; }
 .mascot-svg { max-height: 126px; }
 .home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; width: min(100%, 390px); margin: 3px auto 10px; }
 .home-actions .btn-main { max-width: none; min-height: 64px; margin: 0; padding: 10px 12px; border: 1px solid rgba(255,255,255,.2); border-bottom: 4px solid rgba(3, 9, 24, .7); border-radius: 14px; font-size: 14px; box-shadow: 0 6px 0 rgba(3, 9, 24, .55), inset 0 1px 0 rgba(255,255,255,.2); }
 .home-actions .btn-main span { margin-right: 5px; font-size: 17px; }
 .home-actions .btn-main small { display: block; margin-top: 4px; color: rgba(255,255,255,.72); font-size: 9px; font-weight: 700; }
-.home-actions .garage-open-btn { grid-column: 1 / -1; min-height: 48px; background: linear-gradient(145deg,#34496f,#172340); color: #dbeafe; }
-.home-actions .resume-run-btn { grid-column:1 / -1; min-height:48px; background:linear-gradient(145deg,#145b71,#112d51); border-color:rgba(103,232,249,.55); color:#e0fbff; }
-.home-actions .resume-run-btn small { color:#a5f3fc; }
+.home-footer-actions { display:grid; width:min(100%,390px); gap:7px; margin:7px auto 0; }
+.home-footer-actions .btn-main { width:100%; max-width:none; min-height:42px; margin:0; padding:8px 10px; border:1px solid rgba(255,255,255,.2); border-bottom:4px solid rgba(3,9,24,.7); border-radius:12px; font-size:12px; box-shadow:0 5px 0 rgba(3,9,24,.5),inset 0 1px 0 rgba(255,255,255,.2); }
+.home-footer-actions .garage-open-btn { background:linear-gradient(145deg,#34496f,#172340); color:#dbeafe; }
+.home-footer-actions .resume-run-btn { border-color:rgba(103,232,249,.55); background:linear-gradient(145deg,#145b71,#112d51); color:#e0fbff; }
+.home-footer-actions .resume-run-btn small { color:#a5f3fc; }
 .home-actions .campaign-btn { background: linear-gradient(145deg,#138b68,#075448); }
 .home-actions .survival-btn { background: linear-gradient(145deg,#a94717,#782716); }
 .home-actions .btn-main:hover { transform: translateY(-2px); filter: brightness(1.13); }
@@ -606,8 +641,8 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
 #gameover-screen .btn-main { max-width:360px; min-height:45px; padding:10px 16px; border:1px solid rgba(255,255,255,.17); border-bottom:4px solid rgba(3,9,24,.75); background:linear-gradient(135deg,#1671ca,#2450b4); box-shadow:0 5px 0 rgba(3,9,24,.5); }
 #gameover-screen .btn-secondary { background:linear-gradient(145deg,#34496f,#172340); }
 
-.mobile-controls #controls .ans-btn { min-height:48px; padding:8px 5px; font-size:clamp(12px,3.4vw,15px); touch-action:manipulation; }
-body:not(.mobile-controls) #controls .ans-btn { min-height:38px; }
+.mobile-controls #controls .ans-btn { min-height:0; padding:5px 4px; font-size:var(--answer-font-size,12px); touch-action:manipulation; }
+body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
 @media (max-width:520px) {
     #start-screen { padding-top:64px; }
     .game-logo { margin-top:0; min-height:95px; }
@@ -1096,7 +1131,7 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:38px; }
 #hud .hud-retry .hud-label { color:#67e8f9; }
 #hud .hud-retry .hud-value { color:#a5f3fc; }
 #hud #level-badge { position:static; top:auto; right:auto; left:auto; transform:none; width:100%; max-width:none; padding:5px 3px; border-width:1px; border-radius:8px; font-size:7px; line-height:1.25; letter-spacing:.04em; white-space:normal; text-align:center; }
-#controls { left:calc(50% + 43px); width:calc(92% - 86px); }
+#controls { left:50%; width:min(94%,480px); transform:translateX(-50%); }
 
 .survival-panel { position:relative; width:min(100%,520px); max-height:min(92dvh,840px); overflow-y:auto; padding:24px clamp(14px,4vw,24px) 18px; }
 .dialog-close { position:absolute; top:10px; right:12px; display:grid; width:38px; height:38px; place-items:center; border:1px solid rgba(125,211,252,.38); border-radius:10px; background:linear-gradient(145deg,#263b62,#111a34); color:#dff8ff; font-size:27px; line-height:1; cursor:pointer; }
@@ -1132,7 +1167,7 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:38px; }
     #hud .hud-card .hud-value { font-size:15px; }
     #hud .hud-lives .hud-value { font-size:12px; }
     #hud .hud-score .hud-sub { font-size:6px; }
-    #controls { left:calc(50% + 36px); width:calc(94% - 72px); }
+    #controls { left:50%; width:min(calc(100% - 28px),480px); transform:translateX(-50%); }
     .survival-panel { padding:22px 12px 14px; }
     .survival-theme-grid { gap:5px; }
     .survival-theme-grid .theme-btn { min-height:49px; padding:5px; }
@@ -1160,51 +1195,59 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:38px; }
 }
 @media (prefers-reduced-motion:reduce) { .king-quote,.king-viking { animation:none; } }
 
-/* Fit the refreshed home, mascot, and resource cards on a portrait phone. */
+/* Compact, touch-friendly home layout for portrait phones. */
 @media (max-width:520px) {
-    #start-screen { padding:64px 11px 10px; }
-    .game-logo { min-height:76px; padding:7px 10px 9px; margin:0 auto 6px; }
-    .game-logo-mark { flex-basis:42px; width:42px; }
-    .logo-brain { font-size:clamp(31px,9vw,42px); }
-    .logo-defense { font-size:clamp(25px,7.5vw,34px); }
-    .logo-tagline { margin-top:6px; font-size:6px; }
-    #start-screen > p { margin:0 auto 6px; font-size:11px; line-height:1.2; }
-    #start-screen .theme-grid { gap:5px; margin:0 auto 7px; }
-    #start-screen .theme-btn { min-height:49px; padding:6px 7px; }
-    #start-screen .theme-btn.full-width { min-height:46px; }
-    #start-screen .theme-icon { flex-basis:27px; width:27px; height:27px; font-size:15px; }
+    #start-screen { padding:max(10px,env(safe-area-inset-top)) 12px 12px; }
+    #start-screen .home-topbar { min-height:34px; margin:0 auto 3px; }
+    #start-screen .settings-gear { height:34px; padding:0 10px; border-radius:10px; }
+    #start-screen .home-settings-label { font-size:8px; }
+    #start-screen .game-logo { width:min(100%,370px); min-height:58px; padding:2px 5px 4px; margin:0 auto 19px; transform:none; filter:drop-shadow(0 4px 0 #101b39) drop-shadow(0 6px 6px rgba(0,0,0,.36)); }
+    #start-screen .game-logo::before { inset:2px 0; }
+    #start-screen .game-logo::after { inset:5px 3px; }
+    #start-screen .game-logo-mark { flex-basis:39px; width:39px; }
+    #start-screen .logo-brain { font-size:clamp(29px,8.5vw,37px); text-shadow:0 1px 0 #81500b,1px 2px 0 #102044; }
+    #start-screen .logo-defense { font-size:clamp(23px,7vw,30px); text-shadow:0 1px 0 #1558a3,1px 2px 0 #0b1736; }
+    #start-screen .logo-tagline { margin-top:4px; font-size:5.5px; }
+    #start-screen > p { margin:0 auto 7px; font-size:11px; line-height:1.25; }
+    #start-screen .theme-grid { width:calc(100% - 20px); gap:7px; margin:0 auto 8px; }
+    #start-screen .theme-btn { min-height:53px; padding:7px 8px; }
+    #start-screen .theme-btn.full-width { min-height:48px; }
+    #start-screen .theme-icon { flex-basis:29px; width:29px; height:29px; font-size:16px; }
     #start-screen .theme-name { font-size:10px; }
-    #start-screen .record-pill { padding:2px 5px; font-size:7px; }
-    #start-screen .home-actions { gap:6px; margin:0 auto 5px; }
-    #start-screen .home-actions .btn-main { min-height:45px; padding:6px; font-size:11px; }
-    #start-screen .home-actions .garage-open-btn { min-height:36px; }
-    #start-screen .home-actions .btn-main small { margin-top:2px; font-size:7px; }
-    #start-screen .hero-scene { max-width:185px; height:96px; margin:0 auto 1px; overflow:hidden; }
-    #start-screen .mascot-svg { width:185px; height:auto; max-height:none; }
-    #start-screen .home-resource-station { gap:5px; margin:0 auto; padding:6px; }
-    #start-screen .resource-count { min-height:30px; }
-    #start-screen .resource-ad-btn { min-height:28px; }
+    #start-screen .record-pill { padding:3px 6px; font-size:8px; }
+    #start-screen .home-actions { width:calc(100% - 20px); grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:0 auto 5px; }
+    #start-screen .home-actions .btn-main { min-height:56px; padding:7px 5px; font-size:11px; }
+    #start-screen .home-actions .btn-main small { margin-top:3px; font-size:8px; line-height:1.15; }
+    #start-screen .hero-scene { width:min(100%,190px); max-width:190px; height:auto; margin:3px auto 6px; overflow:visible; flex:0 0 auto; }
+    #start-screen .mascot-svg { display:block; width:100%; height:auto; max-height:none; }
+    #start-screen .home-resource-station { width:calc(100% - 32px); gap:4px; margin:0 auto; padding:5px; }
+    #start-screen .resource-count { min-height:28px; padding:3px 5px; }
+    #start-screen .resource-count > span { font-size:14px; }
+    #start-screen .resource-count small { font-size:7px; }
+    #start-screen .resource-count strong { font-size:15px; }
+    #start-screen .resource-ad-btn { min-height:31px; padding:4px 6px; font-size:8px; }
+    #start-screen .home-footer-actions { width:calc(100% - 20px); gap:6px; margin:6px auto 0; }
+    #start-screen .home-footer-actions .btn-main { min-height:38px; padding:6px 9px; font-size:11px; }
 }
 @media (max-width:520px) and (max-height:720px) {
-    #start-screen { padding-top:60px; padding-bottom:6px; }
-    .game-logo { min-height:68px; padding-top:5px; padding-bottom:7px; margin-bottom:4px; }
-    .game-logo-mark { flex-basis:37px; width:37px; }
-    .logo-brain { font-size:clamp(29px,8.5vw,37px); }
-    .logo-defense { font-size:clamp(23px,7vw,30px); }
-    .logo-tagline { margin-top:4px; font-size:5.5px; }
-    #start-screen > p { margin-bottom:4px; font-size:10px; }
-    #start-screen .theme-btn { min-height:43px; padding:5px 6px; }
-    #start-screen .theme-btn.full-width { min-height:41px; }
-    #start-screen .theme-grid { margin-bottom:5px; }
-    #start-screen .home-actions .btn-main { min-height:40px; }
-    #start-screen .home-actions .garage-open-btn { min-height:32px; }
-    #start-screen .hero-scene { height:78px; }
-    #start-screen .mascot-svg { width:155px; }
-    #start-screen .home-resource-station { gap:4px; padding:5px; }
-    #start-screen .resource-count { min-height:26px; padding:3px 5px; }
-    #start-screen .resource-count > span { font-size:14px; }
-    #start-screen .resource-count small { font-size:6px; }
-    #start-screen .resource-count strong { font-size:14px; }
-    #start-screen .resource-ad-btn { min-height:25px; padding:3px 5px; font-size:6px; }
+    #start-screen { padding-top:max(6px,env(safe-area-inset-top)); padding-bottom:8px; }
+    #start-screen .home-topbar { min-height:30px; margin-bottom:1px; }
+    #start-screen .settings-gear { height:30px; }
+    #start-screen .game-logo { min-height:54px; padding-top:1px; padding-bottom:3px; margin-bottom:15px; }
+    #start-screen .game-logo-mark { flex-basis:34px; width:34px; }
+    #start-screen .logo-brain { font-size:clamp(26px,8vw,34px); }
+    #start-screen .logo-defense { font-size:clamp(21px,6.5vw,27px); }
+    #start-screen .logo-tagline { margin-top:3px; font-size:5px; }
+    #start-screen > p { margin-bottom:5px; font-size:10px; }
+    #start-screen .theme-grid { gap:5px; margin-bottom:6px; }
+    #start-screen .theme-btn { min-height:46px; padding:5px 6px; }
+    #start-screen .theme-btn.full-width { min-height:42px; }
+    #start-screen .home-actions { gap:6px; margin-bottom:4px; }
+    #start-screen .home-actions .btn-main { min-height:46px; }
+    #start-screen .hero-scene { width:min(100%,170px); max-width:170px; }
+    #start-screen .home-resource-station { gap:3px; padding:4px; }
+    #start-screen .resource-count { min-height:30px; padding:3px 5px; }
+    #start-screen .resource-ad-btn { min-height:29px; padding:3px 5px; font-size:7px; }
+    #start-screen .home-footer-actions .btn-main { min-height:34px; }
 }
 .hud-lives .hud-value { white-space:nowrap; }

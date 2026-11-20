@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
     <title>Brain Defense — jeu éducatif</title>
-    <link rel="stylesheet" href="style.css?v=bd-20261120-e">
+    <link rel="stylesheet" href="style.css?v=bd-20261120-mobile-home-4">
 </head>
 <body>
 
@@ -55,7 +55,6 @@
 
     <!-- Écran d'accueil -->
     <div id="start-screen" class="overlay">
-        <button class="settings-gear" onclick="openSettings()" aria-label="Paramètres" title="Paramètres">⚙</button>
         <div class="game-logo">
             <svg class="game-logo-mark" viewBox="0 0 64 64" aria-hidden="true">
                 <defs>
@@ -101,8 +100,6 @@
         </div>
 
         <div class="home-actions">
-            <button class="btn-main btn-secondary garage-open-btn" onclick="openGarage()"><span>🛠️</span> Garage Défense</button>
-            <button id="resume-run-btn" class="btn-main resume-run-btn hidden" onclick="resumeSavedGame()">▶ Reprendre la partie</button>
             <button class="btn-main campaign-btn" onclick="startGame('tours')"><span>⚔️</span> Mode Parcours <small>6 niveaux · 2 tours chacun</small></button>
             <button class="btn-main survival-btn" onclick="openSurvivalSetup()"><span>🚀</span> Mode Survival <small>240 questions · difficulté fixe</small></button>
         </div>
@@ -207,12 +204,23 @@
             </svg>
         </div>
 
+        <div class="home-topbar">
+            <button class="settings-gear" onclick="openSettings()" aria-label="Paramètres" title="Paramètres">
+                <span aria-hidden="true">⚙</span><span class="home-settings-label">Paramètres</span>
+            </button>
+        </div>
+
         <section class="home-resource-station" aria-label="Ressources et publicités récompensées">
             <div class="resource-count"><span>⭐</span><small>ÉTOILES</small><strong id="home-stars">0</strong></div>
             <div class="resource-count retry-resource"><span>🔑</span><small>CLÉS RETRY</small><strong id="home-retry-keys">0</strong></div>
             <button class="resource-ad-btn" onclick="watchAdForReward('stars')"><span>▶</span> Pub récompensée <b>+3 ⭐</b></button>
             <button class="resource-ad-btn retry-ad-btn" onclick="watchAdForReward('retry')"><span>▶</span> Pub récompensée <b>+1 🔑</b></button>
         </section>
+
+        <div class="home-footer-actions">
+            <button class="btn-main btn-secondary garage-open-btn" onclick="openGarage()"><span>🛠️</span> Garage Défense</button>
+            <button id="resume-run-btn" class="btn-main resume-run-btn hidden" onclick="resumeSavedGame()">▶ Reprendre la partie</button>
+        </div>
 
     </div>
 
@@ -388,7 +396,7 @@
     <script src="background.js?v=bd-20261120-e"></script>
     <script src="retry.js?v=bd-20261120-e"></script>
     <script src="king-dialogue.js"></script>
-    <script src="i18n.js?v=bd-20261120-e"></script>
-    <script src="game.js?v=bd-20261120-e"></script>
+    <script src="i18n.js?v=bd-20261120-mobile-home"></script>
+    <script src="game.js?v=bd-20261120-mobile-home-4"></script>
 </body>
 </html>
