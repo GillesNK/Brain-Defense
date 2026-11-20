@@ -398,12 +398,13 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(5px, 1vw, 12px);
-    
-    width: min(50%, 370px);
-    min-height: 112px;
-    padding: 12px clamp(12px, 2vw, 24px) 14px;
-    margin: 0 auto 12px;
+    gap: 10px;
+
+    width: fit-content;
+    max-width: 94vw;
+    height: 44px;
+    padding: 0 14px;
+    margin: 0 auto 10px;
     transform: rotate(-1deg);
     filter: drop-shadow(0 9px 0 #101b39) drop-shadow(0 13px 12px rgba(0, 0, 0, 0.55));
 }
@@ -428,8 +429,8 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
 }
 
 .game-logo-mark {
-    flex: 0 0 clamp(48px, 15vw, 62px);
-    width: clamp(48px, 15vw, 62px);
+    flex: 0 0 64px;
+    width: 64px;
     height: auto;
     filter: drop-shadow(0 3px 0 #0b1024) drop-shadow(0 0 9px rgba(110, 231, 255, 0.7));
     animation: logoMarkPulse 2.6s ease-in-out infinite;
@@ -439,11 +440,12 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin: 0;
+    margin: 14px 0 0;
     color: #fff;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     font-style: italic;
     font-weight: 1000;
+    font-size: 52px;
     line-height: 0.79;
     text-align: left;
     text-transform: uppercase;
@@ -516,7 +518,7 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     backdrop-filter: blur(8px);
 }
 
-.home-topbar { display:flex; justify-content:center; align-items:center; width:min(100%,370px); min-height:38px; margin:12px auto 12px; }
+.home-topbar { display:flex; justify-content:center; align-items:center; width:min(100%,370px); min-height:38px; margin:12px auto 20px; }
 .settings-gear {
     position: static;
     display: inline-flex;
@@ -697,7 +699,7 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
 .theme-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 9px;
+    gap: 14px;
     width: min(100%, 370px);
     margin: 2px auto 14px;
 }
@@ -880,7 +882,7 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
 }
 
 @media (max-width: 360px) {
-    .theme-grid { gap: 7px; }
+    .theme-grid { gap: 10px; }
     .theme-btn { gap: 6px; min-height: 66px; padding: 8px 7px; }
     .theme-icon { flex-basis: 30px; width: 30px; height: 30px; font-size: 17px; }
     .theme-name { font-size: 11px; }
@@ -1198,18 +1200,18 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
 /* Compact, touch-friendly home layout for portrait phones. */
 @media (max-width:520px) {
     #start-screen { padding:max(10px,env(safe-area-inset-top)) 12px 12px; }
-    #start-screen .home-topbar { min-height:34px; margin:8px auto 8px; }
+    #start-screen .home-topbar { min-height:34px; margin:8px auto 14px; }
     #start-screen .settings-gear { height:34px; padding:0 10px; border-radius:10px; }
     #start-screen .home-settings-label { font-size:8px; }
-    #start-screen .game-logo { width:min(100%,370px); min-height:58px; padding:2px 5px 4px; margin:0 auto 19px; transform:none; filter:drop-shadow(0 4px 0 #101b39) drop-shadow(0 6px 6px rgba(0,0,0,.36)); }
+    #start-screen .game-logo { width:fit-content; max-width:94vw; height:34px; padding:0 6px; margin:0 auto 14px; transform:none; filter:drop-shadow(0 4px 0 #101b39) drop-shadow(0 6px 6px rgba(0,0,0,.36)); }
     #start-screen .game-logo::before { inset:2px 0; }
     #start-screen .game-logo::after { inset:5px 3px; }
-    #start-screen .game-logo-mark { flex-basis:39px; width:39px; }
-    #start-screen .logo-brain { font-size:clamp(29px,8.5vw,37px); text-shadow:0 1px 0 #81500b,1px 2px 0 #102044; }
-    #start-screen .logo-defense { font-size:clamp(23px,7vw,30px); text-shadow:0 1px 0 #1558a3,1px 2px 0 #0b1736; }
+    #start-screen .game-logo-mark { flex-basis:48px; width:48px; }
+    #start-screen .logo-brain { font-size:clamp(36px,10vw,46px); text-shadow:0 1px 0 #81500b,1px 2px 0 #102044; }
+    #start-screen .logo-defense { font-size:clamp(30px,9vw,38px); text-shadow:0 1px 0 #1558a3,1px 2px 0 #0b1736; }
     #start-screen .logo-tagline { margin-top:4px; font-size:5.5px; }
     #start-screen > p { margin:0 auto 7px; font-size:11px; line-height:1.25; }
-    #start-screen .theme-grid { width:calc(100% - 20px); gap:7px; margin:0 auto 8px; }
+    #start-screen .theme-grid { width:calc(100% - 20px); gap:12px; margin:0 auto 8px; }
     #start-screen .theme-btn { min-height:53px; padding:7px 8px; }
     #start-screen .theme-btn.full-width { min-height:48px; }
     #start-screen .theme-icon { flex-basis:29px; width:29px; height:29px; font-size:16px; }
@@ -1233,13 +1235,13 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
     #start-screen { padding-top:max(6px,env(safe-area-inset-top)); padding-bottom:8px; }
     #start-screen .home-topbar { min-height:30px; margin-bottom:1px; }
     #start-screen .settings-gear { height:30px; }
-    #start-screen .game-logo { min-height:54px; padding-top:1px; padding-bottom:3px; margin-bottom:15px; }
-    #start-screen .game-logo-mark { flex-basis:34px; width:34px; }
-    #start-screen .logo-brain { font-size:clamp(26px,8vw,34px); }
-    #start-screen .logo-defense { font-size:clamp(21px,6.5vw,27px); }
+    #start-screen .game-logo { width:fit-content; height:28px; padding:0 5px; margin-bottom:12px; }
+    #start-screen .game-logo-mark { flex-basis:40px; width:40px; }
+    #start-screen .logo-brain { font-size:clamp(32px,9vw,40px); }
+    #start-screen .logo-defense { font-size:clamp(26px,7.5vw,34px); }
     #start-screen .logo-tagline { margin-top:3px; font-size:5px; }
     #start-screen > p { margin-bottom:5px; font-size:10px; }
-    #start-screen .theme-grid { gap:5px; margin-bottom:6px; }
+    #start-screen .theme-grid { gap:10px; margin-bottom:6px; }
     #start-screen .theme-btn { min-height:46px; padding:5px 6px; }
     #start-screen .theme-btn.full-width { min-height:42px; }
     #start-screen .home-actions { gap:6px; margin-bottom:4px; }
