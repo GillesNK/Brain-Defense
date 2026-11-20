@@ -516,7 +516,7 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
     backdrop-filter: blur(8px);
 }
 
-.home-topbar { display:flex; justify-content:flex-end; align-items:center; width:min(100%,370px); min-height:38px; margin:0 auto 4px; }
+.home-topbar { display:flex; justify-content:center; align-items:center; width:min(100%,370px); min-height:38px; margin:12px auto 12px; }
 .settings-gear {
     position: static;
     display: inline-flex;
@@ -1198,7 +1198,7 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
 /* Compact, touch-friendly home layout for portrait phones. */
 @media (max-width:520px) {
     #start-screen { padding:max(10px,env(safe-area-inset-top)) 12px 12px; }
-    #start-screen .home-topbar { min-height:34px; margin:0 auto 3px; }
+    #start-screen .home-topbar { min-height:34px; margin:8px auto 8px; }
     #start-screen .settings-gear { height:34px; padding:0 10px; border-radius:10px; }
     #start-screen .home-settings-label { font-size:8px; }
     #start-screen .game-logo { width:min(100%,370px); min-height:58px; padding:2px 5px 4px; margin:0 auto 19px; transform:none; filter:drop-shadow(0 4px 0 #101b39) drop-shadow(0 6px 6px rgba(0,0,0,.36)); }
