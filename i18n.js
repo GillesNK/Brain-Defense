@@ -151,11 +151,11 @@
     }
     function setLanguage(value) {
         preference = value === 'auto' || supported.includes(value) ? value : 'auto';
-        try { localStorage.setItem(storageKey, preference); } catch (_) {}
+        try { Storage.setItem(storageKey, preference); } catch (_) {}
         language = preference === 'auto' ? detect() : preference;
         apply();
     }
-    try { preference = localStorage.getItem(storageKey) || 'auto'; } catch (_) {}
+    try { preference = Storage.getItem(storageKey) || 'auto'; } catch (_) {}
     language = preference === 'auto' || !supported.includes(preference) ? detect() : preference;
     window.UI18n = {
         supported, labels, get language() { return language; }, get preference() { return preference; },

@@ -14,21 +14,53 @@ const THEME_LABELS = {
 };
 
 // Chargement des records individuels par thème depuis localStorage
+const Storage = {
+    getItem(key, fallback = null) {
+        try {
+            // Essayer localStorage d'abord
+            const value = localStorage.getItem(key);
+            if (value !== null) return value;
+            // Fallback sur CrazyGames Data si disponible
+            if (window.CrazyGames?.SDK?.data) {
+                return window.CrazyGames.SDK.data.getItem(key) ?? fallback;
+            }
+            return fallback;
+        } catch (_) { return fallback; }
+    },
+
+    setItem(key, value) {
+        try { localStorage.setItem(key, value); } catch (_) {}
+        try {
+            if (window.CrazyGames?.SDK?.data) {
+                window.CrazyGames.SDK.data.setItem(key, value);
+            }
+        } catch (_) {}
+    },
+
+    removeItem(key) {
+        try { localStorage.removeItem(key); } catch (_) {}
+        try {
+            if (window.CrazyGames?.SDK?.data) {
+                window.CrazyGames.SDK.data.removeItem(key);
+            }
+        } catch (_) {}
+    }
+};
+
 function getStoredValue(key, fallback = null) {
-    try { return localStorage.getItem(key) ?? fallback; }
-    catch (_) { return fallback; }
+    return Storage.getItem(key, fallback);
 }
 
 function getStoredObject(key, fallback) {
     try {
-        const value = JSON.parse(localStorage.getItem(key) || 'null');
+        const value = JSON.parse(Storage.getItem(key) || 'null');
         return value && typeof value === 'object' && !Array.isArray(value) ? value : fallback;
     } catch (_) { return fallback; }
 }
 
 function getStoredArray(key, fallback) {
     try {
-        const value = JSON.parse(localStorage.getItem(key) || 'null');
+        const value = JSON.parse(Storage.getItem(key) || 'null');
         return Array.isArray(value) ? value : fallback;
     } catch (_) { return fallback; }
 }
@@ -43,12 +75,12 @@ let themeRecords = getStoredObject('chrono_theme_records', {
 let campaignWins = getStoredObject('chrono_campaign_wins', {});
 function readSavedRunProgress() {
     try {
-        const saved = JSON.parse(localStorage.getItem('chrono_saved_run') || 'null');
+        const saved = JSON.parse(Storage.getItem('chrono_saved_run') || 'null');
         if (!saved || !['tours', 'survival'].includes(saved.mode)) return null;
         return saved;
     } catch (error) {
         console.warn('Brain Defense: sauvegarde illisible, elle est ignorée.', error);
-        try { localStorage.removeItem('chrono_saved_run'); } catch (_) { }
+        Storage.removeItem('chrono_saved_run');
         return null;
     }
 }
@@ -318,7 +350,7 @@ function saveGameProgress() {
         savedAt: Date.now()
     };
     try {
-        localStorage.setItem('chrono_saved_run', JSON.stringify(savedRunProgress));
+        Storage.setItem('chrono_saved_run', JSON.stringify(savedRunProgress));
     } catch (error) {
         console.error('Brain Defense: impossible de sauvegarder la partie.', error);
     }
@@ -326,9 +358,7 @@ function saveGameProgress() {
 }
 
 function clearSavedGameProgress() {
-    try { localStorage.removeItem('chrono_saved_run'); } catch (error) {
-        console.warn('Brain Defense: impossible de supprimer la sauvegarde.', error);
-    }
+    Storage.removeItem('chrono_saved_run');
     sessionCanResume = false;
     savedRunProgress = null;
     updateResumeRunButton();
@@ -373,7 +403,7 @@ function resumeSavedGame() {
     if (!saved || saved.sessionCanResume === false) return;
     try {
         RetryTrace.stop();
-        try { localStorage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
+        try { Storage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
         sessionCanResume = true;
         setCrazyGameplayActive(true);
         gameMode = saved.mode === 'survival' ? 'survival' : 'tours';
@@ -422,7 +452,7 @@ window.addEventListener('error', event => {
 function pauseForBackground() {
     if (!sessionCanResume || isPaused) return;
     saveGameProgress();
-    try { localStorage.setItem(INTERRUPTION_STORAGE_KEY, 'true'); } catch (_) { }
+    try { Storage.setItem(INTERRUPTION_STORAGE_KEY, 'true'); } catch (_) { }
     isPaused = true;
     stopGameFrame();
     pausedByVisibility = true;
@@ -446,25 +476,25 @@ window.addEventListener('pagehide', pauseForBackground);
 window.addEventListener('pageshow', resumeAfterBackground);
 
 function resumeInterruptedGame() {
-    try { localStorage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
+    try { Storage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
     if (sessionCanResume) resumeGame();
     else resumeSavedGame();
 }
 
 try {
-    const interruptedOnPreviousVisit = localStorage.getItem(INTERRUPTION_STORAGE_KEY) === 'true';
+    const interruptedOnPreviousVisit = Storage.getItem(INTERRUPTION_STORAGE_KEY) === 'true';
     if (interruptedOnPreviousVisit && savedRunProgress) {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('interruption-screen').classList.remove('hidden');
     } else if (interruptedOnPreviousVisit) {
-        localStorage.removeItem(INTERRUPTION_STORAGE_KEY);
+        Storage.removeItem(INTERRUPTION_STORAGE_KEY);
     }
 } catch (_) { }
 
 function toggleMute() {
     soundEnabled = !soundEnabled;
     applyGameAudioMute();
-    localStorage.setItem('chrono_sound', String(soundEnabled));
+    Storage.setItem('chrono_sound', String(soundEnabled));
     document.getElementById('sound-btn').innerText = soundEnabled ? '\uD83D\uDD0A' : '\uD83D\uDD07';
     const setting = document.getElementById('setting-sound');
     if (setting) setting.checked = soundEnabled;
@@ -473,26 +503,26 @@ function toggleMute() {
 function setSoundEnabled(enabled) {
     soundEnabled = Boolean(enabled);
     applyGameAudioMute();
-    localStorage.setItem('chrono_sound', String(soundEnabled));
+    Storage.setItem('chrono_sound', String(soundEnabled));
     document.getElementById('sound-btn').innerText = soundEnabled ? '\uD83D\uDD0A' : '\uD83D\uDD07';
 }
 
 function setVibrationEnabled(enabled) {
     vibrationEnabled = Boolean(enabled);
-    localStorage.setItem('chrono_vibration', String(vibrationEnabled));
+    Storage.setItem('chrono_vibration', String(vibrationEnabled));
     if (vibrationEnabled && navigator.vibrate) navigator.vibrate(20);
 }
 
 function setMobileMode(enabled) {
     mobileModeEnabled = Boolean(enabled);
     document.body.classList.toggle('mobile-controls', mobileModeEnabled);
-    localStorage.setItem('chrono_mobile_mode', String(mobileModeEnabled));
+    Storage.setItem('chrono_mobile_mode', String(mobileModeEnabled));
 }
 
 function setTargetLanguage(target) {
     if (!['en', 'fr', 'es', 'de', 'zh', 'ru'].includes(target)) return;
     targetLanguage = target;
-    localStorage.setItem('chrono_target_language', targetLanguage);
+    Storage.setItem('chrono_target_language', targetLanguage);
     document.getElementById('setting-language-target').value = targetLanguage;
     setLangPair('fr', targetLanguage);
 }
@@ -618,7 +648,7 @@ function openSurvivalSetup() {
 function selectSurvivalDifficulty(key, button) {
     if (!DIFFICULTY_LEVELS.some(level => level.key === key)) return;
     survivalDifficulty = key;
-    localStorage.setItem('chrono_survival_difficulty', key);
+    Storage.setItem('chrono_survival_difficulty', key);
     document.querySelectorAll('.difficulty-choice').forEach(option => option.classList.remove('selected'));
     button.classList.add('selected');
     updateSurvivalHomeRecord();
@@ -647,7 +677,7 @@ function pauseGame() {
 function resumeGame() {
     document.getElementById('pause-menu').classList.add('hidden');
     document.getElementById('interruption-screen').classList.add('hidden');
-    try { localStorage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
+    try { Storage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
     isPaused = false;
     setCrazyGameplayActive(true);
     startHUDAnimation();
@@ -676,7 +706,7 @@ function selectTheme(theme, btnElement) {
 
 function showMenu() {
     saveGameProgress();
-    try { localStorage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
+    try { Storage.removeItem(INTERRUPTION_STORAGE_KEY); } catch (_) { }
     isPaused = true;
     setCrazyGameplayActive(false);
     stopGameFrame();
@@ -876,7 +906,7 @@ function updateButtons() {
             const basePts = 5;
             const ptsEarned = basePts * comboMultiplier;
             score += ptsEarned;
-            localStorage.setItem('chrono_stars', stars);
+            Storage.setItem('chrono_stars', stars);
 
             if (feverActive) {
                 // Double laser en fever
@@ -938,12 +968,12 @@ function updateButtons() {
             meteorsDestroyed++;
             if (target.starReward > 0) {
                 stars += target.starReward;
-                localStorage.setItem('chrono_stars', stars);
+                Storage.setItem('chrono_stars', stars);
                 addFloatingText(target.x, target.y, `⭐ +${target.starReward}`, '#fef08a');
             }
             if (target.isRetryMeteor) {
                 retryKeys += 1;
-                localStorage.setItem('chrono_retry_keys', retryKeys);
+                Storage.setItem('chrono_retry_keys', retryKeys);
                 addFloatingText(target.x, target.y, '🔑 +1 CLÉ RETRY', '#67e8f9');
             }
 
@@ -951,11 +981,11 @@ function updateButtons() {
                 const key = survivalRecordKey();
                 if (score > (survivalRecords[key] || 0)) {
                     survivalRecords[key] = score;
-                    localStorage.setItem('chrono_survival_records', JSON.stringify(survivalRecords));
+                    Storage.setItem('chrono_survival_records', JSON.stringify(survivalRecords));
                 }
             } else if (score > (themeRecords[selectedTheme] || 0)) {
                 themeRecords[selectedTheme] = score;
-                localStorage.setItem('chrono_theme_records', JSON.stringify(themeRecords));
+                Storage.setItem('chrono_theme_records', JSON.stringify(themeRecords));
             }
 
             updateHUD();
@@ -1057,7 +1087,7 @@ function updateButtons() {
             AudioEngine.playFreeze();
             addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '❄️ GEL 3s', '#8be9ff');
             enemies.forEach(e => { e.speed *= 0.35; e.frozen = true; setTimeout(() => { e.speed = e.speed / 0.35; e.frozen = false; }, 3000); });
-            stars += 1; localStorage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +1', '#8be9ff');
+            stars += 1; Storage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +1', '#8be9ff');
         } else if (type === 'life') {
             if (lives < 3) {
                 lives = Math.min(3, lives + 1);
@@ -1067,13 +1097,13 @@ function updateButtons() {
             } else {
                 addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '💖 VIE MAX', '#ff7eb6');
             }
-            stars += 2; localStorage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +2', '#ff7eb6');
+            stars += 2; Storage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +2', '#ff7eb6');
         } else if (type === 'gold') {
             const bonus = 30 * comboMultiplier;
             score += bonus;
             const goldStars = 3;
             stars += goldStars;
-            localStorage.setItem('chrono_stars', stars);
+            Storage.setItem('chrono_stars', stars);
             AudioEngine.playLaserHit();
             addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `⭐ +${goldStars}  +${bonus} PTS`, '#fef08a');
             updateHUD();
@@ -1443,16 +1473,16 @@ function updateButtons() {
         if (selectedSkin === id) return;
         if (skin.owned || ownedSkins.includes(id)) {
             selectedSkin = id;
-            localStorage.setItem('chrono_selected_skin', selectedSkin);
+            Storage.setItem('chrono_selected_skin', selectedSkin);
             AudioEngine.playLaserHit();
         } else if (stars >= skin.cost) {
             stars -= skin.cost;
             skin.owned = true;
             ownedSkins.push(id);
-            localStorage.setItem('chrono_stars', stars);
-            localStorage.setItem('chrono_owned_skins', JSON.stringify(ownedSkins));
+            Storage.setItem('chrono_stars', stars);
+            Storage.setItem('chrono_owned_skins', JSON.stringify(ownedSkins));
             selectedSkin = id;
-            localStorage.setItem('chrono_selected_skin', selectedSkin);
+            Storage.setItem('chrono_selected_skin', selectedSkin);
             AudioEngine.playGaragePurchase();
         }
         renderGarage();
@@ -1492,7 +1522,7 @@ function updateButtons() {
             continueButton.classList.add('hidden');
             completionActions.classList.remove('hidden');
             campaignWins[selectedTheme] = true;
-            localStorage.setItem('chrono_campaign_wins', JSON.stringify(campaignWins));
+            Storage.setItem('chrono_campaign_wins', JSON.stringify(campaignWins));
             clearSavedGameProgress();
         } else {
             title.innerText = window.UI18n?.t('roundComplete') || 'Tour terminé !';
@@ -1750,10 +1780,10 @@ function updateButtons() {
             }
             if (completedReward === 'stars') {
                 stars += 3;
-                localStorage.setItem('chrono_stars', stars);
+                Storage.setItem('chrono_stars', stars);
             } else if (completedReward === 'retry') {
                 retryKeys += 1;
-                localStorage.setItem('chrono_retry_keys', retryKeys);
+                Storage.setItem('chrono_retry_keys', retryKeys);
             }
             document.getElementById('start-screen').classList.remove('hidden');
             updateHUD();
@@ -1778,7 +1808,7 @@ function updateButtons() {
             return;
         }
         retryKeys--;
-        localStorage.setItem('chrono_retry_keys', retryKeys);
+        Storage.setItem('chrono_retry_keys', retryKeys);
         document.getElementById('gameover-screen').classList.add('hidden');
         document.getElementById('retry-status').classList.add('hidden');
         document.getElementById('retry-challenge-screen').classList.remove('hidden');
