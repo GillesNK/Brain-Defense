@@ -749,9 +749,12 @@ function spawnEnemy() {
 
     const isText = data.question.length > 9;
     const maxTextRadius = Math.min(180, canvasLogicalWidth() * 0.42);
+    const isMobile = canvasLogicalWidth() <= 520;
     const radius = isText
-        ? Math.min(maxTextRadius, 32 + Math.sqrt(Math.max(0, data.question.length - 20)) * 4.5)
-        : 26;
+        ? (isMobile
+            ? Math.min(maxTextRadius, 28 + Math.sqrt(Math.max(0, data.question.length - 20)) * 4.0)
+            : Math.min(maxTextRadius, 32 + Math.sqrt(Math.max(0, data.question.length - 20)) * 4.5))
+        : (isMobile ? 23 : 26);
     const x = getMeteorSpawnX(radius);
     const survivalBaseSpeed = ((isText ? 35 : 44) + difficultyIndex * 8) * 1.12;
     const survivalRamp = Math.min(survivalQuestionsAnswered * 0.055, 13);
@@ -1892,7 +1895,9 @@ function updateButtons() {
             ctx.shadowBlur = 0;
             // Texte de la question
             ctx.fillStyle = '#ffffff';
-            let meteorFontSize = e.isText ? Math.max(7, e.radius * 0.16) : Math.max(10, e.radius * 0.20);
+            let meteorFontSize = e.isText
+                ? (canvasLogicalWidth() > 520 ? Math.max(12, e.radius * 0.32) : Math.max(7, e.radius * 0.16))
+                : (canvasLogicalWidth() > 520 ? Math.max(16, e.radius * 0.38) : Math.max(10, e.radius * 0.20));
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             if (e.isText) {
@@ -1970,7 +1975,9 @@ function updateButtons() {
             ctx.shadowBlur = 0;
             // Texte de la question
             ctx.fillStyle = '#ffffff';
-            let meteorFontSize = e.isText ? Math.max(7, e.radius * 0.16) : Math.max(10, e.radius * 0.20);
+            let meteorFontSize = e.isText
+                ? (canvasLogicalWidth() > 520 ? Math.max(12, e.radius * 0.32) : Math.max(7, e.radius * 0.16))
+                : (canvasLogicalWidth() > 520 ? Math.max(16, e.radius * 0.38) : Math.max(10, e.radius * 0.20));
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             if (e.isText) {
