@@ -2616,6 +2616,20 @@ const QuestionManager = (() => {
         };
     }
 
+    function buildLangQuestionText(type, sourceText) {
+        const uiLang = (typeof window !== 'undefined' && window.UI18n && window.UI18n.language) || 'fr';
+        const templates = {
+            fr: { phrase: `Traduis : « ${sourceText} »`, word: `Traduis le mot « ${sourceText} »` },
+            en: { phrase: `Translate: "${sourceText}"`, word: `Translate the word "${sourceText}"` },
+            es: { phrase: `Traduce: « ${sourceText} »`, word: `Traduce la palabra « ${sourceText} »` },
+            de: { phrase: `Übersetze: „${sourceText}“`, word: `Übersetze das Wort „${sourceText}“` },
+            zh: { phrase: `翻译：「${sourceText}」`, word: `翻译单词：「${sourceText}」` },
+            ru: { phrase: `Переведи: « ${sourceText} »`, word: `Переведи слово « ${sourceText} »` }
+        };
+        const pack = templates[uiLang] || templates.fr;
+        return type === 'word' ? pack.word : pack.phrase;
+    }
+
     function generateLangQuestion(level) {
         const source = langSource;
         const target = langTarget;
@@ -2624,7 +2638,8 @@ const QuestionManager = (() => {
         const row = pickQuestion(`anglais_${source}_${target}`, level.key, pool);
         if (!row) throw new Error(`Banque de traduction vide pour le niveau ${level.label}`);
         const distractors = translationDistractors(pool, Object.values(languageLevels).flat(), row);
-        return createQuestion(row[0], row[1], distractors, level, 'anglais');
+        const localizedQuestion = buildLangQuestionText(row[3], row[5] != null ? row[5] : row[0]);
+        return createQuestion(localizedQuestion, row[1], distractors, level, 'anglais');
     }
 
     function getNextQuestion(selectedTheme, difficultyKey) {
