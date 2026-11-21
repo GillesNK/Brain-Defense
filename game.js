@@ -1616,7 +1616,7 @@ function updateButtons() {
                 const btn = document.querySelector('button[onclick="shareGame()"]');
                 if (btn) {
                     const old = btn.innerText;
-                    btn.innerText = '✅ Copié !';
+                    btn.innerText = window.UI18n?.t('copied') || '✅ Copié !';
                     setTimeout(() => { btn.innerText = old; }, 1500);
                 }
             }).catch(() => {
@@ -1717,7 +1717,7 @@ function updateButtons() {
         }
         crazyAdInProgress = true;
         document.getElementById('ad-title').innerText = window.UI18n?.t('publicAd') || 'Midgame ad';
-        document.getElementById('ad-message').innerText = 'Preparing ad request...';
+        document.getElementById('ad-message').innerText = window.UI18n?.t('adPreparing') || 'Preparing ad request...';
         document.getElementById('ad-screen').classList.remove('hidden');
         let settled = false;
         const finish = error => {
@@ -1774,7 +1774,7 @@ function updateButtons() {
         pendingAdReward = rewardType;
         document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
         document.getElementById('ad-title').innerText = window.UI18n?.t('publicAd') || 'Rewarded ad';
-        document.getElementById('ad-message').innerText = 'Preparing ad request...';
+        document.getElementById('ad-message').innerText = window.UI18n?.t('adPreparing') || 'Preparing ad request...';
         document.getElementById('ad-screen').classList.remove('hidden');
         const returnScreen = rewardType === 'revive' ? 'gameover-screen' : 'start-screen';
 
@@ -1817,14 +1817,16 @@ function updateButtons() {
         document.getElementById('gameover-screen').classList.add('hidden');
         document.getElementById('retry-status').classList.add('hidden');
         document.getElementById('retry-challenge-screen').classList.remove('hidden');
-        document.getElementById('retry-instructions').innerText = 'Une clé est en jeu. Le Roi Paresse te met à l’épreuve.';
+        document.getElementById('retry-instructions').innerText = window.UI18n?.t('retryIntro') || 'Une clé est en jeu. Le Roi Paresse te met à l’épreuve.';
         isPaused = true;
         stopGameFrame();
         updateHUD();
         RetryTrace.start(document.getElementById('retry-trace-canvas'), difficultyIndex, {
             onReady(figure) {
-                document.getElementById('retry-figure-title').innerText = 'Épreuve de reprise';
-                document.getElementById('retry-level-chip').innerText = `DIFFICULTÉ · ${figure.level}`;
+                document.getElementById('retry-figure-title').innerText = window.UI18n?.t('retryTitle') || 'Épreuve de reprise';
+                const prefix = window.UI18n?.t('retryLevelPrefix') || 'DIFFICULTÉ';
+                const levelName = Number.isInteger(figure.tierIndex) ? window.UI18n?.tier(figure.tierIndex) : figure.level;
+                document.getElementById('retry-level-chip').innerText = `${prefix} · ${levelName || figure.level}`;
             },
             onComplete() {
                 document.getElementById('retry-challenge-screen').classList.add('hidden');
@@ -1857,7 +1859,7 @@ function updateButtons() {
     function cancelRetryChallenge() {
         RetryTrace.stop();
         document.getElementById('retry-challenge-screen').classList.add('hidden');
-        document.getElementById('retry-status').innerText = 'Reprise abandonnée : la clé Retry a été utilisée.';
+        document.getElementById('retry-status').innerText = window.UI18n?.t('retryAbandoned') || 'Reprise abandonnée : la clé Retry a été utilisée.';
         document.getElementById('retry-status').classList.remove('hidden');
         document.getElementById('gameover-screen').classList.remove('hidden');
         updateResourceDisplays();

@@ -212,7 +212,7 @@
         canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move);
         canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', cancel);
         window.addEventListener('resize', resize); draw();
-        if (callbacks.onReady) callbacks.onReady({ level: TIERS[tierIndex].name });
+        if (callbacks.onReady) callbacks.onReady({ level: TIERS[tierIndex].name, tierIndex });
     }
     function stop() { stopListeners(); }
     function getFiguresForLevel(index) {
