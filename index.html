@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Brain Defense - Jeu éducatif où tu défends ta base avec ton cerveau. Choisis un thème (Maths, Géographie, Traduction, Culture G.) et élimine les météores en répondant aux questions.">
     <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
     <title>Brain Defense — jeu éducatif</title>
     <link rel="stylesheet" href="style.css?v=bd-20261120-mobile-home-4">
@@ -106,7 +107,7 @@
 
         <!-- Décor & Personnage SVG Animé -->
         <div class="hero-scene">
-            <svg viewBox="0 0 320 175" class="mascot-svg" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 320 175" class="mascot-svg" xmlns="http://www.w3.org/2000/svg" aria-label="Mascotte pensive avec des symboles éducatifs" role="img">
                 <defs>
                     <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stop-color="#1f6feb" stop-opacity="0.45"/>
@@ -119,21 +120,21 @@
                         <stop offset="100%" stop-color="#eab308"/>
                     </radialGradient>
                 </defs>
-                <circle cx="160" cy="92" r="82" fill="url(#bgGlow)" class="scene-glow"/>
-                <ellipse cx="160" cy="158" rx="115" ry="12" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-                <g class="float-slow">
+                <circle cx="160" cy="92" r="82" fill="url(#bgGlow)" class="scene-glow" aria-hidden="true"/>
+                <ellipse cx="160" cy="158" rx="115" ry="12" fill="#161b22" stroke="#30363d" stroke-width="1.5" aria-hidden="true"/>
+                <g class="float-slow" aria-hidden="true">
                     <circle cx="46" cy="52" r="11" fill="#38bdf8"/>
                     <ellipse cx="46" cy="52" rx="18" ry="4" fill="none" stroke="#bae6fd" stroke-width="2" transform="rotate(-18 46 52)"/>
                 </g>
-                <g transform="translate(36, 134)">
+                <g transform="translate(36, 134)" aria-hidden="true">
                     <path d="M0,12 Q12,6 24,12 L24,22 Q12,16 0,22 Z" fill="#f8fafc"/>
                     <path d="M24,12 Q36,6 48,12 L48,22 Q36,16 24,22 Z" fill="#e2e8f0"/>
                     <path d="M0,22 Q12,16 24,22 Q36,16 48,22" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
                 </g>
-                <text x="262" y="54" fill="#a78bfa" font-size="18" font-weight="bold" class="float-slow">π</text>
-                <polygon points="274,118 277,125 285,125 279,130 281,137 274,133 267,137 269,130 263,125 271,125" fill="#fbbf24" class="float-slow"/>
-                <circle cx="72" cy="108" r="3" fill="#34d399"/>
-                <circle cx="248" cy="88" r="3.5" fill="#f472b6"/>
+                <text x="262" y="54" fill="#a78bfa" font-size="18" font-weight="bold" class="float-slow" aria-hidden="true">π</text>
+                <polygon points="274,118 277,125 285,125 279,130 281,137 274,133 267,137 269,130 263,125 271,125" fill="#fbbf24" class="float-slow" aria-hidden="true"/>
+                <circle cx="72" cy="108" r="3" fill="#34d399" aria-hidden="true"/>
+                <circle cx="248" cy="88" r="3.5" fill="#f472b6" aria-hidden="true"/>
                 <g class="character-body">
                     <path d="M122,156 C122,126 198,126 198,156 Z" fill="#2563eb"/>
                     <path d="M146,130 L160,144 L174,130" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linecap="round"/>
@@ -301,11 +302,11 @@
         <p id="pause-tour-progress" class="tour-progress-message">Basique — tour 1/2 terminé. Prochaine étape : Basique, tour 2/2.</p>
         <p>Prends quelques secondes pour souffler avant la suite.</p>
         <div class="breathe-circle"></div>
-        <button id="continue-tour-btn" class="btn-main" onclick="resumeFromPause()">Continuer · Basique</button>
+        <button id="continue-tour-btn" class="btn-main" onclick="resumeFromPause()">▶️ Continuer · Basique</button>
         <div id="campaign-complete-actions" class="campaign-complete-actions hidden">
-            <button class="btn-main" onclick="startGame('tours')">Rejouer le parcours</button>
-            <button class="btn-main btn-secondary" onclick="chooseAnotherTheme()">Choisir un autre thème</button>
-            <button class="btn-main btn-secondary" onclick="showMenu()">Menu principal</button>
+            <button class="btn-main" onclick="startGame('tours')">🔄 Rejouer le parcours</button>
+            <button class="btn-main btn-secondary" onclick="chooseAnotherTheme()">🎯 Choisir un autre thème</button>
+            <button class="btn-main btn-secondary" onclick="showMenu()">🏠 Menu principal</button>
         </div>
     </div>
 
@@ -322,8 +323,8 @@
             <span class="panel-kicker">REPRISE DE PARTIE</span>
             <h1 id="interruption-title">Partie interrompue</h1>
             <p id="interruption-message">La partie a été mise en pause pendant ton absence. Ta progression est conservée.</p>
-            <button class="btn-main" onclick="resumeInterruptedGame()">▶ Reprendre la partie</button>
-            <button class="btn-main btn-secondary" onclick="showMenu()">Retour au menu</button>
+            <button class="btn-main" onclick="resumeInterruptedGame()">▶️ Reprendre la partie</button>
+            <button class="btn-main btn-secondary" onclick="showMenu()">🏠 Retour au menu</button>
         </div>
     </div>
 
@@ -353,12 +354,12 @@
             <div class="result-stats"><div><span>THÈME</span><strong id="end-theme">Aléatoire</strong></div><div><span>NIVEAU</span><strong id="end-difficulty">Basique</strong></div><div><span>PROGRESSION</span><strong id="end-progress">0 / 20</strong></div><div><span>RECORD</span><strong id="best-score">0</strong></div></div>
         </div>
         <button id="retry-key-btn" class="btn-main retry-key-btn" onclick="useRetryKey()">🔑 Continuer avec une clé Retry</button>
-        <button id="revive-video-btn" class="btn-main revive-video-btn" onclick="watchAdForReward('revive')">Regarder une vid&#233;o pour revivre</button>
+        <button id="revive-video-btn" class="btn-main revive-video-btn" onclick="watchAdForReward('revive')">🎬 Regarder une vidéo pour revivre</button>
         <p id="retry-empty-message" class="retry-empty-message">Aucune clé Retry. Tu peux en gagner à l’accueil avec une pub récompensée.</p>
         <p id="retry-status" class="retry-status hidden"></p>
-        <button class="btn-main" onclick="startGame(gameMode)">Rejouer ce thème</button>
+        <button class="btn-main" onclick="startGame(gameMode)">🔄 Rejouer ce thème</button>
         <button class="btn-main btn-secondary" onclick="shareGame()">📤 Défier un ami</button>
-        <button class="btn-main btn-secondary" onclick="showMenu()">Changer de thème</button>
+        <button class="btn-main btn-secondary" onclick="showMenu()">🏠 Changer de thème</button>
     </div>
 
     <div id="retry-challenge-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="retry-figure-title">
@@ -368,7 +369,7 @@
             <p id="retry-instructions">Une clé est en jeu. Le Roi Paresse te met à l’épreuve.</p>
             <div class="retry-level-chip" id="retry-level-chip">ÉPREUVE RETRY</div>
             <canvas id="retry-trace-canvas" aria-label="Tracer la figure sans lever le doigt"></canvas>
-            <button class="btn-main btn-secondary retry-abandon" onclick="cancelRetryChallenge()">Abandonner cette reprise</button>
+            <button class="btn-main btn-secondary retry-abandon" onclick="cancelRetryChallenge()">✖️ Abandonner cette reprise</button>
         </div>
     </div>
 
