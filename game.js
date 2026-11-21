@@ -1650,6 +1650,16 @@ function updateButtons() {
         adResumeGameplayAfterAd = false;
     }
 
+    function showAdUnavailableMessage(screenId) {
+        const screen = document.getElementById(screenId) || document.getElementById('start-screen');
+        if (!screen) return;
+        const neonMessage = document.createElement('div');
+        neonMessage.className = 'neon-message';
+        neonMessage.innerText = window.UI18n?.t('noAdAvailable') || '📺 Aucune publicité disponible pour le moment. Réessaie dans quelques instants.';
+        screen.appendChild(neonMessage);
+        setTimeout(() => neonMessage.remove(), 3000);
+    }
+
     function showRewardedAd(onRewardSuccess, onAdError) {
         if (!window.CrazyGames?.SDK) {
             console.warn('CrazyGames SDK not detected (local mode).');
@@ -1666,9 +1676,9 @@ function updateButtons() {
             crazyAdInProgress = false;
             rewardAdInProgress = false;
             finishCrazyAdLifecycle();
-            console.log('Rewarded ad error:', error);
+            console.warn('Rewarded ad error:', error);
             if (onAdError) onAdError(error);
-            else alert('Aucune publicite disponible pour le moment. Reessaie dans quelques instants !');
+            else showAdUnavailableMessage('start-screen');
         };
         const callbacks = {
             adStarted: () => pauseGameplayForCrazyAd(),
@@ -1716,7 +1726,7 @@ function updateButtons() {
             crazyAdInProgress = false;
             finishCrazyAdLifecycle();
             document.getElementById('ad-screen').classList.add('hidden');
-            if (error) console.log('Midgame ad error:', error);
+            if (error) console.warn('Midgame ad error:', error);
             if (onComplete) onComplete();
         };
         const callbacks = {
@@ -1793,13 +1803,8 @@ function updateButtons() {
             document.getElementById('ad-screen').classList.add('hidden');
             const returnScreenEl = document.getElementById(returnScreen);
             returnScreenEl.classList.remove('hidden');
-            const neonMessage = document.createElement('div');
-            neonMessage.className = 'neon-message';
-            neonMessage.innerText = window.UI18n?.t('videoUnavailable') || 'Vidéo non disponible';
-            returnScreenEl.appendChild(neonMessage);
-            setTimeout(() => neonMessage.remove(), 3000);
+            showAdUnavailableMessage(returnScreen);
             updateResourceDisplays();
-            alert('Aucune publicite disponible pour le moment. Reessaie dans quelques instants !');
         });
     }
     function useRetryKey() {
