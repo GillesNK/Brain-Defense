@@ -13,37 +13,73 @@ const THEME_LABELS = {
     random: "Aléatoire"
 };
 
+let crazyGamesSDKInitialized = false;
+const storageWarnings = new Set();
+
+function warnStorageOnce(operation, key, error) {
+    if (storageWarnings.has(operation)) return;
+    storageWarnings.add(operation);
+    console.warn(`Brain Defense: impossible d'effectuer l'opération "${operation}" pour "${key}".`, error);
+}
+
 // Chargement des records individuels par thème depuis localStorage
 const Storage = {
     getItem(key, fallback = null) {
+        let localValue = null;
         try {
-            // Essayer localStorage d'abord
-            const value = localStorage.getItem(key);
-            if (value !== null) return value;
-            // Fallback sur CrazyGames Data si disponible
-            if (window.CrazyGames?.SDK?.data) {
-                return window.CrazyGames.SDK.data.getItem(key) ?? fallback;
-            }
+            localValue = localStorage.getItem(key);
+        } catch (error) { warnStorageOnce('lecture locale', key, error); }
+        if (localValue !== null) return localValue;
+        if (!crazyGamesSDKInitialized || !window.CrazyGames?.SDK?.data) return fallback;
+        try { return window.CrazyGames.SDK.data.getItem(key) ?? fallback; }
+        catch (error) {
+            warnStorageOnce('lecture CrazyGames', key, error);
             return fallback;
-        } catch (_) { return fallback; }
+        }
     },
 
     setItem(key, value) {
-        try { localStorage.setItem(key, value); } catch (_) {}
+        try { localStorage.setItem(key, value); }
+        catch (error) { warnStorageOnce('écriture locale', key, error); }
         try {
-            if (window.CrazyGames?.SDK?.data) {
+            if (crazyGamesSDKInitialized && window.CrazyGames?.SDK?.data) {
                 window.CrazyGames.SDK.data.setItem(key, value);
             }
-        } catch (_) {}
+        } catch (error) { warnStorageOnce('écriture CrazyGames', key, error); }
     },
 
     removeItem(key) {
-        try { localStorage.removeItem(key); } catch (_) {}
+        try { localStorage.removeItem(key); }
+        catch (error) { warnStorageOnce('suppression locale', key, error); }
         try {
-            if (window.CrazyGames?.SDK?.data) {
+            if (crazyGamesSDKInitialized && window.CrazyGames?.SDK?.data) {
                 window.CrazyGames.SDK.data.removeItem(key);
             }
-        } catch (_) {}
+        } catch (error) { warnStorageOnce('suppression CrazyGames', key, error); }
+    },
+
+    synchronize(keys) {
+        const data = window.CrazyGames?.SDK?.data;
+        if (!data) return;
+        for (const key of keys) {
+            let localValue = null;
+            try {
+                localValue = localStorage.getItem(key);
+            } catch (error) {
+                warnStorageOnce('synchronisation', key, error);
+                break;
+            }
+            try {
+                if (localValue !== null) data.setItem(key, localValue);
+                else {
+                    const sdkValue = data.getItem(key);
+                    if (sdkValue !== null && sdkValue !== undefined) localStorage.setItem(key, sdkValue);
+                }
+            } catch (error) {
+                warnStorageOnce('synchronisation', key, error);
+                break;
+            }
+        }
     }
 };
 
@@ -114,6 +150,7 @@ let enemies = [];
 let particles = [];
 let lasers = []; // Faisceaux laser tirés par le canon
 let currentOptions = [];
+let currentButtonTarget = null;
 const QUESTIONS_PER_TOUR = 20;
 let difficultyIndex = 0;
 let tourNumber = 1;
@@ -170,6 +207,48 @@ const ownedSkins = getStoredArray('chrono_owned_skins', ['blue']);
 SKINS.blue.owned = true;
 ownedSkins.forEach(s => { if (SKINS[s]) SKINS[s].owned = true; });
 let canvasCannonImage = null;
+
+function restorePersistedState() {
+    stars = parseInt(getStoredValue('chrono_stars')) || 0;
+    retryKeys = parseInt(getStoredValue('chrono_retry_keys')) || 0;
+    selectedSkin = getStoredValue('chrono_selected_skin', 'blue');
+    if (!SKINS[selectedSkin]) selectedSkin = 'blue';
+    const restoredSkins = getStoredArray('chrono_owned_skins', ['blue']);
+    ownedSkins.splice(0, ownedSkins.length, ...restoredSkins);
+    SKINS.blue.owned = true;
+    Object.values(SKINS).forEach(skin => { skin.owned = false; });
+    SKINS.blue.owned = true;
+    ownedSkins.forEach(id => { if (SKINS[id]) SKINS[id].owned = true; });
+    themeRecords = getStoredObject('chrono_theme_records', themeRecords);
+    campaignWins = getStoredObject('chrono_campaign_wins', campaignWins);
+    survivalRecords = getStoredObject('chrono_survival_records', survivalRecords);
+    vibrationEnabled = getStoredValue('chrono_vibration') === 'true';
+    mobileModeEnabled = getStoredValue('chrono_mobile_mode') !== 'false';
+    soundEnabled = getStoredValue('chrono_sound') !== 'false';
+    const restoredTarget = getStoredValue('chrono_target_language');
+    if (QUESTION_LANGUAGES.includes(restoredTarget)) targetLanguage = restoredTarget;
+    const restoredDifficulty = getStoredValue('chrono_survival_difficulty', 'basique');
+    if (DIFFICULTY_LEVELS.some(level => level.key === restoredDifficulty)) survivalDifficulty = restoredDifficulty;
+    if (!sessionCanResume) savedRunProgress = readSavedRunProgress();
+    applyGameAudioMute();
+    document.body.classList.toggle('mobile-controls', mobileModeEnabled);
+    const soundButton = document.getElementById('sound-btn');
+    if (soundButton) soundButton.innerText = soundEnabled ? '🔊' : '🔇';
+    const soundSetting = document.getElementById('setting-sound');
+    if (soundSetting) soundSetting.checked = soundEnabled;
+    const vibrationSetting = document.getElementById('setting-vibration');
+    if (vibrationSetting) vibrationSetting.checked = vibrationEnabled;
+    const mobileSetting = document.getElementById('setting-mobile');
+    if (mobileSetting) mobileSetting.checked = mobileModeEnabled;
+    const targetSelect = document.getElementById('setting-language-target');
+    if (targetSelect) targetSelect.value = targetLanguage;
+    updateCatapultSkin();
+    updateResourceDisplays();
+    refreshMenuRecords();
+    updateResumeRunButton();
+    syncQuestionLanguages(getInterfaceLanguage());
+    window.dispatchEvent(new Event('brain-defense-storage-ready'));
+}
 
 // Charge le canon équipé pour le dessiner dans le canvas.
 function updateCatapultSkin() {
@@ -321,6 +400,7 @@ function refreshMenuRecords() {
 }
 refreshMenuRecords();
 window.addEventListener('brain-defense-language-change', () => {
+    syncQuestionLanguages(window.UI18n && window.UI18n.language);
     refreshMenuRecords();
     updateDifficultyBadge();
 });
@@ -425,7 +505,7 @@ function resumeSavedGame() {
         RetryTrace.resetRun(saved.retryFigureHistory);
         reviveAdUsedThisRun = Boolean(saved.reviveAdUsedThisRun);
         if (gameMode === 'survival') survivalDifficulty = DIFFICULTY_LEVELS[difficultyIndex].key;
-        enemies = []; particles = []; lasers = []; floatingTexts = []; currentOptions = [];
+        enemies = []; particles = []; lasers = []; floatingTexts = []; currentOptions = []; currentButtonTarget = null;
         QuestionManager.resetHistory();
         document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
         document.getElementById('controls').classList.remove('hidden');
@@ -519,12 +599,42 @@ function setMobileMode(enabled) {
     Storage.setItem('chrono_mobile_mode', String(mobileModeEnabled));
 }
 
+const QUESTION_LANGUAGES = ['en', 'fr', 'es', 'de', 'zh', 'ru'];
+
+function getInterfaceLanguage() {
+    const language = window.UI18n && window.UI18n.language;
+    return QUESTION_LANGUAGES.includes(language) ? language : 'fr';
+}
+
+function chooseDifferentTargetLanguage(source) {
+    return QUESTION_LANGUAGES.find(language => language !== source);
+}
+
+function syncQuestionLanguages(source) {
+    if (!QUESTION_LANGUAGES.includes(source)) source = getInterfaceLanguage();
+    if (targetLanguage === source) {
+        targetLanguage = chooseDifferentTargetLanguage(source);
+        Storage.setItem('chrono_target_language', targetLanguage);
+        const targetSelect = document.getElementById('setting-language-target');
+        if (targetSelect) targetSelect.value = targetLanguage;
+    }
+    setLangPair(source, targetLanguage);
+    QuestionManager.resetHistory();
+}
+
 function setTargetLanguage(target) {
-    if (!['en', 'fr', 'es', 'de', 'zh', 'ru'].includes(target)) return;
+    if (!QUESTION_LANGUAGES.includes(target)) return;
+    const source = getInterfaceLanguage();
+    if (target === source) {
+        const targetSelect = document.getElementById('setting-language-target');
+        if (targetSelect) targetSelect.value = targetLanguage;
+        return;
+    }
     targetLanguage = target;
     Storage.setItem('chrono_target_language', targetLanguage);
     document.getElementById('setting-language-target').value = targetLanguage;
-    setLangPair('fr', targetLanguage);
+    setLangPair(source, targetLanguage);
+    QuestionManager.resetHistory();
 }
 
 function openSettings() {
@@ -592,6 +702,19 @@ async function initializeCrazyGamesSDK() {
     if (!sdk) return false;
     try {
         await sdk.init();
+        crazyGamesSDKInitialized = true;
+        try {
+            Storage.synchronize([
+                'chrono_ui_language', 'chrono_theme_records', 'chrono_campaign_wins',
+                'chrono_saved_run', 'chrono_target_language', 'chrono_survival_difficulty',
+                'chrono_survival_records', 'chrono_vibration', 'chrono_mobile_mode',
+                'chrono_sound', 'chrono_stars', 'chrono_retry_keys', 'chrono_selected_skin',
+                'chrono_owned_skins', INTERRUPTION_STORAGE_KEY
+            ]);
+            restorePersistedState();
+        } catch (error) {
+            console.warn('Brain Defense: impossible de restaurer les données du joueur après l’initialisation SDK.', error);
+        }
         handleCrazyGamesSettings(sdk.game?.settings);
         sdk.game?.addSettingsChangeListener?.(handleCrazyGamesSettings);
         console.info('CrazyGames SDK v3 initialized.');
@@ -660,10 +783,12 @@ document.getElementById('setting-vibration').checked = vibrationEnabled;
 document.getElementById('setting-mobile').checked = mobileModeEnabled;
 document.body.classList.toggle('mobile-controls', mobileModeEnabled);
 document.getElementById('setting-language-target').value = targetLanguage;
-setLangPair('fr', targetLanguage);
+syncQuestionLanguages(getInterfaceLanguage());
 
 function setLangPair(source, target) {
-    QuestionManager.setLangPair(source, target);
+    if (!QuestionManager.setLangPair(source, target)) {
+        throw new Error(`Paire de langues invalide : ${source} → ${target}`);
+    }
 }
 
 function pauseGame() {
@@ -847,8 +972,13 @@ function getPriorityTarget() {
 
 function updateButtons() {
     const target = getPriorityTarget();
-    if (!target) return;
+    if (!target) {
+        currentOptions = [];
+        currentButtonTarget = null;
+        return;
+    }
     currentOptions = target.options;
+    currentButtonTarget = target;
     for (let i = 0; i < 3; i++) {
         const button = document.getElementById(`btn${i}`);
         const answer = String(currentOptions[i] ?? '');
@@ -884,21 +1014,32 @@ function updateButtons() {
     function checkAnswer(btnIndex) {
         if (isPaused || enemies.length === 0) return;
 
-        const chosenValue = currentOptions[btnIndex];
         const target = getPriorityTarget();
+        if (!target) return;
+        if (target !== currentButtonTarget) {
+            updateButtons();
+            return;
+        }
+        const chosenValue = target.options[btnIndex];
+        if (chosenValue === undefined) return;
 
         if (chosenValue === target.answer) {
             // --- Combo & Fever ---
             combo++;
             if (combo >= FEVER_COMBO_THRESHOLD) {
+                comboMultiplier = 3;
                 feverActive = true;
                 feverTimer = FEVER_DURATION;
                 AudioEngine.playFever();
                 addFloatingText(target.x, target.y, '🔥 FEVER!', '#fef08a');
+            } else if (combo >= 6) {
+                comboMultiplier = 3;
+                AudioEngine.playCombo(combo);
             } else if (combo >= 4) {
                 comboMultiplier = 2;
                 AudioEngine.playCombo(combo);
             } else {
+                comboMultiplier = 1;
                 AudioEngine.playCombo(combo);
             }
 
@@ -974,7 +1115,7 @@ function updateButtons() {
             if (target.isRetryMeteor) {
                 retryKeys += 1;
                 Storage.setItem('chrono_retry_keys', retryKeys);
-                addFloatingText(target.x, target.y, '🔑 +1 CLÉ RETRY', '#67e8f9');
+                addFloatingText(target.x, target.y, `🔑 ${window.UI18n?.t('retryKeyOne') || '+1 CLÉ RETRY'}`, '#67e8f9');
             }
 
             if (gameMode === 'survival') {
@@ -1085,17 +1226,17 @@ function updateButtons() {
         if (type === 'ice') {
             // Gel : ralentir tous les ennemis pendant 3s
             AudioEngine.playFreeze();
-            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '❄️ GEL 3s', '#8be9ff');
+            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, window.UI18n?.t('freezeThreeSeconds') || '❄️ GEL 3s', '#8be9ff');
             enemies.forEach(e => { e.speed *= 0.35; e.frozen = true; setTimeout(() => { e.speed = e.speed / 0.35; e.frozen = false; }, 3000); });
             stars += 1; Storage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +1', '#8be9ff');
         } else if (type === 'life') {
             if (lives < 3) {
                 lives = Math.min(3, lives + 1);
                 AudioEngine.playLifeGain();
-                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `💖 +1 VIE · ${lives}/3`, '#ff7eb6');
+                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `💖 ${window.UI18n?.t('extraLife') || '+1 VIE'} · ${lives}/3`, '#ff7eb6');
                 updateHUD();
             } else {
-                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '💖 VIE MAX', '#ff7eb6');
+                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `💖 ${window.UI18n?.t('maxLives') || 'VIE MAX'}`, '#ff7eb6');
             }
             stars += 2; Storage.setItem('chrono_stars', stars); addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, '⭐ +2', '#ff7eb6');
         } else if (type === 'gold') {
@@ -1105,7 +1246,7 @@ function updateButtons() {
             stars += goldStars;
             Storage.setItem('chrono_stars', stars);
             AudioEngine.playLaserHit();
-            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `⭐ +${goldStars}  +${bonus} PTS`, '#fef08a');
+            addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, `⭐ +${goldStars}  +${bonus} ${window.UI18n?.t('pointsAbbreviation') || 'PTS'}`, '#fef08a');
             updateHUD();
         }
     }
@@ -1333,9 +1474,10 @@ function updateButtons() {
     }
     function updateHUD() {
         document.getElementById('score').innerText = score;
-        document.getElementById('hud-best').innerText = gameMode === 'survival'
+        const bestScore = gameMode === 'survival'
             ? (survivalRecords[survivalRecordKey()] || 0)
             : (themeRecords[selectedTheme] || 0);
+        document.getElementById('hud-best').innerText = `${window.UI18n?.t('record') || 'Record'}: ${bestScore}`;
         document.getElementById('lives').innerText = '❤️'.repeat(Math.min(3, Math.max(0, lives)));
         // Combo / Fever HUD
         const comboEl = document.getElementById('streak-tag');
@@ -1446,7 +1588,6 @@ function updateButtons() {
         const container = document.getElementById('garage-skins');
         container.innerHTML = '';
         document.getElementById('garage-stars').innerText = stars;
-        // Trier par coût croissant : du canon le plus faible au plus puissant
         Object.entries(SKINS).sort((a, b) => a[1].cost - b[1].cost).forEach(([id, skin]) => {
             const card = document.createElement('div');
             card.className = 'garage-skin';
@@ -1454,13 +1595,15 @@ function updateButtons() {
             if (!skin.owned) card.classList.add('locked');
             const isOwned = skin.owned || ownedSkins.includes(id);
             const canBuy = isOwned || stars >= skin.cost;
+            const rankKey = skin.cost === 0 ? 'skinRankStarter' : skin.cost < 250 ? 'skinRankRare' : skin.cost < 600 ? 'skinRankEpic' : 'skinRankLegendary';
+            const buttonLabel = selectedSkin === id ? 'skinEquipped' : isOwned ? 'skinEquip' : 'skinBuy';
             card.innerHTML = `
             ${cannonSVG(skin)}
-            <span class="garage-skin-rank">${skin.cost === 0 ? 'STARTER' : skin.cost < 20 ? 'RARE' : skin.cost < 50 ? 'ÉPIQUE' : 'LÉGENDAIRE'}</span>
-            <div class="garage-skin-name">${skin.name}</div>
-            <div class="garage-skin-cost">${skin.cost > 0 ? skin.cost + ' ⭐' : 'GRATUIT'}</div>
+            <span class="garage-skin-rank">${window.UI18n?.t(rankKey) || rankKey}</span>
+            <div class="garage-skin-name">${window.UI18n?.t(`skin_${id}`) || skin.name}</div>
+            <div class="garage-skin-cost">${skin.cost > 0 ? skin.cost + ' ⭐' : (window.UI18n?.t('skinFree') || 'FREE')}</div>
             <button class="garage-skin-btn" onclick="handleGarageSkin('${id}')" ${!canBuy ? 'disabled' : ''}>
-                ${selectedSkin === id ? 'ÉQUIPÉ' : (isOwned ? 'ÉQUIPER' : 'ACHETER')}
+                ${window.UI18n?.t(buttonLabel) || buttonLabel}
             </button>
         `;
             container.appendChild(card);
@@ -1605,7 +1748,9 @@ function updateButtons() {
 
     // Partage viral : défier un ami
     function shareGame() {
-        const text = `J'ai fait ${score} points sur ${THEME_LABELS[selectedTheme]} dans Brain Defense ! Peux-tu battre mon score ?`;
+        const text = (window.UI18n?.t('shareBody') || 'J’ai fait {score} points sur {theme} dans Brain Defense ! Peux-tu battre mon score ?')
+            .replace('{score}', String(score))
+            .replace('{theme}', localizedThemeLabel(selectedTheme));
         const url = window.location.href;
         if (navigator.share) {
             navigator.share({ title: 'Brain Defense', text, url }).catch(() => {
@@ -1620,10 +1765,10 @@ function updateButtons() {
                     setTimeout(() => { btn.innerText = old; }, 1500);
                 }
             }).catch(() => {
-                window.prompt('Copie ce défi pour le partager :', `${text}\n${url}`);
+                window.prompt(`${window.UI18n?.t('sharePrompt') || 'Copie ce défi pour le partager :'}\n${text}\n${url}`);
             });
         } else {
-            window.prompt('Copie ce défi pour le partager :', `${text}\n${url}`);
+            window.prompt(`${window.UI18n?.t('sharePrompt') || 'Copie ce défi pour le partager :'}\n${text}\n${url}`);
         }
     }
     function pauseGameplayForCrazyAd() {
@@ -1663,7 +1808,9 @@ function updateButtons() {
     function showRewardedAd(onRewardSuccess, onAdError) {
         if (!window.CrazyGames?.SDK) {
             console.warn('CrazyGames SDK not detected (local mode).');
-            onRewardSuccess?.();
+                const error = new Error('Rewarded ads are unavailable without the CrazyGames SDK.');
+                if (onAdError) onAdError(error);
+                else showAdUnavailableMessage('start-screen');
             return;
         }
         if (crazyAdInProgress) return;
@@ -1827,6 +1974,11 @@ function updateButtons() {
                 const prefix = window.UI18n?.t('retryLevelPrefix') || 'DIFFICULTÉ';
                 const levelName = Number.isInteger(figure.tierIndex) ? window.UI18n?.tier(figure.tierIndex) : figure.level;
                 document.getElementById('retry-level-chip').innerText = `${prefix} · ${levelName || figure.level}`;
+                const hint = figure.hasFixedEndpoints ? 'retryOpenTrail' : 'retryIntro';
+                document.getElementById('retry-instructions').innerText =
+                    window.UI18n?.t(hint) || (figure.hasFixedEndpoints
+                        ? 'Trace chaque ligne une seule fois, sans lever le doigt. Commence au point vert et termine au point doré.'
+                        : 'Trace toutes les lignes sans lever le doigt ni repasser dessus.');
             },
             onComplete() {
                 document.getElementById('retry-challenge-screen').classList.add('hidden');
@@ -1891,7 +2043,7 @@ function updateButtons() {
                 feverActive = false;
                 feverTimer = 0;
                 comboMultiplier = 1;
-                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, 'FEVER TERMINÉ', '#fef08a');
+                addFloatingText(canvasLogicalWidth() / 2, canvasLogicalHeight() / 2, window.UI18n?.t('feverEnded') || 'FEVER TERMINÉ', '#fef08a');
             }
         }
         // 2. Mise à jour et dessin des météorites
@@ -2124,6 +2276,7 @@ function updateButtons() {
         }
 
         // 5. Dessin du canon/vaisseau par-dessus le décor
+        if (getPriorityTarget() !== currentButtonTarget) updateButtons();
         updateAndDrawTurret(ctx, dt, getPriorityTarget());
 
         // Halo doré du canon en mode Fever

@@ -173,10 +173,10 @@ const GEO_QUESTIONS = [
 ["Quelle est la capitale de la Malaisie ?","Kuala Lumpur",["George Town","Ipoh","Johor Bahru"]],
 ["Quelle est la capitale de l'Indonésie ?","Jakarta",["Surabaya","Bandung","Medan"]],
 ["Quelle est la capitale des Philippines ?","Manille",["Quezon City","Davao","Cebu"]],
-["Quelle est la capitale de Singapour ?","Singapour",["L'Oural","L'Indonésie"]],
+["Quelle est la capitale de Singapour ?","Singapour",["Kuala Lumpur","Manille","Jakarta"]],
 ["Quelle est la capitale du Cambodge ?","Phnom Penh",["Siem Reap","Battambang","Sihanoukville"]],
 ["Quelle est la capitale du Laos ?","Vientiane",["Luang Prabang","Pakse","Savannakhet"]],
-["Quelle est la capitale de la Birmanie (Myanmar) ?","Naypyidaw",["Rangoun","Mandalay"]],
+["Quelle est la capitale de la Birmanie (Myanmar) ?","Naypyidaw",["Yangon","Mandalay","Bago"]],
 ["Quelle est la capitale du Bangladesh ?","Dacca",["Chittagong","Khulna","Rajshahi"]],
 ["Quelle est la capitale du Pakistan ?","Islamabad",["Karachi","Lahore","Faisalabad"]],
 ["Quelle est la capitale de l'Afghanistan ?","Kaboul",["Kandahar","Herat","Mazar-i-Sharif"]],
@@ -225,15 +225,15 @@ const GEO_QUESTIONS = [
 ["Quelle est la capitale du Mozambique ?","Maputo",["Beira","Nampula","Quelimane"]],
 ["Quelle est la capitale de Madagascar ?","Antananarivo",["Toamasina","Antsiranana","Fianarantsoa"]],
 ["Quelle est la capitale de Maurice ?","Port-Louis",["Curepipe","Vacoas","Quatre Bornes"]],
-["Quelle est la capitale des Seychelles ?","Victoria",["Conakry","Berne"]],
+["Quelle est la capitale des Seychelles ?","Victoria",["Conakry","Berne","Glacis"]],
 ["Quelle est la capitale des Comores ?","Moroni",["Mutsamudu","Fomboni","Domoni"]],
-["Quelle est la capitale de Djibouti ?","Djibouti",["Stockholm","Le Sénégal"]],
+["Quelle est la capitale de Djibouti ?","Djibouti",["Stockholm","Le Sénégal","Ali Sabieh"]],
 ["Quelle est la capitale de l'Érythrée ?","Asmara",["Massawa","Keren","Assab"]],
 ["Quelle est la capitale de la Somalie ?","Mogadiscio",["Hargeisa","Bosaso","Kismayo"]],
 ["Quelle est la capitale du Soudan ?","Khartoum",["Omdurman","Port-Soudan","Kassala"]],
 ["Quelle est la capitale du Soudan du Sud ?","Djouba",["Wau","Malakal","Aweil"]],
 ["Quelle est la capitale de la République centrafricaine ?","Bangui",["Berbérati","Bambari","Carnot"]],
-["Quelle est la capitale de la Guinée équatoriale ?","Malabo",["Bata","Ebebiyin","Aconibe"]],
+["Quelle est la capitale de la Guinée équatoriale ?","Ciudad de la Paz",["Bata","Ebebiyin","Malabo"]],
 ["Quelle est la capitale de Sao Tomé-et-Principe ?","Sao Tomé",["Santo Antonio","Neves","Trindade"]],
 ["Sur quel continent se trouve la France ?","Europe",["Asie","Afrique","Amérique"]],
 ["Sur quel continent se trouve le Brésil ?","Amérique du Sud",["Amérique du Nord","Europe","Afrique"]],
@@ -403,7 +403,7 @@ const GEO_QUESTIONS = [
 ["Quel fleuve traverse le Libéria ?","Le Saint-Paul",["Le Saint-Jean","Le Cavalla","Le Lofa"]],
 ["Quel fleuve traverse la Guinée-Bissau ?","Le Geba",["Le Cacheu","Le Corubal","Le Mansôa"]],
 ["Quel fleuve traverse le Sénégal ?","Le Sénégal",["Le Gambie","Le Saloum","Le Casamance"]],
-["Quel fleuve traverse la Gambie ?","Le Gambie",["Nauru","Le lac Eyre"]],
+["Quel fleuve traverse la Gambie ?","Le fleuve Gambie",["Le Sénégal","Le Saloum","Le Casamance"]],
 ["Quel fleuve traverse la Mauritanie ?","Le Sénégal",["L'orgueil","Le Gorgol","Le Garfa"]],
 ["Quel fleuve traverse l'Algérie ?","Le Chéliff",["Le Soummam","Le Seybouse","Le Mekerra"]],
 ["Quel fleuve traverse le Maroc ?","Le Moulouya",["Le Sebou","Le Oum Er-Rbia","Le Drâa"]],
@@ -447,26 +447,26 @@ const GEO_QUESTIONS = [
 ["Quel fleuve traverse le Maroc ?","Le Sebou",["Le Moulouya","Le Oum Er-Rbia","Le Drâa"]],
 ["Quel fleuve traverse la Tunisie ?","L'Oued Zouara",["La Medjerda","Le Zoussouna","Le Oued Siliana"]],
 ["Quel sommet est le plus haut d'Afrique ?","Le Kilimandjaro",["Le Mont Kenya","Le Ruwenzori","Le Mont Meru"]],
-["Quel sommet est le plus haut d'Europe ?","Le Mont Blanc",["L'Elbrouz","Le Cervin","Le Mont Rosa"]],
+["Quel sommet est le plus haut des Alpes ?","Le Mont Blanc",["L'Elbrouz","Le Cervin","Le Mont Rosa"]],
 ["Quel sommet est le plus haut d'Asie ?","L'Everest",["Le K2","Le Kangchenjunga","Le Lhotse"]],
 ["Quel sommet est le plus haut d'Amérique du Nord ?","Le Denali",["Le Mont Logan","Le Pico de Orizaba","Le Mont Saint-Élie"]],
 ["Quel sommet est le plus haut d'Amérique du Sud ?","L'Aconcagua",["L'Ojos del Salado","Le Pissis","Le Mercedario"]],
 ["Quel sommet est le plus haut d'Océanie ?","Le Puncak Jaya",["Le Mont Kosciuszko","Le Mont Wilhelm","Le Mont Giluwe"]],
 ["Quel sommet est le plus haut d'Antarctique ?","Le Vinson",["Le Mont Tyree","Le Mont Shinn","Le Mont Heger"]],
-["Quel désert est le plus grand du monde ?","Le Sahara",["L'Antarctique","L'Arctique","Le Gobi"]],
-["Quel désert est le plus grand désert chaud ?","Le Sahara",["L'Arabie","Le Gobi","Le Kalahari"]],
-["Quel désert est le plus aride du monde ?","L'Atacama",["Le Sahara","Le Mojave","Le Gobi"]],
+["Quel désert est le plus grand du monde ?","Le désert antarctique",["Le Sahara","Le désert arctique","Le Gobi"]],
+["Quel est le plus grand désert chaud du monde ?","Le Sahara",["Le désert d'Arabie","Le Gobi","Le Kalahari"]],
+["Quel est le désert non polaire le plus aride du monde ?","L'Atacama",["Le Sahara","Le Mojave","Le Gobi"]],
 ["Quel désert se trouve en Afrique du Nord ?","Le Sahara",["Le Kalahari","Le Namib","Le Gobi"]],
 ["Quel désert se trouve en Afrique australe ?","Le Kalahari",["Le Sahara","Le Namib","Le Gobi"]],
 ["Quel désert se trouve en Namibie ?","Le Namib",["Le Kalahari","Le Sahara","Le Gobi"]],
-["Quel désert se trouve en Asie centrale ?","Le Gobi",["Le Sahara","Le Kalahari","Le Taklamakan"]],
-["Quel désert se trouve en Chine ?","Le Taklamakan",["Le Gobi","Le Sahara","Le Kalahari"]],
-["Quel désert se trouve en Arabie saoudite ?","L'Arabie",["Le Sahara","Le Gobi","Le Kalahari"]],
+["Quel désert s'étend en Mongolie et dans le nord de la Chine ?","Le Gobi",["Le Sahara","Le Kalahari","Le Taklamakan"]],
+["Quel désert se trouve dans la région chinoise du Xinjiang ?","Le Taklamakan",["Le Gobi","Le Sahara","Le Kalahari"]],
+["Quel désert se trouve en Arabie saoudite ?","Le Rub al-Khali",["Le Sahara","Le Gobi","Le Kalahari"]],
 ["Quel désert se trouve en Amérique du Nord ?","Le Mojave",["Le Sahara","Le Gobi","Le Kalahari"]],
 ["Quel désert se trouve en Amérique du Sud ?","L'Atacama",["Le Sahara","Le Gobi","Le Kalahari"]],
 ["Quel désert se trouve en Australie ?","Le Grand Désert Victoria",["Le Sahara","Le Gobi","Le Kalahari"]],
-["Quel désert se trouve en Antarctique ?","L'Antarctique",["Le Sahara","Le Gobi","Le Kalahari"]],
-["Quel désert se trouve en Arctique ?","L'Arctique",["Le Sahara","Le Gobi","Le Kalahari"]],
+["Quel désert se trouve en Antarctique ?","Le désert antarctique",["Le Sahara","Le Gobi","Le Kalahari"]],
+["Quel désert se trouve en Arctique ?","Le désert arctique",["Le Sahara","Le Gobi","Le Kalahari"]],
 ["Quel océan est le plus grand du monde ?","Le Pacifique",["L'Atlantique","L'Indien","L'Arctique"]],
 ["Quel océan sépare l'Amérique de l'Europe et de l'Afrique ?","L'Atlantique",["Le Pacifique","L'Indien","L'Arctique"]],
 ["Quel océan se trouve entre l'Afrique, l'Asie et l'Australie ?","L'Indien",["Le Pacifique","L'Atlantique","L'Arctique"]],
@@ -670,7 +670,7 @@ const GEO_QUESTIONS = [
 ["Quel pays traverse le Cercle polaire arctique ?","Les États-Unis (Alaska)",["Le Canada","Le Groenland","La Russie"]],
 ["Quel pays traverse le Cercle polaire arctique ?","Le Canada",["Les États-Unis (Alaska)","Le Groenland","La Russie"]],
 ["Quel pays traverse le Cercle polaire arctique ?","Le Groenland (Danemark)",["Le Canada","Les États-Unis","La Russie"]],
-["Quel pays traverse le Cercle polaire antarctique ?","L'Antarctique",["Le Salouen","Windhoek"]],
+["Quel continent est traversé par le Cercle polaire antarctique ?","L'Antarctique",["L'Europe","L'Asie","L'Amérique du Sud"]],
 ["Quel pays possède le plus grand nombre de lacs ?","Le Canada",["La Russie","Les États-Unis","La Finlande"]],
 ["Quel pays possède le plus grand nombre d'îles ?","La Suède",["La Finlande","Le Canada","L'Indonésie"]],
 ["Quel pays possède le plus grand nombre de volcans actifs ?","L'Indonésie",["Le Japon","Les États-Unis","L'Islande"]],
@@ -696,7 +696,7 @@ const GEO_QUESTIONS = [
 ["Quel est le plus grand lac d'Amérique du Sud ?","Le lac Titicaca",["Le lac Maracaibo","Le lac Poopó","Le lac Laguna Merín"]],
 ["Quel est le plus grand lac d'Europe ?","Le lac Ladoga",["Le lac Onega","Le lac Vänern","Le lac Saïmaa"]],
 ["Quel est le plus grand lac d'Océanie ?","Le lac Eyre",["Le lac Taupo","Le lac Macquarie","Le lac George"]],
-["Quel est le plus grand lac d'Antarctique ?","Le lac Vostok",["L'Oti","Brazzaville"]],
+["Quel est le plus grand lac d'Antarctique ?","Le lac Vostok",["Le lac Hodgson","Le lac East","Le lac Mercer"]],
 ["Quel est le plus grand lac salé du monde ?","La mer Caspienne",["Le lac d'Aral","Le Grand Lac Salé","La mer Morte"]],
 ["Quel est le plus grand lac entièrement en Afrique ?","Le lac Victoria",["Le lac Tanganyika","Le lac Malawi","Le lac Tchad"]],
 ["Quel est le plus grand lac entièrement en Asie ?","Le lac Baïkal",["Le lac Balkhach","Le lac d'Aral","Le lac Taihu"]],
@@ -719,7 +719,7 @@ const GEO_QUESTIONS = [
 ["Quel pays possède le plus grand nombre de frontières terrestres en Asie ?","La Chine (14)",["La Russie","L'Inde","Le Kazakhstan"]],
 ["Quel pays possède le plus grand nombre de frontières terrestres en Amérique du Nord ?","Les États-Unis (2)",["Le Canada","Le Mexique","Le Guatemala"]],
 ["Quel pays possède le plus grand nombre de frontières terrestres en Océanie ?","L'Indonésie (2)",["La Papouasie-Nouvelle-Guinée","La Nouvelle-Zélande","Fidji"]],
-["Quel pays possède le plus grand nombre de frontières terrestres en Antarctique ?","Aucun",["L'Espagne","Le Japon (îles Ogasawara)"]],
+["Quel traité encadre l'utilisation pacifique de l'Antarctique depuis 1961 ?","Le Traité sur l'Antarctique",["Le Traité de l'espace","Le Protocole de Kyoto","La Convention de Genève"]],
 ["Quel pays possède le plus grand nombre de fuseaux horaires ?","La France (12)",["La Russie","Les États-Unis","Le Royaume-Uni"]],
 ["Quel pays possède le deuxième plus grand nombre de fuseaux horaires ?","La Russie (11)",["La France","Les États-Unis","Le Royaume-Uni"]],
 ["Quel pays possède le troisième plus grand nombre de fuseaux horaires ?","Les États-Unis (11)",["La France","La Russie","Le Royaume-Uni"]],
@@ -852,19 +852,19 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale des Bahamas ?","Nassau",["Freeport","Marsh Harbour","George Town"]],
     ["Quelle est la capitale de Bahreïn ?","Manama",["Muharraq","Riffa","Hidd"]],
     ["Quelle est la capitale du Bangladesh ?","Dacca",["Chittagong","Khulna","Rajshahi"]],
-    ["Quelle est la capitale de la Barbade ?","Bridgetown",["Paris","Londres"]],
+    ["Quelle est la capitale de la Barbade ?","Bridgetown",["Speightstown","Oistins","Holetown"]],
     ["Quelle est la capitale de la Belgique ?","Bruxelles",["Anvers","Gand","Bruges"]],
     ["Quelle est la capitale du Belize ?","Belmopan",["Belize City","Orange Walk","Corozal"]],
     ["Quelle est la capitale du Bénin ?","Porto-Novo",["Cotonou","Parakou","Djougou"]],
-    ["Quelle est la capitale du Bhoutan ?","Thimphou",["Paris","Londres"]],
+    ["Quelle est la capitale du Bhoutan ?","Thimphou",["Paro","Bumthang","Trongsa"]],
     ["Quelle est la capitale de la Bolivie ?","Sucre",["La Paz","Santa Cruz","Cochabamba"]],
     ["Quelle est la capitale de la Bosnie-Herzégovine ?","Sarajevo",["Banja Luka","Tuzla","Mostar"]],
     ["Quelle est la capitale du Botswana ?","Gaborone",["Francistown","Molepolole","Maun"]],
     ["Quelle est la capitale du Brésil ?","Brasilia",["Rio de Janeiro","São Paulo","Salvador"]],
-    ["Quelle est la capitale du Brunei ?","Bandar Seri Begawan",["Paris","Londres"]],
+    ["Quelle est la capitale du Brunei ?","Bandar Seri Begawan",["Kuala Belait","Tutong","Seria"]],
     ["Quelle est la capitale de la Bulgarie ?","Sofia",["Plovdiv","Varna","Bourgas"]],
     ["Quelle est la capitale du Burkina Faso ?","Ouagadougou",["Bobo-Dioulasso","Koudougou","Ouahigouya"]],
-    ["Quelle est la capitale du Burundi ?","Gitega",["Bujumbura","Ngozi","Kitega"]],
+    ["Quelle est la capitale du Burundi ?","Gitega",["Bujumbura","Ngozi","Muyinga"]],
     ["Quelle est la capitale du Cambodge ?","Phnom Penh",["Siem Reap","Battambang","Sihanoukville"]],
     ["Quelle est la capitale du Cameroun ?","Yaoundé",["Douala","Garoua","Bafoussam"]],
     ["Quelle est la capitale du Canada ?","Ottawa",["Toronto","Montréal","Vancouver"]],
@@ -882,37 +882,37 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale de Cuba ?","La Havane",["Santiago de Cuba","Camagüey","Holguín"]],
     ["Quelle est la capitale de Chypre ?","Nicosie",["Limassol","Larnaca","Famagouste"]],
     ["Quelle est la capitale du Danemark ?","Copenhague",["Aarhus","Odense","Aalborg"]],
-    ["Quelle est la capitale de Djibouti ?","Djibouti",["Paris","Londres"]],
-    ["Quelle est la capitale de la Dominique ?","Roseau",["Paris","Londres"]],
+    ["Quelle est la capitale de Djibouti ?","Djibouti",["Ali Sabieh","Tadjourah","Arta"]],
+    ["Quelle est la capitale de la Dominique ?","Roseau",["Marigot","Portsmouth","Roseau Valley"]],
     ["Quelle est la capitale de l'Égypte ?","Le Caire",["Alexandrie","Louxor","Gizeh"]],
     ["Quelle est la capitale des Émirats arabes unis ?","Abou Dabi",["Dubaï","Charjah","Al-Aïn"]],
     ["Quelle est la capitale de l'Équateur ?","Quito",["Guayaquil","Cuenca","Machala"]],
-    ["Quelle est la capitale de l'Érythrée ?","Asmara",["Massawa","Keren","Assab"]],
+["Quelle est la capitale de l'Érythrée ?","Asmara",["Massawa","Keren","Assab"]],
     ["Quelle est la capitale de l'Espagne ?","Madrid",["Barcelone","Séville","Valence"]],
     ["Quelle est la capitale de l'Estonie ?","Tallinn",["Tartu","Narva","Pärnu"]],
     ["Quelle est la capitale des États-Unis ?","Washington",["New York","Los Angeles","Chicago"]],
     ["Quelle est la capitale de l'Éthiopie ?","Addis-Abeba",["Dire Dawa","Gonder","Bahir Dar"]],
-    ["Quelle est la capitale des Fidji ?","Suva",["Paris","Londres"]],
-    ["Quelle est la capitale de la Finlande ?","Helsinki",["Espoo","Tampere","Turku"]],
+    ["Quelle est la capitale des Fidji ?","Suva",["Nadi","Lautoka","Labasa"]],
+["Quelle est la capitale de la Finlande ?","Helsinki",["Espoo","Tampere","Turku"]],
     ["Quelle est la capitale de la France ?","Paris",["Lyon","Marseille","Bordeaux"]],
     ["Quelle est la capitale du Gabon ?","Libreville",["Port-Gentil","Franceville","Oyem"]],
-    ["Quelle est la capitale de la Gambie ?","Banjul",["Paris","Londres"]],
+    ["Quelle est la capitale de la Gambie ?","Banjul",["Brikama","Georgetown","Farafenni"]],
     ["Quelle est la capitale de la Géorgie ?","Tbilissi",["Koutaïssi","Batoumi","Roustavi"]],
     ["Quelle est la capitale de l'Allemagne ?","Berlin",["Munich","Hambourg","Francfort"]],
     ["Quelle est la capitale du Ghana ?","Accra",["Kumasi","Tamale","Sekondi-Takoradi"]],
     ["Quelle est la capitale de la Grèce ?","Athènes",["Thessalonique","Patras","Héraklion"]],
-    ["Quelle est la capitale de Grenade ?","Saint-Georges",["Paris","Londres"]],
+    ["Quelle est la capitale de la Grenade ?","Saint-Georges",["Gouyave","Victoria","St. David's"]],
     ["Quelle est la capitale du Guatemala ?","Guatemala",["Quetzaltenango","Escuintla","Villa Nueva"]],
     ["Quelle est la capitale de la Guinée ?","Conakry",["Nzérékoré","Kankan","Kindia"]],
-    ["Quelle est la capitale de la Guinée-Bissau ?","Bissau",["Paris","Londres"]],
-    ["Quelle est la capitale de la Guinée équatoriale ?","Malabo",["Bata","Ebebiyin","Aconibe"]],
-    ["Quelle est la capitale du Guyana ?","Georgetown",["Paris","Londres"]],
+    ["Quelle est la capitale de la Guinée-Bissau ?","Bissau",["Bafatá","Gabú","Cacheu"]],
+    ["Quelle est la capitale de la Guinée équatoriale ?","Ciudad de la Paz",["Bata","Ebebiyin","Malabo"]],
+    ["Quelle est la capitale du Guyana ?","Georgetown",["New Amsterdam","Bartica","Lethem"]],
     ["Quelle est la capitale d'Haïti ?","Port-au-Prince",["Cap-Haïtien","Les Cayes","Gonaïves"]],
     ["Quelle est la capitale du Honduras ?","Tegucigalpa",["San Pedro Sula","La Ceiba","Choluteca"]],
     ["Quelle est la capitale de la Hongrie ?","Budapest",["Debrecen","Szeged","Miskolc"]],
     ["Quelle est la capitale de l'Islande ?","Reykjavik",["Akureyri","Kópavogur","Hafnarfjörður"]],
     ["Quelle est la capitale de l'Inde ?","New Delhi",["Mumbai","Bengaluru","Kolkata"]],
-    ["Quelle est la capitale de l'Indonésie ?","Jakarta",["Surabaya","Bandung","Medan"]],
+["Quelle est la capitale de l'Indonésie ?","Jakarta",["Surabaya","Bandung","Medan"]],
     ["Quelle est la capitale de l'Iran ?","Téhéran",["Machhad","Ispahan","Tabriz"]],
     ["Quelle est la capitale de l'Irak ?","Bagdad",["Mossoul","Bassorah","Erbil"]],
     ["Quelle est la capitale de l'Irlande ?","Dublin",["Cork","Galway","Limerick"]],
@@ -923,39 +923,39 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale de la Jordanie ?","Amman",["Zarqa","Irbid","Aqaba"]],
     ["Quelle est la capitale du Kazakhstan ?","Astana",["Almaty","Chymkent","Karaganda"]],
     ["Quelle est la capitale du Kenya ?","Nairobi",["Mombasa","Kisumu","Nakuru"]],
-    ["Quelle est la capitale des Kiribati ?","Tarawa",["Paris","Londres"]],
+    ["Quelle est la capitale des Kiribati ?","Tarawa-Sud",["Betio","Bairiki","Abaiang"]],
     ["Quelle est la capitale du Koweït ?","Koweït",["Hawalli","Al Farwaniyah","Al Ahmadi"]],
     ["Quelle est la capitale du Kirghizistan ?","Bichkek",["Och","Djalal-Abad","Karakol"]],
     ["Quelle est la capitale du Laos ?","Vientiane",["Luang Prabang","Pakse","Savannakhet"]],
     ["Quelle est la capitale de la Lettonie ?","Riga",["Daugavpils","Liepāja","Jelgava"]],
     ["Quelle est la capitale du Liban ?","Beyrouth",["Tripoli","Sidon","Tyr"]],
-    ["Quelle est la capitale du Lesotho ?","Maseru",["Paris","Londres"]],
+    ["Quelle est la capitale du Lesotho ?","Maseru",["Mafeteng","Mohale's Hoek","Quthing"]],
     ["Quelle est la capitale du Liberia ?","Monrovia",["Buchanan","Gbarnga","Harper"]],
     ["Quelle est la capitale de la Libye ?","Tripoli",["Benghazi","Misrata","Al-Bayda"]],
-    ["Quelle est la capitale du Liechtenstein ?","Vaduz",["Paris","Londres"]],
+    ["Quelle est la capitale du Liechtenstein ?","Vaduz",["Schaan","Balzers","Triesen"]],
     ["Quelle est la capitale de la Lituanie ?","Vilnius",["Kaunas","Klaipėda","Šiauliai"]],
-    ["Quelle est la capitale du Luxembourg ?","Luxembourg",["Paris","Londres"]],
+    ["Quelle est la capitale du Luxembourg ?","Luxembourg",["Esch-sur-Alzette","Differdange","Dudelange"]],
     ["Quelle est la capitale de Madagascar ?","Antananarivo",["Toamasina","Antsiranana","Fianarantsoa"]],
     ["Quelle est la capitale du Malawi ?","Lilongwe",["Blantyre","Mzuzu","Zomba"]],
     ["Quelle est la capitale de la Malaisie ?","Kuala Lumpur",["George Town","Ipoh","Johor Bahru"]],
-    ["Quelle est la capitale des Maldives ?","Malé",["Paris","Londres"]],
+    ["Quelle est la capitale des Maldives ?","Malé",["Hithadhoo","Fuvahmulah","Addu City"]],
     ["Quelle est la capitale du Mali ?","Bamako",["Sikasso","Mopti","Koutiala"]],
     ["Quelle est la capitale de Malte ?","La Valette",["Mdina","Sliema","Birgu"]],
     ["Quelle est la capitale du Maroc ?","Rabat",["Casablanca","Marrakech","Fès"]],
-    ["Quelle est la capitale des Îles Marshall ?","Majuro",["Paris","Londres"]],
+    ["Quelle est la capitale des Îles Marshall ?","Majuro",["Kwajalein","Wotje","Jaluit"]],
     ["Quelle est la capitale de Maurice ?","Port-Louis",["Curepipe","Vacoas","Quatre Bornes"]],
-    ["Quelle est la capitale de la Mauritanie ?","Nouakchott",["Paris","Londres"]],
+    ["Quelle est la capitale de la Mauritanie ?","Nouakchott",["Nouadhibou","Rosso","Zouérat"]],
     ["Quelle est la capitale du Mexique ?","Mexico",["Guadalajara","Monterrey","Puebla"]],
-    ["Quelle est la capitale de la Micronésie ?","Palikir",["Paris","Londres"]],
+    ["Quelle est la capitale de la Micronésie ?","Palikir",["Weno","Colonia","Tono"]],
     ["Quelle est la capitale de la Moldavie ?","Chișinău",["Tiraspol","Bălți","Cahul"]],
-    ["Quelle est la capitale de Monaco ?","Monaco",["Paris","Londres"]],
+    ["Quelle est la capitale de Monaco ?","Monaco",["Monte Carlo","La Condamine","Fontvieille"]],
     ["Quelle est la capitale de la Mongolie ?","Oulan-Bator",["Erdenet","Darkhan","Choibalsan"]],
-    ["Quelle est la capitale du Monténégro ?","Podgorica",["Paris","Londres"]],
+    ["Quelle est la capitale du Monténégro ?","Podgorica",["Nikšić","Bijelo Polje","Cetinje"]],
     ["Quelle est la capitale du Mozambique ?","Maputo",["Beira","Nampula","Quelimane"]],
-    ["Quelle est la capitale de la Birmanie (Myanmar) ?","Naypyidaw",["Rangoun","Mandalay"]],
+["Quelle est la capitale de la Birmanie (Myanmar) ?","Naypyidaw",["Yangon","Mandalay","Bago"]],
     ["Quelle est la capitale de la Namibie ?","Windhoek",["Swakopmund","Walvis Bay","Oshakati"]],
-    ["Quelle est la capitale de Nauru ?","Yaren",["Paris","Londres"]],
-    ["Quelle est la capitale du Népal ?","Katmandou",["Paris","Londres"]],
+    ["Quelle est la capitale de Nauru ?","Yaren",["Denigomodu","Aiwo","Boe"]],
+    ["Quelle est la capitale du Népal ?","Katmandou",["Lalitpur","Bhaktapur","Pokhara"]],
     ["Quelle est la capitale des Pays-Bas ?","Amsterdam",["La Haye","Rotterdam","Utrecht"]],
     ["Quelle est la capitale de la Nouvelle-Zélande ?","Wellington",["Auckland","Christchurch","Hamilton"]],
     ["Quelle est la capitale du Nicaragua ?","Managua",["León","Masaya","Granada"]],
@@ -964,10 +964,10 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale de la Norvège ?","Oslo",["Bergen","Trondheim","Stavanger"]],
     ["Quelle est la capitale d'Oman ?","Mascate",["Salalah","Sohar","Nizwa"]],
     ["Quelle est la capitale du Pakistan ?","Islamabad",["Karachi","Lahore","Faisalabad"]],
-    ["Quelle est la capitale des Palaos ?","Ngerulmud",["Paris","Londres"]],
+    ["Quelle est la capitale des Palaos ?","Ngerulmud",["Koror","Melekeok","Airai"]],
     ["Quelle est la capitale de la Palestine ?","Jérusalem",["Ramallah","Gaza","Hébron"]],
-    ["Quelle est la capitale du Panama ?","Panama",["Paris","Londres"]],
-    ["Quelle est la capitale de la Papouasie-Nouvelle-Guinée ?","Port-Moresby",["Paris","Londres"]],
+    ["Quelle est la capitale du Panama ?","Panama",["Colón","David","Chitré"]],
+    ["Quelle est la capitale de la Papouasie-Nouvelle-Guinée ?","Port-Moresby",["Lae","Madang","Rabaul"]],
     ["Quelle est la capitale du Paraguay ?","Asuncion",["Ciudad del Este","Encarnación","Pedro Juan Caballero"]],
     ["Quelle est la capitale du Pérou ?","Lima",["Arequipa","Cusco","Trujillo"]],
     ["Quelle est la capitale des Philippines ?","Manille",["Quezon City","Davao","Cebu"]],
@@ -978,25 +978,25 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale de la Roumanie ?","Bucarest",["Cluj-Napoca","Timișoara","Iași"]],
     ["Quelle est la capitale du Royaume-Uni ?","Londres",["Manchester","Liverpool","Birmingham"]],
     ["Quelle est la capitale de la Russie ?","Moscou",["Saint-Pétersbourg","Kiev","Minsk"]],
-    ["Quelle est la capitale du Rwanda ?","Kigali",["Paris","Londres"]],
-    ["Quelle est la capitale de Saint-Kitts-et-Nevis ?","Basseterre",["Paris","Londres"]],
-    ["Quelle est la capitale de Sainte-Lucie ?","Castries",["Paris","Londres"]],
-    ["Quelle est la capitale de Saint-Vincent-et-les-Grenadines ?","Kingstown",["Paris","Londres"]],
-    ["Quelle est la capitale des Salomon ?","Honiara",["Paris","Londres"]],
-    ["Quelle est la capitale du Samoa ?","Apia",["Paris","Londres"]],
+    ["Quelle est la capitale du Rwanda ?","Kigali",["Butare","Gisenyi","Ruhengeri"]],
+    ["Quelle est la capitale de Saint-Kitts-et-Nevis ?","Basseterre",["Charlestown","Gingerland","Newtown"]],
+    ["Quelle est la capitale de Sainte-Lucie ?","Castries",["Gros Isle","Soufrière","Vieux Fort"]],
+    ["Quelle est la capitale de Saint-Vincent-et-les-Grenadines ?","Kingstown",["Georgetown","Calliaqua","Bequia"]],
+    ["Quelle est la capitale des Salomon ?","Honiara",["Gizo","Auki","Kirakira"]],
+    ["Quelle est la capitale du Samoa ?","Apia",["Mulifanua","Salelologa","Faleolo"]],
     ["Quelle est la capitale de Sao Tomé-et-Principe ?","Sao Tomé",["Santo Antonio","Neves","Trindade"]],
     ["Quelle est la capitale du Sénégal ?","Dakar",["Bamako","Abidjan","Conakry"]],
     ["Quelle est la capitale de la Serbie ?","Belgrade",["Novi Sad","Niš","Kragujevac"]],
-    ["Quelle est la capitale des Seychelles ?","Victoria",["Paris","Londres"]],
+    ["Quelle est la capitale des Seychelles ?","Victoria",["Anse Boileau","Beau Vallon","Glacis"]],
     ["Quelle est la capitale de la Sierra Leone ?","Freetown",["Bo","Kenema","Makeni"]],
-    ["Quelle est la capitale de Singapour ?","Singapour",["Paris","Londres"]],
+    ["Quelle est la capitale de Singapour ?","Singapour",["Kuala Lumpur","Manille","Jakarta"]],
     ["Quelle est la capitale de la Slovaquie ?","Bratislava",["Košice","Prešov","Žilina"]],
     ["Quelle est la capitale de la Slovénie ?","Ljubljana",["Maribor","Celje","Kranj"]],
     ["Quelle est la capitale de la Somalie ?","Mogadiscio",["Hargeisa","Bosaso","Kismayo"]],
     ["Quelle est la capitale du Soudan ?","Khartoum",["Omdurman","Port-Soudan","Kassala"]],
     ["Quelle est la capitale du Soudan du Sud ?","Djouba",["Wau","Malakal","Aweil"]],
     ["Quelle est la capitale du Sri Lanka ?","Sri Jayawardenepura Kotte",["Colombo","Kandy","Galle"]],
-    ["Quelle est la capitale du Suriname ?","Paramaribo",["Paris","Londres"]],
+    ["Quelle est la capitale du Suriname ?","Paramaribo",["Lelydorp","Commewijne","Nieuw Nickerie"]],
     ["Quelle est la capitale de la Suède ?","Stockholm",["Göteborg","Malmö","Uppsala"]],
     ["Quelle est la capitale de la Suisse ?","Berne",["Zurich","Genève","Bâle"]],
     ["Quelle est la capitale de la Syrie ?","Damas",["Alep","Homs","Hama"]],
@@ -1009,13 +1009,13 @@ GEO_QUESTIONS.push(
     ["Quelle est la capitale de la Tunisie ?","Tunis",["Sfax","Sousse","Kairouan"]],
     ["Quelle est la capitale de la Turquie ?","Ankara",["Istanbul","Izmir","Antalya"]],
     ["Quelle est la capitale du Turkménistan ?","Achgabat",["Türkmenabat","Dasgouoz","Mary"]],
-    ["Quelle est la capitale de Tuvalu ?","Funafuti",["Paris","Londres"]],
+    ["Quelle est la capitale de Tuvalu ?","Funafuti",["Vaitupu","Nukufetau","Nukulaelae"]],
     ["Quelle est la capitale de l'Ouganda ?","Kampala",["Gulu","Lira","Jinja"]],
     ["Quelle est la capitale de l'Ukraine ?","Kiev",["Kharkiv","Odessa","Dnipro"]],
     ["Quelle est la capitale de l'Uruguay ?","Montevideo",["Salto","Paysandú","Las Piedras"]],
     ["Quelle est la capitale de l'Ouzbékistan ?","Tachkent",["Samarcande","Boukhara","Namangan"]],
-    ["Quelle est la capitale du Vanuatu ?","Port-Vila",["Paris","Londres"]],
-    ["Quelle est la capitale du Vatican ?","Cité du Vatican",["Paris","Londres"]],
+    ["Quelle est la capitale du Vanuatu ?","Port-Vila",["Luganville","Santo","Tanna"]],
+    ["Quelle est la capitale du Vatican ?","Cité du Vatican",["Borgo","Prati","Trastevere"]],
     ["Quelle est la capitale du Venezuela ?","Caracas",["Maracaibo","Valencia","Barquisimeto"]],
     ["Quelle est la capitale du Viêt Nam ?","Hanoï",["Hô Chi Minh-Ville","Da Nang","Hai Phong"]],
     ["Quelle est la capitale du Yémen ?","Sanaa",["Aden","Taëzz","Hodeïda"]],
@@ -1236,11 +1236,11 @@ GEO_QUESTIONS.push(
     ["Quel fleuve traverse l'Espagne ?","Le Tage",["Le Douro","Le Guadalquivir","L'Èbre"]],
     ["Quel fleuve traverse les États-Unis ?","Le Mississippi",["Le Missouri","L'Ohio","Le Tennessee"]],
     ["Quel fleuve traverse l'Éthiopie ?","Le Nil bleu",["L'Awash","L'Omo","Le Tekezé"]],
-    ["Quel fleuve traverse la Finlande ?","Le Kemijoki",["Paris","Londres"]],
+    ["Quel fleuve traverse la Finlande ?","Le Kemijoki",["L'Ounasjoki","Le Tornionjoki","Le Lainionjoki"]],
     ["Quel fleuve traverse la France ?","La Seine",["La Loire","Le Rhône","La Garonne"]],
     ["Quel fleuve traverse le Gabon ?","L'Ogooué",["Le Nyanga","Le Komo","Le Ivindo"]],
-    ["Quel fleuve traverse la Gambie ?","Le Gambie",["Paris","Londres"]],
-    ["Quel fleuve traverse la Géorgie ?","Le Koura",["Paris","Londres"]],
+    ["Quel fleuve traverse la Gambie ?","Le fleuve Gambie",["Le Sénégal","Le Saloum","Le Casamance"]],
+    ["Quel fleuve traverse la Géorgie ?","Le Koura",["Le Rioni","Le Mtkvari","Le Tergi"]],
     ["Quel fleuve traverse l'Allemagne ?","Le Rhin",["Le Danube","L'Elbe","Le Pô"]],
     ["Quel fleuve traverse le Ghana ?","Le Volta",["L'Oti","Le Pra","L'Ankobra"]],
     ["Quel fleuve traverse le Guatemala ?","Le Motagua",["Le Polochic","Le Sarstún","Le Usumacinta"]],
@@ -1252,31 +1252,31 @@ GEO_QUESTIONS.push(
     ["Quel fleuve traverse l'Inde ?","Le Gange",["L'Indus","Le Brahmapoutre","Le Yamuna"]],
     ["Quel fleuve traverse l'Indonésie ?","Le Kapuas",["Le Mahakam","Le Barito","Le Musi"]],
     ["Quel fleuve traverse l'Irak ?","Le Tigre",["L'Euphrate","Le Karoun","Le Chatt al-Arab"]],
-    ["Quel fleuve traverse l'Irlande ?","Le Shannon",["Paris","Londres"]],
+    ["Quel fleuve traverse l'Irlande ?","Le Shannon",["Le Corrib","Le Suir","Le Nore"]],
     ["Quel fleuve traverse l'Italie ?","Le Pô",["L'Arno","Le Tibre","L'Adige"]],
     ["Quel fleuve traverse la Jamaïque ?","Le Rio Minho",["Le Rio Cobre","Le Black River","Le Martha Brae"]],
-    ["Quel fleuve traverse le Japon ?","Le Shinano",["Paris","Londres"]],
-    ["Quel fleuve traverse la Jordanie ?","Le Jourdain",["Paris","Londres"]],
+    ["Quel fleuve traverse le Japon ?","Le Shinano",["Le Tone","Le Kitakami","Le Ishikari"]],
+    ["Quel fleuve traverse la Jordanie ?","Le Jourdain",["Le Yarmouk","Le Zarqa","Le Río Grande"]],
     ["Quel fleuve traverse le Kazakhstan ?","L'Irtych",["L'Ob","L'Ienisseï","L'Amour"]],
     ["Quel fleuve traverse le Kenya ?","Le Tana",["L'Athi","Le Ewaso Ng'iro","Le Nzoia"]],
-    ["Quel fleuve traverse le Kirghizistan ?","Le Naryn",["Paris","Londres"]],
+    ["Sur quel fleuve le barrage de Toktogul a-t-il été construit au Kirghizistan ?","Le Naryn",["Le Syr-Daria","Le Chatkal","Le Arys"]],
     ["Quel fleuve traverse le Laos ?","Le Mékong",["Le Nam Ou","Le Xe Bang Fai","Le Xe Don"]],
-    ["Quel fleuve traverse la Lettonie ?","La Daugava",["Paris","Londres"]],
-    ["Quel fleuve traverse le Liban ?","Le Litani",["Paris","Londres"]],
+    ["Quel fleuve traverse la Lettonie ?","La Daugava",["Le Lielupe","Le Venta","Le Gauja"]],
+    ["Quel fleuve traverse le Liban ?","Le Litani",["Le Nahr al-Bared","Le Nahr Ibrahim","Le Nahr al-Kalb"]],
     ["Quel fleuve traverse le Liberia ?","Le Saint-Paul",["Le Saint-Jean","Le Cavalla","Le Lofa"]],
-    ["Quel fleuve traverse le Liechtenstein ?","Le Rhin",["Paris","Londres"]],
-    ["Quel fleuve traverse la Lituanie ?","Le Niémen",["Paris","Londres"]],
-    ["Quel fleuve traverse le Luxembourg ?","L'Alzette",["Paris","Londres"]],
+    ["Quel fleuve traverse le Liechtenstein ?","Le Rhin",["L'Aar","Le Landquart","L'Inn"]],
+    ["Quel fleuve traverse la Lituanie ?","Le Niémen",["Le Lielupe","Le Venta","Le Gauja"]],
+    ["Quel fleuve traverse le Luxembourg ?","L'Alzette",["La Sûre","La Moselle","L'Attert"]],
     ["Quel fleuve traverse Madagascar ?","Le Betsiboka",["Le Mangoky","Le Onilahy","Le Ikopa"]],
     ["Quel fleuve traverse le Malawi ?","Le Shire",["Le Zambèze","Le Ruo","Le Linthipe"]],
     ["Quel fleuve traverse la Malaisie ?","Le Rajang",["Le Kinabatangan","Le Pahang","Le Perak"]],
     ["Quel fleuve traverse le Mali ?","Le Niger",["Le Bani","Le Sénégal","Le Falémé"]],
     ["Quel fleuve traverse le Maroc ?","Le Moulouya",["Le Sebou","Le Oum Er-Rbia","Le Drâa"]],
-    ["Quel fleuve traverse la Mauritanie ?","Le Sénégal",["L'orgueil","Le Gorgol","Le Garfa"]],
+["Quel fleuve traverse la Mauritanie ?","Le Sénégal",["Le Gorgol","Le Garfa","Le Yérimi"]],
     ["Quel fleuve traverse le Mexique ?","Le Rio Grande",["Le Balsas","Le Grijalva","L'Usumacinta"]],
-    ["Quel fleuve traverse la Moldavie ?","Le Dniestr",["Paris","Londres"]],
-    ["Quel fleuve traverse la Mongolie ?","L'Orkhon",["Paris","Londres"]],
-    ["Quel fleuve traverse le Monténégro ?","La Tara",["Paris","Londres"]],
+    ["Quel fleuve traverse la Moldavie ?","Le Dniestr",["Le Prut","Le Bîc","Le Ichel"]],
+    ["Quel fleuve traverse la Mongolie ?","L'Orkhon",["Le Selenga","Le Kerulen","Le Toula"]],
+    ["Quel fleuve traverse le Monténégro ?","La Tara",["Le Lim","Le Morača","L'Ibar"]],
     ["Quel fleuve traverse le Mozambique ?","Le Zambèze",["Le Limpopo","Le Save","Le Pungwe"]],
     ["Quel fleuve traverse la Birmanie (Myanmar) ?","L'Irrawaddy",["Le Salouen","Le Chindwin","Le Sittoung"]],
     ["Quel fleuve traverse la Namibie ?","L'Orange",["Le Fish","Le Swakop","Le Kuiseb"]],
@@ -1286,9 +1286,9 @@ GEO_QUESTIONS.push(
     ["Quel fleuve traverse le Nicaragua ?","Le Coco",["Le San Juan","Le Escondido","Le Grande"]],
     ["Quel fleuve traverse le Niger ?","Le Niger",["Le Sirba","Le Gorouol","Le Dargol"]],
     ["Quel fleuve traverse le Nigeria ?","Le Niger",["Le Benoué","Le Kaduna","Le Sokoto"]],
-    ["Quel fleuve traverse la Norvège ?","La Glomma",["Paris","Londres"]],
+    ["Quel fleuve traverse la Norvège ?","La Glomma",["La Tana","La Drammen","La Vorma"]],
     ["Quel fleuve traverse le Pakistan ?","L'Indus",["Le Gange","Le Brahmapoutre","Le Jhelum"]],
-    ["Quel fleuve traverse la Palestine ?","Le Jourdain",["Paris","Londres"]],
+    ["Quel fleuve traverse la Palestine ?","Le Jourdain",["Le Yarmouk","Le Zarqa","Le Hasbani"]],
     ["Quel fleuve traverse le Panama ?","Le Chagres",["Le Tuira","Le Chepo","Le Bayano"]],
     ["Quel fleuve traverse la Papouasie-Nouvelle-Guinée ?","Le Sepik",["Le Fly","Le Purari","Le Markham"]],
     ["Quel fleuve traverse le Paraguay ?","Le Paraguay",["Le Paraná","Le Pilcomayo","Le Apa"]],
@@ -1296,61 +1296,61 @@ GEO_QUESTIONS.push(
     ["Quel fleuve traverse les Philippines ?","Le Cagayan",["Le Agusan","Le Pasig","Le Pulangi"]],
     ["Quel fleuve traverse la Pologne ?","La Vistule",["L'Oder","La Warta","Le Bug"]],
     ["Quel fleuve traverse le Portugal ?","Le Douro",["Le Tage","Le Guadalquivir","L'Èbre"]],
-    ["Quel fleuve traverse la Tchéquie ?","La Vltava",["Paris","Londres"]],
+    ["Quel fleuve traverse la Tchéquie ?","La Vltava",["L'Elbe","La Morava","L'Oder"]],
     ["Quel fleuve traverse la Roumanie ?","Le Danube",["Le Prut","Le Olt","Le Mureș"]],
     ["Quel fleuve traverse le Royaume-Uni ?","La Tamise",["La Severn","La Mersey","La Clyde"]],
     ["Quel fleuve traverse la Russie ?","La Volga",["Le Danube","L'Ob","L'Ienisseï"]],
     ["Quel fleuve traverse le Rwanda ?","Le Kagera",["Le Nyabarongo","Le Ruvubu","Le Ruvironza"]],
     ["Quel fleuve traverse la Serbie ?","Le Danube",["La Save","La Tisza","La Morava"]],
     ["Quel fleuve traverse la Sierra Leone ?","Le Rokel",["Le Jong","Le Sewa","Le Moa"]],
-    ["Quel fleuve traverse la Slovaquie ?","Le Danube",["Paris","Londres"]],
-    ["Quel fleuve traverse la Slovénie ?","La Save",["Paris","Londres"]],
+    ["Quel fleuve traverse la Slovaquie ?","Le Danube",["Le Váh","Le Hron","Le Ipeľ"]],
+    ["Quel fleuve traverse la Slovénie ?","La Save",["La Drava","La Kolpa","La Soča"]],
     ["Quel fleuve traverse la Somalie ?","Le Chébéli",["Le Jubba","Le Nogal","Le Daror"]],
     ["Quel fleuve traverse le Soudan ?","Le Nil blanc",["Le Nil bleu","L'Atbara","Le Bahr el Ghazal"]],
     ["Quel fleuve traverse le Soudan du Sud ?","Le Nil blanc",["Le Sobat","Le Bahr el Ghazal","Le Pibor"]],
-    ["Quel fleuve traverse le Sri Lanka ?","Le Mahaweli",["Paris","Londres"]],
+    ["Quel fleuve traverse le Sri Lanka ?","Le Mahaweli",["Le Kelani","Le Walawe","Le Deduru Oya"]],
     ["Quel fleuve traverse le Suriname ?","Le Suriname",["Le Maroni","Le Coppename","Le Saramacca"]],
-    ["Quel fleuve traverse la Suède ?","La Lule",["Paris","Londres"]],
+    ["Quel fleuve traverse la Suède ?","La Lule",["Le Torne","Le Dalälven","Le Göta älv"]],
     ["Quel fleuve traverse la Suisse ?","Le Rhin",["Le Rhône","L'Inn","Le Ticino"]],
     ["Quel fleuve traverse la Syrie ?","L'Euphrate",["Le Khabour","Le Balikh","Le Sajour"]],
-    ["Quel fleuve traverse le Tadjikistan ?","L'Amou-Daria",["Paris","Londres"]],
+    ["Quel fleuve traverse le Tadjikistan ?","L'Amou-Daria",["Le Syr Darya","Le Panj","Le Vakhsh"]],
     ["Quel fleuve traverse la Tanzanie ?","Le Rufiji",["Le Ruvuma","Le Wami","Le Pangani"]],
     ["Quel fleuve traverse le Tchad ?","Le Chari",["Le Logone","Le Bahr el Ghazal","Le Ouham"]],
     ["Quel fleuve traverse la Thaïlande ?","Le Mékong",["Le Ping","Le Wang","Le Yom"]],
     ["Quel fleuve traverse le Togo ?","Le Mono",["L'Oti","Le Haho","Le Zio"]],
     ["Quel fleuve traverse Trinité-et-Tobago ?","Le Caroni",["L'Oropouche","Le South Oropouche","Le Nariva"]],
     ["Quel fleuve traverse la Tunisie ?","La Medjerda",["Le Zoussouna","Le Oued Zouara","Le Oued Siliana"]],
-    ["Quel fleuve traverse la Turquie ?","Le Kizilirmak",["Paris","Londres"]],
-    ["Quel fleuve traverse le Turkménistan ?","L'Amou-Daria",["Paris","Londres"]],
+    ["Quel fleuve traverse la Turquie ?","Le Kizilirmak",["Le Sakarya","L'Euphrate","Le Tigre"]],
+    ["Quel fleuve traverse le Turkménistan ?","L'Amou-Daria",["Le Tejen","Le Sumbar","Le Mourgab"]],
     ["Quel fleuve traverse l'Ouganda ?","Le Nil blanc",["Le Kafu","Le Mpongo","Le Semliki"]],
     ["Quel fleuve traverse l'Ukraine ?","Le Dniepr",["Le Dniestr","Le Boug","Le Donets"]],
     ["Quel fleuve traverse l'Uruguay ?","Le Río Negro",["Le Santa Lucía","Le Cebollatí","Le Yaguarí"]],
-    ["Quel fleuve traverse l'Ouzbékistan ?","L'Amou-Daria",["Paris","Londres"]],
+    ["Quel fleuve traverse l'Ouzbékistan ?","L'Amou-Daria",["Le Syr Darya","Le Chirchiq","Le Zeravchan"]],
     ["Quel fleuve traverse le Venezuela ?","L'Orénoque",["Le Caroni","Le Apure","Le Meta"]],
     ["Quel fleuve traverse le Viêt Nam ?","Le Mékong",["Le Dong Nai","Le Perfume","Le Saigon"]],
     ["Quel fleuve traverse la Zambie ?","Le Zambèze",["Le Kafue","Le Luangwa","Le Chambeshi"]],
     ["Quel fleuve traverse le Zimbabwe ?","Le Zambèze",["Le Limpopo","Le Save","Le Pungwe"]],
     ["Quel sommet est le plus haut d'Afrique ?","Le Kilimandjaro",["Le Mont Kenya","Le Ruwenzori","Le Mont Meru"]],
     ["Quel sommet est le plus haut d'Asie ?","L'Everest",["Le K2","Le Kangchenjunga","Le Lhotse"]],
-    ["Quel sommet est le plus haut d'Europe ?","Le Mont Blanc",["L'Elbrouz","Le Cervin","Le Mont Rosa"]],
+    ["Quel sommet est le plus haut des Alpes ?","Le Mont Blanc",["L'Elbrouz","Le Cervin","Le Mont Rosa"]],
     ["Quel sommet est le plus haut d'Amérique du Nord ?","Le Denali",["Le Mont Logan","Le Pico de Orizaba","Le Mont Saint-Élie"]],
     ["Quel sommet est le plus haut d'Amérique du Sud ?","L'Aconcagua",["L'Ojos del Salado","Le Pissis","Le Mercedario"]],
     ["Quel sommet est le plus haut d'Océanie ?","Le Puncak Jaya",["Le Mont Kosciuszko","Le Mont Wilhelm","Le Mont Giluwe"]],
     ["Quel sommet est le plus haut d'Antarctique ?","Le Vinson",["Le Mont Tyree","Le Mont Shinn","Le Mont Heger"]],
-    ["Quel désert est le plus grand du monde ?","Le Sahara",["L'Antarctique","L'Arctique","Le Gobi"]],
-    ["Quel désert est le plus grand désert chaud ?","Le Sahara",["L'Arabie","Le Gobi","Le Kalahari"]],
-    ["Quel désert est le plus aride du monde ?","L'Atacama",["Le Sahara","Le Mojave","Le Gobi"]],
+    ["Quel désert est le plus grand du monde ?","Le désert antarctique",["Le Sahara","Le désert arctique","Le Gobi"]],
+    ["Quel est le plus grand désert chaud du monde ?","Le Sahara",["Le désert d'Arabie","Le Gobi","Le Kalahari"]],
+    ["Quel est le désert non polaire le plus aride du monde ?","L'Atacama",["Le Sahara","Le Mojave","Le Gobi"]],
     ["Quel désert se trouve en Afrique du Nord ?","Le Sahara",["Le Kalahari","Le Namib","Le Gobi"]],
     ["Quel désert se trouve en Afrique australe ?","Le Kalahari",["Le Sahara","Le Namib","Le Gobi"]],
     ["Quel désert se trouve en Namibie ?","Le Namib",["Le Kalahari","Le Sahara","Le Gobi"]],
-    ["Quel désert se trouve en Asie centrale ?","Le Gobi",["Le Sahara","Le Kalahari","Le Taklamakan"]],
-    ["Quel désert se trouve en Chine ?","Le Taklamakan",["Le Gobi","Le Sahara","Le Kalahari"]],
-    ["Quel désert se trouve en Arabie saoudite ?","L'Arabie",["Le Sahara","Le Gobi","Le Kalahari"]],
+    ["Quel désert s'étend en Mongolie et dans le nord de la Chine ?","Le Gobi",["Le Sahara","Le Kalahari","Le Taklamakan"]],
+    ["Quel désert se trouve dans la région chinoise du Xinjiang ?","Le Taklamakan",["Le Gobi","Le Sahara","Le Kalahari"]],
+    ["Quel désert se trouve en Arabie saoudite ?","Le Rub al-Khali",["Le Sahara","Le Gobi","Le Kalahari"]],
     ["Quel désert se trouve en Amérique du Nord ?","Le Mojave",["Le Sahara","Le Gobi","Le Kalahari"]],
     ["Quel désert se trouve en Amérique du Sud ?","L'Atacama",["Le Sahara","Le Gobi","Le Kalahari"]],
     ["Quel désert se trouve en Australie ?","Le Grand Désert Victoria",["Le Sahara","Le Gobi","Le Kalahari"]],
-    ["Quel désert se trouve en Antarctique ?","L'Antarctique",["Le Sahara","Le Gobi","Le Kalahari"]],
-    ["Quel désert se trouve en Arctique ?","L'Arctique",["Le Sahara","Le Gobi","Le Kalahari"]],
+    ["Quel désert se trouve en Antarctique ?","Le désert antarctique",["Le Sahara","Le Gobi","Le Kalahari"]],
+    ["Quel désert se trouve en Arctique ?","Le désert arctique",["Le Sahara","Le Gobi","Le Kalahari"]],
     ["Quel océan est le plus grand du monde ?","Le Pacifique",["L'Atlantique","L'Indien","L'Arctique"]],
     ["Quel océan sépare l'Amérique de l'Europe et de l'Afrique ?","L'Atlantique",["Le Pacifique","L'Indien","L'Arctique"]],
     ["Quel océan se trouve entre l'Afrique, l'Asie et l'Australie ?","L'Indien",["Le Pacifique","L'Atlantique","L'Arctique"]],
@@ -1418,6 +1418,29 @@ function shuffleOptions(options) {
     return result;
 }
 
+function selectQuestionOptions(question, answer, distractors) {
+    const answerText = String(answer ?? '').trim();
+    const correctKey = normalizeAnswerChoice(answerText);
+    if (!correctKey) throw new Error(`Question sans bonne réponse : ${question}`);
+
+    const uniqueDistractors = new Map();
+    (distractors || []).forEach(choice => {
+        const text = String(choice ?? '').trim();
+        const key = normalizeAnswerChoice(text);
+        if (text && key !== correctKey && !uniqueDistractors.has(key)) {
+            uniqueDistractors.set(key, text);
+        }
+    });
+    if (uniqueDistractors.size < 2) throw new Error(`Pas assez de choix distincts : ${question}`);
+
+    const available = [...uniqueDistractors.values()];
+    const selected = [];
+    for (let i = 0; i < 2; i++) {
+        selected.push(available.splice(Math.floor(Math.random() * available.length), 1)[0]);
+    }
+    return shuffleOptions([answerText, ...selected]);
+}
+
 function questionDifficultyScore(theme, row) {
     const question = normalizeQuestionText(row[0]);
     const answer = normalizeQuestionText(row[1]);
@@ -1446,7 +1469,10 @@ function questionDifficultyScore(theme, row) {
     return score;
 }
 
-function buildQuestionLevels(rows, theme) {
+function buildQuestionLevels(rows, theme, referenceRows = rows) {
+    if (rows.length !== referenceRows.length) {
+        throw new Error(`Banques ${theme} désalignées : ${rows.length} / ${referenceRows.length}`);
+    }
     const seen = new Set();
     const reviewedRiverPrompts = new Set([
         'quel fleuve traverse paris', 'quel fleuve traverse rome', 'quel fleuve traverse bagdad',
@@ -1461,8 +1487,9 @@ function buildQuestionLevels(rows, theme) {
         'quel fleuve traverse le soudan et l egypte', 'quel fleuve traverse notamment l egypte et le soudan',
         'quel fleuve traverse l inde et le pakistan'
     ]);
-    const preparedRows = rows.map(row => {
-        const question = normalizeQuestionText(row[0]);
+    const preparedRows = rows.map((row, index) => {
+        const referenceRow = referenceRows[index];
+        const question = normalizeQuestionText(referenceRow[0]);
         const weakDistractors = (row[2] || []).some(value => ['paris', 'londres'].includes(normalizeQuestionText(value)));
         if (!weakDistractors) return row;
 
@@ -1482,19 +1509,22 @@ function buildQuestionLevels(rows, theme) {
 
         const answerKey = normalizeAnswerChoice(row[1]);
         const alternatives = rows
-            .filter(other => category === 'fleuve'
-                ? normalizeQuestionText(other[0]).startsWith('quel fleuve traverse')
-                : category === 'capitale'
-                    ? normalizeQuestionText(other[0]).startsWith('quelle est la capitale')
-                : normalizeQuestionText(other[0]).startsWith(`qui a ${category}`))
+            .filter((other, otherIndex) => {
+                const otherQuestion = normalizeQuestionText(referenceRows[otherIndex][0]);
+                return category === 'fleuve'
+                    ? otherQuestion.startsWith('quel fleuve traverse')
+                    : category === 'capitale'
+                        ? otherQuestion.startsWith('quelle est la capitale')
+                        : otherQuestion.startsWith(`qui a ${category}`);
+            })
             .map(other => other[1])
             .filter(value => normalizeAnswerChoice(value) !== answerKey);
         const distractors = [...new Map(alternatives.map(value => [normalizeAnswerChoice(value), value])).values()];
         return [row[0], row[1], shuffleOptions(distractors).slice(0, 3)];
     });
 
-    const clean = preparedRows.filter(row => {
-        const signature = normalizeQuestionText(row[0]);
+    const clean = preparedRows.map((row, index) => ({ row, referenceRow: referenceRows[index] })).filter(({ referenceRow }) => {
+        const signature = normalizeQuestionText(referenceRow[0]);
         if (!signature || seen.has(signature)) return false;
         seen.add(signature);
 
@@ -1514,7 +1544,11 @@ function buildQuestionLevels(rows, theme) {
         return true;
     });
 
-    const ordered = clean.map((row, index) => ({ row, index, score: questionDifficultyScore(theme, row) }))
+    const ordered = clean.map(({ row, referenceRow }, index) => ({
+        row,
+        index,
+        score: questionDifficultyScore(theme, referenceRow)
+    }))
         .sort((a, b) => a.score - b.score || a.index - b.index);
     const levels = Object.fromEntries(DIFFICULTY_LEVELS.map(level => [level.key, []]));
     ordered.forEach((item, index) => {
@@ -1568,7 +1602,7 @@ function buildLanguageLevels(rows) {
         return score(aSource) - score(bSource);
     });
     vocabulary.forEach((row, index) => {
-        const levelIndex = Math.min(2, Math.floor(index * 3 / Math.max(1, vocabulary.length)));
+        const levelIndex = Math.min(5, Math.floor(index * 6 / Math.max(1, vocabulary.length)));
         levels[DIFFICULTY_LEVELS[levelIndex].key].push(row);
     });
     return levels;
@@ -1879,165 +1913,165 @@ const LANG_VOCAB = [
 
 // --- PHRASES COURTES POUR LA TRADUCTION (FR <-> EN, max 6 mots) ---
 const LANG_PHRASES = [
-    ["Comment allez-vous ?", "How are you?"],
-    ["Je vais très bien.", "I am very well."],
-    ["Où est la gare ?", "Where is the station?"],
-    ["Je cherche mon chemin.", "I am looking for directions."],
-    ["Combien cela coûte ?", "How much does it cost?"],
-    ["Je voudrais de l'eau.", "I would like some water."],
-    ["Pouvez-vous m'aider ?", "Can you help me?"],
-    ["Je ne comprends pas.", "I do not understand."],
-    ["Parlez plus lentement, s'il vous plaît.", "Please speak more slowly."],
-    ["Le bus est en retard.", "The bus is late."],
-    ["Nous sommes presque arrivés.", "We are almost there."],
-    ["Je reviens tout de suite.", "I will be right back."],
-    ["Fermez la porte, s'il vous plaît.", "Please close the door."],
-    ["Ouvre la fenêtre, s'il te plaît.", "Please open the window."],
-    ["Le magasin est fermé.", "The shop is closed."],
-    ["La réunion commence maintenant.", "The meeting starts now."],
-    ["Je suis en route.", "I am on my way."],
-    ["Nous devons partir tôt.", "We must leave early."],
-    ["Elle a perdu ses clés.", "She has lost her keys."],
-    ["J'ai oublié mon téléphone.", "I forgot my phone."],
-    ["Il pleut depuis ce matin.", "It has been raining since morning."],
-    ["Le soleil brille aujourd'hui.", "The sun is shining today."],
-    ["Ce repas est délicieux.", "This meal is delicious."],
-    ["Je préfère le thé.", "I prefer tea."],
-    ["Nous étudions ensemble.", "We study together."],
-    ["Il faut faire attention.", "You must be careful."],
-    ["Je suis d'accord avec vous.", "I agree with you."],
-    ["Ce n'est pas nécessaire.", "It is not necessary."],
-    ["Je voudrais réserver une chambre.", "I would like to book a room."],
-    ["Avez-vous une table libre ?", "Do you have a table available?"],
-    ["Le train arrive bientôt.", "The train arrives soon."],
-    ["Attendez-moi ici, s'il vous plaît.", "Please wait for me here."],
-    ["Je travaille depuis lundi.", "I have been working since Monday."],
-    ["Elle parle trois langues.", "She speaks three languages."],
-    ["Nous cherchons une solution.", "We are looking for a solution."],
-    ["Le dossier est prêt.", "The file is ready."],
-    ["Envoyez-moi le document demain.", "Send me the document tomorrow."],
-    ["Je vous rappellerai demain matin.", "I will call you tomorrow morning."],
-    ["Il a beaucoup progressé.", "He has made great progress."],
-    ["N'oubliez pas votre rendez-vous.", "Do not forget your appointment."],
-    ["La route est très longue.", "The road is very long."],
-    ["Le travail est presque terminé.", "The work is almost finished."],
-    ["Je dois vérifier les chiffres.", "I must check the figures."],
-    ["Cette idée mérite réflexion.", "This idea deserves consideration."],
-    ["Nous avons besoin de temps.", "We need some time."],
-    ["Elle est arrivée en avance.", "She arrived early."],
-    ["Il a choisi la bonne réponse.", "He chose the correct answer."],
-    ["Pourquoi êtes-vous en retard ?", "Why are you late?"],
-    ["Quand commence le cours ?", "When does the lesson start?"],
-    ["Qui a pris mon sac ?", "Who took my bag?"],
-    ["Je peux essayer encore ?", "Can I try again?"],
-    ["Tout dépend de la situation.", "It all depends on the situation."],
-    ["Le marché ouvre à huit heures.", "The market opens at eight."],
-    ["Nous irons demain matin.", "We will go tomorrow morning."],
-    ["Je voudrais apprendre davantage.", "I would like to learn more."],
-    ["Elle ne travaille pas dimanche.", "She does not work on Sunday."],
-    ["Bonjour, comment ça va ?", "Hello, how are you?"],
-    ["Au revoir et à bientôt.", "Goodbye and see you soon."],
-    ["S'il vous plaît, aidez-moi.", "Please help me."],
-    ["Merci beaucoup pour tout.", "Thank you very much."],
-    ["Je m'appelle Gilles.", "My name is Gilles."],
-    ["Où habitez-vous ?", "Where do you live?"],
-    ["J'habite à Paris.", "I live in Paris."],
-    ["Quel temps fait-il ?", "What is the weather like?"],
-    ["Il fait beau aujourd'hui.", "It is nice weather today."],
-    ["Quelle heure est-il ?", "What time is it?"],
-    ["Il est dix heures.", "It is ten o'clock."],
-    ["Quel est votre nom ?", "What is your name?"],
-    ["Mon nom est Marie.", "My name is Marie."],
-    ["Combien de personnes ?", "How many people?"],
-    ["Nous sommes quatre.", "We are four people."],
-    ["Où sont les toilettes ?", "Where are the toilets?"],
-    ["Les toilettes sont là-bas.", "The toilets are over there."],
-    ["Je voudrais payer l'addition.", "I would like to pay the bill."],
-    ["L'addition, s'il vous plaît.", "The bill, please."],
-    ["C'est combien ?", "How much is it?"],
-    ["C'est dix euros.", "It is ten euros."],
-    ["Je prends un café.", "I am having a coffee."],
-    ["Un café, s'il vous plaît.", "A coffee, please."],
-    ["Où est l'hôtel ?", "Where is the hotel?"],
-    ["L'hôtel est près d'ici.", "The hotel is near here."],
-    ["Je suis perdu.", "I am lost."],
-    ["Pouvez-vous me montrer ?", "Can you show me?"],
-    ["Tournez à droite.", "Turn right."],
-    ["Tournez à gauche.", "Turn left."],
-    ["Allez tout droit.", "Go straight ahead."],
-    ["Arrêtez-vous ici.", "Stop here."],
-    ["Je veux acheter cela.", "I want to buy that."],
-    ["C'est trop cher.", "It is too expensive."],
-    ["Avez-vous cela en rouge ?", "Do you have this in red?"],
-    ["Je cherche une chemise.", "I am looking for a shirt."],
-    ["La taille est trop petite.", "The size is too small."],
-    ["Je peux essayer ?", "Can I try it on?"],
-    ["Les cabines sont là-bas.", "The fitting rooms are over there."]
+    ["Comment allez-vous ?", "How are you?", "¿Cómo está?", "Wie geht es Ihnen?", "您好吗？", "Как поживаете?"],
+    ["Je vais très bien.", "I am very well.", "Estoy muy bien.", "Mir geht es sehr gut.", "我很好。", "Я чувствую себя очень хорошо."],
+    ["Où est la gare ?", "Where is the station?", "¿Dónde está la estación?", "Wo ist der Bahnhof?", "车站在哪里？", "Где вокзал?"],
+    ["Je cherche mon chemin.", "I am looking for directions.", "Estoy buscando direcciones.", "Ich suche den Weg.", "我在找路。", "Я ищу дорогу."],
+    ["Combien cela coûte ?", "How much does it cost?", "¿Cuánto cuesta?", "Was kostet das?", "多少钱？", "Сколько это стоит?"],
+    ["Je voudrais de l'eau.", "I would like some water.", "Quisiera agua.", "Ich möchte etwas Wasser.", "我要点水。", "Я бы хотел воды."],
+    ["Pouvez-vous m'aider ?", "Can you help me?", "¿Puede ayudarme?", "Können Sie mir helfen?", "你能帮我吗？", "Вы можете мне помочь?"],
+    ["Je ne comprends pas.", "I do not understand.", "No entiendo.", "Ich verstehe nicht.", "我不明白。", "Я не понимаю."],
+    ["Parlez plus lentement, s'il vous plaît.", "Please speak more slowly.", "Hable más despacio, por favor.", "Bitte sprechen Sie langsamer.", "请说慢一点。", "Пожалуйста, говорите медленнее."],
+    ["Le bus est en retard.", "The bus is late.", "El autobús se retrasa.", "Der Bus hat Verspätung.", "公交车晚点了。", "Автобус опаздывает."],
+    ["Nous sommes presque arrivés.", "We are almost there.", "Ya casi llegamos.", "Wir sind fast da.", "我们快到了。", "Мы почти приехали."],
+    ["Je reviens tout de suite.", "I will be right back.", "Vuelvo enseguida.", "Ich komme gleich zurück.", "我马上回来。", "Я сейчас вернусь."],
+    ["Fermez la porte, s'il vous plaît.", "Please close the door.", "Cierre la puerta, por favor.", "Bitte schließen Sie die Tür.", "请关上门。", "Пожалуйста, закройте дверь."],
+    ["Ouvre la fenêtre, s'il te plaît.", "Please open the window.", "Abre la ventana, por favor.", "Bitte öffne das Fenster.", "请打开窗户。", "Пожалуйста, откройте окно."],
+    ["Le magasin est fermé.", "The shop is closed.", "La tienda está cerrada.", "Das Geschäft ist geschlossen.", "商店关门了。", "Магазин закрыт."],
+    ["La réunion commence maintenant.", "The meeting starts now.", "La reunión comienza ahora.", "Das Meeting beginnt jetzt.", "会议现在开始。", "Встреча начинается сейчас."],
+    ["Je suis en route.", "I am on my way.", "Estoy en camino.", "Ich bin unterwegs.", "我在路上。", "Я в пути."],
+    ["Nous devons partir tôt.", "We must leave early.", "Debemos irnos temprano.", "Wir müssen früh los.", "我们必须早点走。", "Нам нужно уйти рано."],
+    ["Elle a perdu ses clés.", "She has lost her keys.", "Ella ha perdido sus llaves.", "Sie hat ihre Schlüssel verloren.", "她丢了钥匙。", "Она потеряла ключи."],
+    ["J'ai oublié mon téléphone.", "I forgot my phone.", "Olvidé mi teléfono.", "Ich habe mein Telefon vergessen.", "我忘了带手机。", "Я забыл телефон."],
+    ["Il pleut depuis ce matin.", "It has been raining since morning.", "Llueve desde esta mañana.", "Es regnet seit heute Morgen.", "今天早上下雨。", "Дождь идет с утра."],
+    ["Le soleil brille aujourd'hui.", "The sun is shining today.", "El sol brilla hoy.", "Die Sonne scheint heute.", "今天阳光明媚。", "Сегодня светит солнце."],
+    ["Ce repas est délicieux.", "This meal is delicious.", "Esta comida está deliciosa.", "Dieses Essen ist köstlich.", "这顿饭很美味。", "Этот обед вкусный."],
+    ["Je préfère le thé.", "I prefer tea.", "Prefiero el té.", "Ich bevorzuge Tee.", "我喜欢茶。", "Я предпочитаю чай."],
+    ["Nous étudions ensemble.", "We study together.", "Estudiamos juntos.", "Wir lernen gemeinsam.", "我们一起学习。", "Мы учимся вместе."],
+    ["Il faut faire attention.", "You must be careful.", "Hay que tener cuidado.", "Man muss aufpassen.", "必须小心。", "Нужно быть осторожным."],
+    ["Je suis d'accord avec vous.", "I agree with you.", "Estoy de acuerdo con usted.", "Ich bin Ihrer Meinung.", "我同意你。", "Я согласен с вами."],
+    ["Ce n'est pas nécessaire.", "It is not necessary.", "No es necesario.", "Das ist nicht notwendig.", "这不是必要的。", "Это не нужно."],
+    ["Je voudrais réserver une chambre.", "I would like to book a room.", "Quisiera reservar una habitación.", "Ich möchte ein Zimmer buchen.", "我要订一间房。", "Я бы хотел забронировать номер."],
+    ["Avez-vous une table libre ?", "Do you have a table available?", "¿Tiene una mesa libre?", "Haben Sie einen freien Tisch?", "你有空桌子吗？", "У вас есть свободный стол?"],
+    ["Le train arrive bientôt.", "The train arrives soon.", "El tren llega pronto.", "Der Zug kommt gleich.", "火车马上就到。", "Поезд скоро приедет."],
+    ["Attendez-moi ici, s'il vous plaît.", "Please wait for me here.", "Espéreme aquí, por favor.", "Bitte warten Sie hier auf mich.", "请在这里等我。", "Пожалуйста, ждите меня здесь."],
+    ["Je travaille depuis lundi.", "I have been working since Monday.", "Trabajo desde el lunes.", "Ich arbeite seit Montag.", "我从周一开始工作。", "Я работаю с понедельника."],
+    ["Elle parle trois langues.", "She speaks three languages.", "Ella habla tres idiomas.", "Sie spricht drei Sprachen.", "她说三种语言。", "Она говорит на трех языках."],
+    ["Nous cherchons une solution.", "We are looking for a solution.", "Buscamos una solución.", "Wir suchen eine Lösung.", "我们在找解决方案。", "Мы ищем решение."],
+    ["Le dossier est prêt.", "The file is ready.", "El expediente está listo.", "Die Akte ist bereit.", "文件准备好了。", "Дело готово."],
+    ["Envoyez-moi le document demain.", "Send me the document tomorrow.", "Envíeme el documento mañana.", "Schicken Sie mir das Dokument morgen.", "明天把文件发给我。", "Пришлите мне документ завтра."],
+    ["Je vous rappellerai demain matin.", "I will call you tomorrow morning.", "Le llamaré mañana por la mañana.", "Ich rufe Sie morgen früh an.", "我明早给你打电话。", "Я перезвоню вам утром."],
+    ["Il a beaucoup progressé.", "He has made great progress.", "Ha progresado mucho.", "Er hat große Fortschritte gemacht.", "他进步很大。", "Он fez большие успехи."],
+    ["N'oubliez pas votre rendez-vous.", "Do not forget your appointment.", "No olvide su cita.", "Vergessen Sie Ihren Termin nicht.", "不要忘记你的预约。", "Не забудьте о своей встрече."],
+    ["La route est très longue.", "The road is very long.", "El camino es muy largo.", "Die Straße ist sehr lang.", "这条路很长。", "Дорога очень длинная."],
+    ["Le travail est presque terminé.", "The work is almost finished.", "El trabajo está casi terminado.", "Die Arbeit ist fast fertig.", "工作快完成了。", "Работа почти завершена."],
+    ["Je dois vérifier les chiffres.", "I must check the figures.", "Debo verificar las cifras.", "Ich muss die Zahlen überprüfen.", "我必须核对数字。", "Я должен проверить цифры."],
+    ["Cette idée mérite réflexion.", "This idea deserves consideration.", "Esta idea merece consideración.", "Diese Idee verdient Beachtung.", "这个想法值得考虑。", "Эта идея заслуживает внимания."],
+    ["Nous avons besoin de temps.", "We need some time.", "Necesitamos tiempo.", "Wir brauchen Zeit.", "我们需要时间。", "Нам нужно время."],
+    ["Elle est arrivée en avance.", "She arrived early.", "Ella llegó temprano.", "Sie ist früher gekommen.", "她早到了。", "Она пришла раньше."],
+    ["Il a choisi la bonne réponse.", "He chose the correct answer.", "Él escogió la respuesta correcta.", "Er hat die richtige Antwort gewählt.", "他选了正确答案。", "Он выбрал правильный ответ."],
+    ["Pourquoi êtes-vous en retard ?", "Why are you late?", "¿Por qué llega tarde?", "Warum kommen Sie zu spät?", "你为什么迟到？", "Почему вы опоздали?"],
+    ["Quand commence le cours ?", "When does the lesson start?", "¿Cuándo empieza la clase?", "Wann beginnt der Unterricht?", "课什么时候开始？", "Когда начинается урок?"],
+    ["Qui a pris mon sac ?", "Who took my bag?", "¿Quién tomó mi bolsa?", "Wer hat meine Tasche genommen?", "谁拿了我的包？", "Кто взял мою сумку?"],
+    ["Je peux essayer encore ?", "Can I try again?", "¿Puedo intentar de nuevo?", "Kann ich es noch einmal versuchen?", "我可以再试一次吗？", "Могу ли я попробовать еще раз?"],
+    ["Tout dépend de la situation.", "It all depends on the situation.", "Todo depende de la situación.", "Es kommt auf die Situation an.", "这全取决于情况。", "Все зависит от ситуации."],
+    ["Le marché ouvre à huit heures.", "The market opens at eight.", "El mercado abre a las ocho.", "Der Markt öffnet um acht.", "市场八点开门。", "Рынок открывается в восемь."],
+    ["Nous irons demain matin.", "We will go tomorrow morning.", "Iremos mañana por la mañana.", "Wir gehen morgen früh.", "我们明早去。", "Мы пойдем завтра утром."],
+    ["Je voudrais apprendre davantage.", "I would like to learn more.", "Me gustaría aprender más.", "Ich möchte mehr lernen.", "我想学更多。", "Я хочу узнать больше."],
+    ["Elle ne travaille pas dimanche.", "She does not work on Sunday.", "Ella no trabaja el domingo.", "Sie arbeitet nicht sonntags.", "她周日不工作。", "Она не работает в воскресенье."],
+    ["Bonjour, comment ça va ?", "Hello, how are you?", "Hola, ¿cómo estás?", "Hallo, wie geht es dir?", "你好，最近好吗？", "Здравствуйте, как дела?"],
+    ["Au revoir et à bientôt.", "Goodbye and see you soon.", "Adiós y hasta pronto.", "Auf Wiedersehen und bis bald.", "再见，很快见。", "До свидания и до скорой встречи."],
+    ["S'il vous plaît, aidez-moi.", "Please help me.", "Ayúdeme, por favor.", "Bitte helfen Sie mir.", "请帮帮我。", "Пожалуйста, помогите мне."],
+    ["Merci beaucoup pour tout.", "Thank you very much.", "Muchas gracias por todo.", "Vielen Dank für alles.", "非常感谢一切。", "Большое спасибо за всё."],
+    ["Je m'appelle Gilles.", "My name is Gilles.", "Me llamo Gilles.", "Ich heiße Gilles.", "我叫吉勒斯。", "Меня зовут Жиль."],
+    ["Où habitez-vous ?", "Where do you live?", "¿Dónde vive?", "Wo wohnen Sie?", "你住在哪里？", "Где вы живете?"],
+    ["J'habite à Paris.", "I live in Paris.", "Vivo en París.", "Ich wohne in Paris.", "我住在巴黎。", "Я живу в Париже."],
+    ["Quel temps fait-il ?", "What is the weather like?", "¿Qué tiempo hace?", "Wie ist das Wetter?", "天气怎么样？", "Какая погода?"],
+    ["Il fait beau aujourd'hui.", "It is nice weather today.", "Hace buen tiempo hoy.", "Das Wetter ist schön heute.", "今天天气很好。", "Сегодня хорошая погода."],
+    ["Quelle heure est-il ?", "What time is it?", "¿Qué hora es?", "Wie spät ist es?", "现在几点？", "Который час?"],
+    ["Il est dix heures.", "It is ten o'clock.", "Son las diez.", "Es ist zehn Uhr.", "现在十点。", "Сейчас десять часов."],
+    ["Quel est votre nom ?", "What is your name?", "¿Cuál es su nombre?", "Wie ist Ihr Name?", "你叫什么名字？", "Как вас зовут?"],
+    ["Mon nom est Marie.", "My name is Marie.", "Mi nombre es Marie.", "Ich heiße Marie.", "我叫玛丽。", "Меня зовут Мария."],
+    ["Combien de personnes ?", "How many people?", "¿Cuántas personas?", "Wie viele Personen?", "多少人？", "Сколько человек?"],
+    ["Nous sommes quatre.", "We are four people.", "Somos cuatro.", "Wir sind vier.", "我们四个人。", "Мы четверо."],
+    ["Où sont les toilettes ?", "Where are the toilets?", "¿Dónde están los baños?", "Wo sind die Toiletten?", "洗手间在哪里？", "Где туалет?"],
+    ["Les toilettes sont là-bas.", "The toilets are over there.", "Los baños están allí.", "Die Toiletten sind dort.", "洗手间在那里。", "Туалет там."],
+    ["Je voudrais payer l'addition.", "I would like to pay the bill.", "Quisiera pagar la cuenta.", "Ich möchte bezahlen.", "我要结账。", "Я хочу заплатить счет."],
+    ["L'addition, s'il vous plaît.", "The bill, please.", "La cuenta, por favor.", "Die Rechnung, bitte.", "买单，请。", "Счет, пожалуйста."],
+    ["C'est combien ?", "How much is it?", "¿Cuánto cuesta?", "Wie viel kostet das?", "多少钱？", "Сколько стоит?"],
+    ["C'est dix euros.", "It is ten euros.", "Son diez euros.", "Es zehn Euro.", "是十欧元。", "Это десять евро."],
+    ["Je prends un café.", "I am having a coffee.", "Tomo un café.", "Ich trinke einen Kaffee.", "我喝咖啡。", "Я пью кофе."],
+    ["Un café, s'il vous plaît.", "A coffee, please.", "Un café, por favor.", "Einen Kaffee, bitte.", "一杯咖啡，请。", "Кофе, пожалуйста."],
+    ["Où est l'hôtel ?", "Where is the hotel?", "¿Dónde está el hotel?", "Wo ist das Hotel?", "酒店在哪里？", "Где отель?"],
+    ["L'hôtel est près d'ici.", "The hotel is near here.", "El hotel está cerca de aquí.", "Das Hotel ist in der Nähe.", "酒店离这里近。", "Отель рядом."],
+    ["Je suis perdu.", "I am lost.", "Estoy perdido.", "Ich habe mich verlaufen.", "我迷路了。", "Я заблудился."],
+    ["Pouvez-vous me montrer ?", "Can you show me?", "¿Puede mostrarme?", "Können Sie mir zeigen?", "你能给我看看吗？", "Вы можете показать мне?"],
+    ["Tournez à droite.", "Turn right.", "Gire a la derecha.", "Biegen Sie rechts ab.", "向右转。", "Поверните направо."],
+    ["Tournez à gauche.", "Turn left.", "Gire a la izquierda.", "Biegen Sie links ab.", "向左转。", "Поверните налево."],
+    ["Allez tout droit.", "Go straight ahead.", "Siga recto.", "Gehen Sie geradeaus.", "直走。", "Идите прямо."],
+    ["Arrêtez-vous ici.", "Stop here.", "Párese aquí.", "Halten Sie hier an.", "在这里停下。", "Остановитесь здесь."],
+    ["Je veux acheter cela.", "I want to buy that.", "Quiero comprar eso.", "Ich möchte das kaufen.", "我想买那个。", "Я хочу купить это."],
+    ["C'est trop cher.", "It is too expensive.", "Es demasiado caro.", "Das ist zu teuer.", "这太贵了。", "Это слишком дорого."],
+    ["Avez-vous cela en rouge ?", "Do you have this in red?", "¿Tiene esto en rojo?", "Haben Sie das in Rot?", "你有红色的吗？", "У вас есть это в красном?"],
+    ["Je cherche une chemise.", "I am looking for a shirt.", "Busco una camisa.", "Ich suche ein Hemd.", "我在找一件衬衫。", "Я ищу рубашку."],
+    ["La taille est trop petite.", "The size is too small.", "La talla es demasiado pequeña.", "Die Größe ist zu klein.", "尺寸太小了。", "Размер слишком мал."],
+    ["Je peux essayer ?", "Can I try it on?", "¿Puedo probármelo?", "Kann ich es anprobieren?", "我可以试穿吗？", "Могу примерить?"],
+    ["Les cabines sont là-bas.", "The fitting rooms are over there.", "Los probadores están allí.", "Die Umkleidekabinen sind dort.", "试衣间在那里.", "Раздевалки там."]
 ];
 
 // Phrases à syntaxe soutenue : les niveaux sont affectés explicitement pour
 // que les formes verbales, subordonnées et nuances avancées restent en haut.
 const LANG_ADVANCED_PHRASES = [
-    ["Je n'avais pas encore compris ce qu'il voulait dire.", "I had not yet understood what he meant.", "difficile"],
-    ["Depuis combien de temps attendiez-vous que le train arrive ?", "How long had you been waiting for the train to arrive?", "difficile"],
-    ["Elle aurait accepté si on lui avait expliqué les conséquences.", "She would have accepted if we had explained the consequences to her.", "difficile"],
-    ["Il est peu probable qu'ils aient terminé avant midi.", "It is unlikely that they will have finished before noon.", "difficile"],
-    ["Ce n'est pas la première fois qu'il oublie de nous prévenir.", "This is not the first time he has forgotten to let us know.", "difficile"],
-    ["Pourquoi ne leur avez-vous pas demandé s'ils pouvaient rester ?", "Why didn't you ask them whether they could stay?", "difficile"],
-    ["Le rapport doit être envoyé avant que le directeur ne revienne.", "The report must be sent before the director comes back.", "difficile"],
-    ["Plus tôt vous partirez, moins vous risquez de manquer le train.", "The earlier you leave, the less likely you are to miss the train.", "difficile"],
-    ["Je croyais qu'ils étaient déjà partis quand tu les as appelés.", "I thought they had already left when you called them.", "difficile"],
-    ["Depuis qu'il a déménagé, nous ne nous sommes pas revus.", "We have not seen each other since he moved.", "difficile"],
-    ["Aurais-tu le temps de m'expliquer ce qui a changé ?", "Would you have time to explain what has changed?", "difficile"],
-    ["Elle m'a demandé si je pouvais lui prêter le livre que j'avais acheté.", "She asked me whether I could lend her the book I had bought.", "difficile"],
-    ["Les résultats seront publiés dès que le comité aura terminé son examen.", "The results will be published as soon as the committee has finished its review.", "difficile"],
-    ["Je ne pensais pas que le trajet prendrait autant de temps.", "I did not think the journey would take so long.", "difficile"],
-    ["Pourquoi a-t-il fallu attendre que tout le monde soit parti ?", "Why did we have to wait until everyone had left?", "difficile"],
-    ["Elle aurait pu réussir si elle avait suivi les instructions.", "She could have succeeded if she had followed the instructions.", "difficile"],
-    ["À moins qu'il ne pleuve, nous commencerons à l'heure prévue.", "Unless it rains, we will start at the scheduled time.", "difficile"],
-    ["Je me demande si tu as eu le temps de lire le message que je t'ai envoyé.", "I wonder whether you had time to read the message I sent you.", "difficile"],
-    ["Le colis aurait dû arriver hier, mais personne n'a sonné.", "The parcel should have arrived yesterday, but nobody rang the bell.", "difficile"],
-    ["Il a expliqué pourquoi la réunion avait été reportée sans prévenir les participants.", "He explained why the meeting had been postponed without notifying the participants.", "difficile"],
-    ["À peine avions-nous commencé qu'il s'est mis à pleuvoir.", "Hardly had we started when it began to rain.", "tres_difficile"],
-    ["Je me demande ce qu'elle aurait répondu si tu le lui avais demandé.", "I wonder what she would have answered if you had asked her.", "tres_difficile"],
-    ["Bien qu'il ait reconnu son erreur, il refuse toujours de s'excuser.", "Although he has admitted his mistake, he still refuses to apologize.", "tres_difficile"],
-    ["Auriez-vous pu me dire pourquoi cette porte est restée ouverte ?", "Could you have told me why this door was left open?", "tres_difficile"],
-    ["Il faut que chacun puisse exprimer ce qu'il aurait préféré faire.", "Everyone must be able to express what they would have preferred to do.", "tres_difficile"],
-    ["Ce n'est qu'en comparant les deux versions qu'on a repéré l'omission.", "It was only by comparing the two versions that we noticed the omission.", "tres_difficile"],
-    ["Elle prétend ne pas avoir vu le message que je lui avais envoyé.", "She claims not to have seen the message I had sent her.", "tres_difficile"],
-    ["Qu'auriez-vous fait à ma place si vous aviez su la vérité ?", "What would you have done in my place if you had known the truth?", "tres_difficile"],
-    ["Si j'avais su qu'ils viendraient si tard, je ne les aurais pas attendus.", "If I had known they were coming so late, I would not have waited for them.", "tres_difficile"],
-    ["Elle aurait voulu que nous ayons terminé avant son retour.", "She would have wanted us to have finished before she returned.", "tres_difficile"],
-    ["Il a beau prétendre qu'il n'en savait rien, son nom figure sur le document.", "Much as he claims he knew nothing about it, his name appears on the document.", "tres_difficile"],
-    ["À moins que vous n'ayez une meilleure proposition, nous garderons celle-ci.", "Unless you have a better proposal, we will keep this one.", "tres_difficile"],
-    ["Ce que je lui reproche, ce n'est pas d'être parti, mais de n'avoir rien dit.", "What I blame him for is not leaving, but saying nothing.", "tres_difficile"],
-    ["Quand elle a enfin répondu, j'avais déjà envoyé le formulaire.", "By the time she finally replied, I had already sent the form.", "tres_difficile"],
-    ["Ils auraient dû vérifier si les données avaient été correctement sauvegardées.", "They should have checked whether the data had been saved correctly.", "tres_difficile"],
-    ["Pourquoi faudrait-il que je fasse semblant de ne pas comprendre ?", "Why should I have to pretend not to understand?", "tres_difficile"],
-    ["Nous ignorions que la route avait été fermée depuis la veille.", "We did not know the road had been closed since the previous day.", "tres_difficile"],
-    ["Il semble qu'elle ait oublié ce qu'elle était venue chercher.", "It seems she has forgotten what she came to look for.", "tres_difficile"],
-    ["Quel que soit le résultat, nous aurons appris quelque chose.", "Whatever the result, we will have learned something.", "tres_difficile"],
-    ["Tu aurais mieux fait de lui dire ce que tu avais découvert.", "You would have been better off telling him what you had found out.", "tres_difficile"],
-    ["Fût-il mieux préparé, il ne pourrait pas prévoir tout ce qui risque de se produire.", "Even if he were better prepared, he could not foresee everything that might happen.", "master"],
-    ["Encore aurait-il fallu qu'ils nous préviennent avant de changer les règles.", "They would still have had to let us know before changing the rules.", "master"],
-    ["Ce n'est qu'une fois qu'elle eut relu le témoignage qu'elle en comprit la portée.", "Only after she had reread the testimony did she understand its implications.", "master"],
-    ["Qui que vous soyez, vous devrez justifier pourquoi vous avez gardé le silence.", "Whoever you are, you will have to explain why you stayed silent.", "master"],
-    ["Il n'en demeure pas moins que la décision aurait pu être prise autrement.", "The fact remains that the decision could have been made differently.", "master"],
-    ["Si tant est qu'il ait réellement promis de revenir, personne ne l'a entendu.", "If indeed he really promised to come back, nobody heard him.", "master"],
-    ["Non qu'elle ait voulu contester leur choix, mais elle souhaitait en comprendre les raisons.", "Not that she wanted to challenge their choice, but she wanted to understand their reasons.", "master"],
-    ["À quoi bon prétendre que vous l'auriez reconnu si vous ne l'aviez jamais rencontré ?", "What is the point of claiming you would have recognized him if you had never met him?", "master"],
-    ["Il assiste à la conférence sans intervenir.", "He attends the conference without taking part.", "master", ["He assists at the conference without intervening.", "He is assisting at the conference without intervening."]],
-    ["Je suis actuellement en train de vérifier le dossier.", "I am currently checking the file.", "master", ["I am actually checking the file.", "I am eventually checking the file."]],
-    ["Cette solution est sensée, mais le problème reste sensible.", "This solution is sensible, but the issue remains sensitive.", "master", ["This solution is sensitive, but the issue remains sensible.", "This solution makes sense, but the issue stays sensible."]],
-    ["Il a finalement accepté la proposition, bien qu'il ait d'abord prétendu le contraire.", "He eventually accepted the proposal, although he had initially claimed otherwise.", "master", ["He actually accepted the proposal, although he had initially claimed otherwise.", "He eventually accepts the proposal, although he initially claims otherwise."]],
-    ["Si nous avions su qu'elle viendrait, nous aurions attendu.", "If we had known she was coming, we would have waited.", "master", ["If we knew she would come, we would have waited.", "If we had known she came, we would wait."]],
-    ["À peine avaient-ils commencé qu'une autre difficulté surgit.", "Hardly had they started when another difficulty arose.", "master", ["Hardly had they started when another difficulty will arise.", "They had hardly started before another difficulty would arise."]],
-    ["Encore faut-il que les témoins puissent confirmer ce qu'ils ont déclaré.", "The witnesses still need to be able to confirm what they said.", "master"],
-    ["Si complexe qu'elle paraisse, la règle ne souffre aucune exception.", "However complex it may seem, the rule allows no exceptions.", "master"],
-    ["Eût-elle été avertie plus tôt, elle n'aurait sans doute pas pris la même décision.", "Had she been warned earlier, she probably would not have made the same decision.", "master"],
-    ["À supposer qu'il se soit trompé, cela ne justifierait pas qu'on l'exclue.", "Even assuming he was wrong, that would not justify excluding him.", "master"],
-    ["Ce n'est pas faute de lui avoir répété qu'il aurait à répondre de ses actes.", "It is not as if we had failed to tell him he would be held accountable for his actions.", "master"],
-    ["Quelque convaincant que son argument puisse paraître, il repose sur une hypothèse erronée.", "However convincing his argument may seem, it is based on a false assumption.", "master"]
+    ["difficile", "Je n'avais pas encore compris ce qu'il voulait dire.", "I had not yet understood what he meant.", "Todavía no había entendido lo que quería decir.", "Ich hatte noch nicht verstanden, was er meinte.", "我还没明白他想表达什么。", "Я еще не понял, что он имел в виду."],
+    ["difficile", "Depuis combien de temps attendiez-vous que le train arrive ?", "How long had you been waiting for the train to arrive?", "¿Cuánto tiempo llevaba esperando que llegara el tren?", "Wie lange hatten Sie auf den Zug gewartet?", "你等火车等了多久？", "Как долго вы ждали поезд?"],
+    ["difficile", "Elle aurait accepté si on lui avait expliqué les conséquences.", "She would have accepted if we had explained the consequences to her.", "Ella habría aceptado si le hubiéramos explicado las consecuencias.", "Sie hätte angenommen, wenn wir ihr die Folgen erklärt hätten.", "如果我们向她解释后果，她本会接受。", "Она бы согласилась, если бы мы объяснили ей последствия."],
+    ["difficile", "Il est peu probable qu'ils aient terminé avant midi.", "It is unlikely that they will have finished before noon.", "Es poco probable que hayan terminado antes del mediodía.", "Es unwahrscheinlich, dass sie vor Mittag fertig sein werden.", "不太可能他们中午前完成。", "Вряд ли они закончат до полудня."],
+    ["difficile", "Ce n'est pas la première fois qu'il oublie de nous prévenir.", "This is not the first time he has forgotten to let us know.", "No es la primera vez que se olvida de avisarnos.", "Es nicht das erste Mal, dass er uns nicht Bescheid gesagt hat.", "这不是他第一次忘了通知我们。", "Это не первый раз, когда он забыл нас предупредить."],
+    ["difficile", "Pourquoi ne leur avez-vous pas demandé s'ils pouvaient rester ?", "Why didn't you ask them whether they could stay?", "¿Por qué no les preguntó si podían quedarse?", "Warum hast du sie nicht gefragt, ob sie bleiben könnten?", "你为什么不问他们能否留下？", "Почему вы не спросили их, могут ли они остаться?"],
+    ["difficile", "Le rapport doit être envoyé avant que le directeur ne revienne.", "The report must be sent before the director comes back.", "El informe debe enviarse antes de que el director regrese.", "Der Bericht muss abgeschickt werden, bevor der Direktor zurückkommt.", "报告必须在主任回来前发出。", "Отчёт должен быть отправлен до возвращения директора."],
+    ["difficile", "Plus tôt vous partirez, moins vous risquez de manquer le train.", "The earlier you leave, the less likely you are to miss the train.", "Cuanto antes se vaya, menos probabilidades tendrá de perder el tren.", "Je früher Sie losfahren, desto geringer ist das Risiko, den Zug zu verpassen.", "你走得越早，错过火车的风险就越小。", "Чем раньше вы уйдете, тем меньше риск опоздать на поезд."],
+    ["difficile", "Je croyais qu'ils étaient déjà partis quand tu les as appelés.", "I thought they had already left when you called them.", "Creía que ya se habían ido cuando les llamaste.", "Ich dachte, sie wären bereits gegangen, als du sie anriefst.", "我以为他们打电话时已经走了。", "Я думал, что они уже ушли, когда вы им позвонили."],
+    ["difficile", "Depuis qu'il a déménagé, nous ne nous sommes pas revus.", "We have not seen each other since he moved.", "Desde que se mudó, no nos hemos vuelto a ver.", "Seit er umgezogen ist, haben wir uns nicht mehr gesehen.", "自从他搬家后，我们就没再见过面。", "Мы не виделись с тех пор, как он переехал."],
+    ["difficile", "Aurais-tu le temps de m'expliquer ce qui a changé ?", "Would you have time to explain what has changed?", "¿Tendrías tiempo de explicarme qué ha cambiado?", "Hättest du Zeit, mir zu erklären, was sich geändert hat?", "你有时间解释一下变化了什么吗？", "У вас есть время объяснить, что изменилось?"],
+    ["difficile", "Elle m'a demandé si je pouvais lui prêter le livre que j'avais acheté.", "She asked me whether I could lend her the book I had bought.", "Ella me preguntó si podía prestarle el libro que había comprado.", "Sie fragte mich, ob ich ihr das Buch, das ich gekauft hatte, leihen könne.", "她问我是否可以借她我买的书。", "Она спросила меня, могу ли я одолжить ей книгу, которую я купил."],
+    ["difficile", "Les résultats seront publiés dès que le comité aura terminé son examen.", "The results will be published as soon as the committee has finished its review.", "Los resultados se publicarán tan pronto como el comité termine su examen.", "Die Ergebnisse werden veröffentlicht, sobald das Ausschuss seine Prüfung abgeschlossen hat.", "结果将在委员会审查结束后尽快公布。", "Результаты будут опубликованы, как только комитет закончит проверку."],
+    ["difficile", "Je ne pensais pas que le trajet prendrait autant de temps.", "I did not think the journey would take so long.", "No pensé que el viaje tomaría tanto tiempo.", "Ich dachte nicht, dass die Reise so lange dauern würde.", "我没想到旅程会花这么长时间。", "Я не думал, что поездка займет столько времени."],
+    ["difficile", "Pourquoi a-t-il fallu attendre que tout le monde soit parti ?", "Why did we have to wait until everyone had left?", "¿Por qué tuvimos que esperar hasta que todos se fueran?", "Warum mussten wir warten, bis alle gegangen waren?", "为什么我们必须等所有人都走后？", "Зачем нам пришлось ждать, пока все уйдут?"],
+    ["difficile", "Elle aurait pu réussir si elle avait suivi les instructions.", "She could have succeeded if she had followed the instructions.", "Ella podría haber tenido éxito si hubiera seguido las instrucciones.", "Sie hätte Erfolg haben können, wenn sie den Anweisungen gefolgt wäre.", "如果她遵循了指示，她本可以成功。", "Она бы смогла преуспеть, если бы следовала инструкциям."],
+    ["difficile", "À moins qu'il ne pleuve, nous commencerons à l'heure prévue.", "Unless it rains, we will start at the scheduled time.", "A menos que llueva, comenzaremos a la hora prevista.", "Es sei denn, es regnet, werden wir zur geplanten Zeit beginnen.", "除非下雨，否则我们将按时开始。", "Если не пойдет дождь, мы начнем в запланированное время."],
+    ["difficile", "Je me demande si tu as eu le temps de lire le message que je t'ai envoyé.", "I wonder whether you had time to read the message I sent you.", "Me pregunto si tuvo tiempo de leer el mensaje que le envié.", "Ich frage mich, ob du Zeit hattest, die Nachricht zu lesen, die ich dir geschickt habe.", "我想知道你是否有时间读我发给你的消息。", "Я интересуюсь, было ли у вас время прочитать сообщение, которое я вам прислал."],
+    ["difficile", "Le colis aurait dû arriver hier, mais personne n'a sonné.", "The parcel should have arrived yesterday, but nobody rang the bell.", "El paquete debería haber llegado ayer, pero nadie tocó el timbre.", "Das Paket hätte gestern ankommen sollen, aber niemand hat geklingelt.", "包裹本应昨天到，但没人按门铃。", "Посылка должна была прийти вчера, но никто не позвонил."],
+    ["difficile", "Il a expliqué pourquoi la réunion avait été reportée sans prévenir les participants.", "He explained why the meeting had been postponed without notifying the participants.", "Él explicó por qué la reunión se había pospuesto sin notificar a los participantes.", "Er erklärte, warum das Meeting verschoben worden war, ohne die Teilnehmer zu benachrichtigen.", "他解释了为什么会议在没有通知参与者的情况下被推迟。", "Он объяснил, почему встреча была отложена без уведомления участников."],
+    ["tres_difficile", "À peine avions-nous commencé qu'il s'est mis à pleuvoir.", "Hardly had we started when it began to rain.", "Apenas habíamos empezado cuando empezó a llover.", "Kaum hatten wir angefangen, fing es an zu regnen.", "我们刚开始就下雨了。", "Едва мы начали, как пошел дождь."],
+    ["tres_difficile", "Je me demande ce qu'elle aurait répondu si tu le lui avais demandé.", "I wonder what she would have answered if you had asked her.", "Me pregunto qué habría respondido si se le hubiera preguntado.", "Ich frage mich, was sie geantwortet hätte, wenn du sie gefragt hättest.", "我想知道如果你问她，她会怎么回答。", "Я интересуюсь, что бы она ответила, если бы вы спросили её."],
+    ["tres_difficile", "Bien qu'il ait reconnu son erreur, il refuse toujours de s'excuser.", "Although he has admitted his mistake, he still refuses to apologize.", "Aunque haya reconocido su error, todavía se niega a disculparse.", "Obwohl er seinen Fehler eingeräumt hat, weigert er sich immer noch, sich zu entschuldigen.", "虽然他承认了错误，但他仍拒绝道歉。", "Хотя он признал свою ошибку, он всё ещё отказывается извиняться."],
+    ["tres_difficile", "Auriez-vous pu me dire pourquoi cette porte est restée ouverte ?", "Could you have told me why this door was left open?", "¿Podría haberme dicho por qué esta puerta quedó abierta?", "Hätten Sie mir sagen können, warum diese Tür offen gelassen wurde?", "你能告诉我为什么这扇门开着吗？", "Не могли бы вы сказать мне, почему эта дверь была открыта?"],
+    ["tres_difficile", "Il faut que chacun puisse exprimer ce qu'il aurait préféré faire.", "Everyone must be able to express what they would have preferred to do.", "Todos deben poder expresar lo que habrían preferido hacer.", "Jeder muss in der Lage sein, auszudrücken, was er lieber getan hätte.", "每个人都必须能够表达他们本想做什么。", "Каждый должен иметь возможность выразить, чем бы он предпочел заниматься."],
+    ["tres_difficile", "Ce n'est qu'en comparant les deux versions qu'on a repéré l'omission.", "It was only by comparing the two versions that we noticed the omission.", "Solo al comparar las dos versiones notamos la omisión.", "Erst durch den Vergleich der beiden Versionen bemerkten wir die Auslassung.", "只有通过比较两个版本，我们才注意到遗漏。", "Только сравнив две версии, мы заметили опускание."],
+    ["tres_difficile", "Elle prétend ne pas avoir vu le message que je lui avais envoyé.", "She claims not to have seen the message I had sent her.", "Ella afirma no haber visto el mensaje que le había enviado.", "Sie behauptet, die Nachricht nicht gesehen zu haben, die ich ihr geschickt hatte.", "她声称没看过我发给她的消息。", "Она утверждает, что не видела сообщение, которое я ей прислал."],
+    ["tres_difficile", "Qu'auriez-vous fait à ma place si vous aviez su la vérité ?", "What would you have done in my place if you had known the truth?", "¿Qué habría hecho usted en mi lugar si hubiera sabido la verdad?", "Was hätten Sie an meiner Stelle getan, wenn Sie die Wahrheit gekannt hätten?", "如果你知道真相，你会怎么做？", "Что бы вы сделали на моем месте, если бы знали правду?"],
+    ["tres_difficile", "Si j'avais su qu'ils viendraient si tard, je ne les aurais pas attendus.", "If I had known they were coming so late, I would not have waited for them.", "Si hubiera sabido que venirían tan tarde, no los habría esperado.", "Wenn ich gewusst hätte, dass sie so spät kommen, hätte ich nicht auf sie gewartet.", "如果我知道他们会这么晚来，我就不会等他们了。", "Если бы я знал, что они придут так поздно, я бы не ждал их."],
+    ["tres_difficile", "Elle aurait voulu que nous ayons terminé avant son retour.", "She would have wanted us to have finished before she returned.", "Ella habría querido que hubiéramos terminado antes de que ella regresara.", "Sie hätte gewollt, dass wir fertig sind, bevor sie zurückkommt.", "她希望我们在她回来前完成。", "Она хотела бы, чтобы мы закончили до её возвращения."],
+    ["tres_difficile", "Il a beau prétendre qu'il n'en savait rien, son nom figure sur le document.", "Much as he claims he knew nothing about it, his name appears on the document.", "Por mucho que afirme que no sabía nada, su nombre figura en el documento.", "So sehr er auch behauptet, nichts davon gewusst zu haben, sein Name steht auf dem Dokument.", "尽管他声称一无所知，但他的名字出现在文件上。", "Насколько бы он ни утверждал, что ничего не knew, его имя figure в документе."],
+    ["tres_difficile", "À moins que vous n'ayez une meilleure proposition, nous garderons celle-ci.", "Unless you have a better proposal, we will keep this one.", "A menos que tenga una propuesta mejor, guardaremos esta.", "Es sei denn, Sie haben einen besseren Vorschlag, werden wir diesen behalten.", "除非你有更好的提议，否则我们保留这个。", "Если у вас нет лучшего предложения, мы оставим это."],
+    ["tres_difficile", "Ce que je lui reproche, ce n'est pas d'être parti, mais de n'avoir rien dit.", "What I blame him for is not leaving, but saying nothing.", "Lo que le reprocho no es que se haya ido, sino no haber dicho nada.", "Was ich ihm vorwerfe, ist nicht, dass er gegangen ist, sondern, dass er nichts gesagt hat.", "我责备他并不是因为他走了，而是因为他什么都没说。", "То, в чем я виню его, — не то, что он ушел, а то, что он ничего не сказал."],
+    ["tres_difficile", "Quand elle a enfin répondu, j'avais déjà envoyé le formulaire.", "By the time she finally replied, I had already sent the form.", "Cuando ella finalmente respondió, ya había enviado el formulario.", "Als sie endlich antwortete, hatte ich das Formular bereits abgeschickt.", "当她终于回复时，我已经发送了表格。", "К тому времени, как она наконец ответила, я уже отправил форму."],
+    ["tres_difficile", "Ils auraient dû vérifier si les données avaient été correctement sauvegardées.", "They should have checked whether the data had been saved correctly.", "Deberían haber verificado si los datos se habían guardado correctamente.", "Sie hätten prüfen müssen, ob die Daten korrekt gespeichert worden waren.", "他们本应检查数据是否已正确保存。", "Им следовало проверить, были ли данные правильно сохранены."],
+    ["tres_difficile", "Pourquoi faudrait-il que je fasse semblant de ne pas comprendre ?", "Why should I have to pretend not to understand?", "¿Por qué tendría que fingir que no entiendo?", "Warum sollte ich so tun, als ob ich nicht verstünde?", "为什么我要假装不明白？", "Зачем мне притворяться, что я не понимаю?"],
+    ["tres_difficile", "Nous ignorions que la route avait été fermée depuis la veille.", "We did not know the road had been closed since the previous day.", "Ignorábamos que la carretera había estado cerrada desde el día anterior.", "Wir wussten nicht, dass die Straße seit dem Vortag gesperrt war.", "我们不知道路从前一天起就封闭了。", "Мы не знали, что дорога была закрыта с предыдущего дня."],
+    ["tres_difficile", "Il semble qu'elle ait oublié ce qu'elle était venue chercher.", "It seems she has forgotten what she came to look for.", "Parece que ella ha olvidado lo que vino a buscar.", "Es scheint, als hätte sie vergessen, wonach sie gekommen war.", "似乎她忘了自己来找什么。", "Похоже, она забыла, зачем пришла."],
+    ["tres_difficile", "Quel que soit le résultat, nous aurons appris quelque chose.", "Whatever the result, we will have learned something.", "Cualquiera que sea el resultado, habremos aprendido algo.", "Was auch immer das Ergebnis sein mag, wir werden etwas gelernt haben.", "无论结果如何，我们都会学到东西。", "Какой бы ни был результат, мы чему-то научимся."],
+    ["tres_difficile", "Tu aurais mieux fait de lui dire ce que tu avais découvert.", "You would have been better off telling him what you had found out.", "Habría sido mejor que le dijeras lo que habías descubierto.", "Du wärst besser dran, ihm zu sagen, was du herausgefunden hattest.", "你最好告诉他你发现了什么。", "Тебе стоило бы сказать ему, что ты узнал."],
+    ["master", "Fût-il mieux préparé, il ne pourrait pas prévoir tout ce qui risque de se produire.", "Even if he were better prepared, he could not foresee everything that might happen.", "Incluso si estuviera mejor preparado, no podría prever todo lo que podría suceder.", "Selbst wenn er besser vorbereitet wäre, könnte er nicht alles vorhersehen, was passieren könnte.", "即使他准备得更好，他也无法预见一切可能发生的事情。", "Даже если бы он был лучше подготовлен, он не смог бы предсказать всё, что может случиться."],
+    ["master", "Encore aurait-il fallu qu'ils nous préviennent avant de changer les règles.", "They would still have had to let us know before changing the rules.", "Todavía habrían tenido que informarnos antes de cambiar las reglas.", "Sie hätten uns trotzdem vor der Änderung der Regeln informieren müssen.", "他们改变规则之前仍然应该通知我们。", "Они всё равно должны были уведомить нас перед изменением правил."],
+    ["master", "Ce n'est qu'une fois qu'elle eut relu le témoignage qu'elle en comprit la portée.", "Only after she had reread the testimony did she understand its implications.", "Solo después de que ella releyó el testimonio entendió sus implicaciones.", "Erst nachdem sie das Zeugnis noch einmal gelesen hatte, verstand sie dessen Tragweite.", "只有在她重读证词后，她才明白其含义。", "Только после того, как она перечитала показания, она поняла их значение."],
+    ["master", "Qui que vous soyez, vous devrez justifier pourquoi vous avez gardé le silence.", "Whoever you are, you will have to explain why you stayed silent.", "Quienquiera que seas, tendrás que justificar por qué guardaste silencio.", "Wer auch immer Sie sind, Sie werden erklären müssen, warum Sie geschwiegen haben.", "无论你是谁，你都必须解释为什么保持沉默。", "Кем бы вы ни были, вам придется объяснить, почему вы молчали."],
+    ["master", "Il n'en demeure pas moins que la décision aurait pu être prise autrement.", "The fact remains that the decision could have been made differently.", "No obstante, la decisión podría haberse tomado de otra manera.", "Dennoch bliebe dabei, dass die Entscheidung anders hätte getroffen werden können.", "无论如何，决定本可以做出不同。", "Тем не менее, решение могло быть принято иначе."],
+    ["master", "Si tant est qu'il ait réellement promis de revenir, personne ne l'a entendu.", "If indeed he really promised to come back, nobody heard him.", "Si realmente prometió regresar, nadie lo oyó.", "Wenn er wirklich versprochen hat, zurückzukommen, hat es niemand gehört.", "如果他确实承诺过要回来，没人听到。", "Если он действительно пообещал вернуться, никто этого не слышал."],
+    ["master", "Non qu'elle ait voulu contester leur choix, mais elle souhaitait en comprendre les raisons.", "Not that she wanted to challenge their choice, but she wanted to understand their reasons.", "No es que ella quisiera impugnar su elección, sino que quería entender las razones.", "Nicht, dass sie ihre Wahl anfechten wollte, aber sie wollte die Gründe verstehen.", "她不是想质疑他们的选择，而是想了解原因。", "Она не хотела оспаривать их выбор, она хотела понять причины."],
+    ["master", "À quoi bon prétendre que vous l'auriez reconnu si vous ne l'aviez jamais rencontré ?", "What is the point of claiming you would have recognized him if you had never met him?", "¿De qué sirve pretender que lo habrías reconocido si nunca lo habías conocido?", "Wozu dient es zu behaupten, Sie hätten ihn erkannt, wenn Sie ihn nie getroffen hätten?", "如果你从未见过他，声称你会认出他有什么意义？", "Зачем утверждать, что вы бы узнали его, если никогда его не встречали?"],
+    ["master", "Il assiste à la conférence sans intervenir.", "He attends the conference without taking part.", "Asiste a la conferencia sin participar.", "Er nimmt an der Konferenz teil, ohne sich zu beteiligen.", "他参加会议但不发言。", "Он присутствует на конференции, не участвуя."],
+    ["master", "Je suis actuellement en train de vérifier le dossier.", "I am currently checking the file.", "Actualmente estoy verificando el expediente.", "Ich überprüfe derzeit die Akte.", "我正在审查档案。", "Я сейчас проверяю дело."],
+    ["master", "Cette solution est sensée, mais le problème reste sensible.", "This solution is sensible, but the issue remains sensitive.", "Esta solución es sensata, pero el problema sigue siendo delicado.", "Diese Lösung ist vernünftig, aber die Frage bleibt heikel.", "这个解决方案是明智的，但问题仍然敏感。", "Это разумное решение, но вопрос остается деликатным."],
+    ["master", "Il a finalement accepté la proposition, bien qu'il ait d'abord prétendu le contraire.", "He eventually accepted the proposal, although he had initially claimed otherwise.", "Finalmente aceptó la propuesta, aunque al principio afirmó lo contrario.", "Er hat den Vorschlag schließlich angenommen, obwohl er zunächst das Gegenteil behauptet hatte.", "他最终接受了提案，尽管他起初声称相反。", "Он в конечном итоге принял предложение, хотя сначала утверждал обратное."],
+    ["master", "Si nous avions su qu'elle viendrait, nous aurions attendu.", "If we had known she was coming, we would have waited.", "Si hubiéramos sabido que ella vendría, habríamos esperado.", "Wenn wir gewusst hätten, dass sie kommt, hätten wir gewartet.", "如果我们知道她会来，我们就会等。", "Если бы мы знали, что она придет, мы бы подождали."],
+    ["master", "À peine avaient-ils commencé qu'une autre difficulté surgit.", "Hardly had they started when another difficulty arose.", "Apenas habían empezado cuando surgió otra dificultad.", "Kaum hatten sie begonnen, als eine weitere Schwierigkeit auftrat.", "他们刚开始就又遇到困难。", "Едва они начали, как возникла другая трудность."],
+    ["master", "Encore faut-il que les témoins puissent confirmer ce qu'ils ont déclaré.", "The witnesses still need to be able to confirm what they said.", "Aún hace falta que los testigos puedan confirmar lo que declararon.", "Es noch erforderlich, dass die Zeugen bestätigen können, was sie ausgesagt haben.", "证人仍需能够确认他们的陈述。", "Все ещё необходимо, чтобы свидетели могли подтвердить свои показания."],
+    ["master", "Si complexe qu'elle paraisse, la règle ne souffre aucune exception.", "However complex it may seem, the rule allows no exceptions.", "Por compleja que parezca, la regla no admite excepciones.", "So komplex sie auch erscheinen mag, die Regel kennt keine Ausnahmen.", "无论规则看起来多么复杂，都不允许例外。", "Как бы сложным оно ни казалось, правило не допускает исключений."],
+    ["master", "Eût-elle été avertie plus tôt, elle n'aurait sans doute pas pris la même décision.", "Had she been warned earlier, she probably would not have made the same decision.", "Si la hubieran advertido más temprano, probablemente no habría tomado la misma decisión.", "Wäre sie früher gewarnt worden, hätte sie wahrscheinlich nicht dieselbe Entscheidung getroffen.", "如果她早些被警告，她可能就不会做出同样的决定。", "Если бы её предупредили раньше, она, вероятно, не приняла бы того же решения."],
+    ["master", "À supposer qu'il se soit trompé, cela ne justifierait pas qu'on l'exclue.", "Even assuming he was wrong, that would not justify excluding him.", "Incluso suponiendo que se equivocara, eso no justificaría excluirlo.", "Selbst wenn man annähme, dass er sich geirrt hätte, würde das ihn nicht ausschließen rechtfertigen.", "即使假设他错了，那也不能证明把他排除在外是合理的。", "Даже если предположить, что он ошибся, это не оправдывает его исключение."],
+    ["master", "Ce n'est pas faute de lui avoir répété qu'il aurait à répondre de ses actes.", "It is not as if we had failed to tell him he would be held accountable for his actions.", "No es que no le hayamos dicho repetidamente que tendría que responder de sus actos.", "Es nicht so, dass wir ihm nicht wiederholt gesagt hätten, dass er für seine Taten zur Rechenschaft gezogen werden würde.", "这不是因为我们没告诉他要为自己的行为负责。", "Это не потому, что мы не говорили ему, что он будет нести ответственность за свои действия."],
+    ["master", "Quelque convaincant que son argument puisse paraître, il repose sur une hypothèse erronée.", "However convincing his argument may seem, it is based on a false assumption.", "Por convincente que parezca su argumento, se basa en una suposición errónea.", "So überzeugend sein Argument auch erscheinen mag, es beruht auf einer falschen Annahme.", "无论他的论点看起来多么有说服力，它都建立在错误的假设上。", "Каким бы убедительным ни казался его аргумент, он основан на ошибочном предположении."]
 ];
 
 // --- CULTURE GÉNÉRALE (>1000 questions: sciences, histoire, arts, sport, cinéma, tech) ---
@@ -2085,8 +2119,8 @@ const CULTURE_QUESTIONS = [
 ["Qui a peint la Joconde ?","Léonard de Vinci",["Pablo Picasso","Vincent van Gogh","Claude Monet"]],
 ["Qui a écrit Les Misérables ?","Victor Hugo",["Molière","Voltaire","Émile Zola"]],
 ["En quelle année l'homme a-t-il marché sur la Lune pour la première fois ?","1969",["1961","1972","1959"]],
-["En quelle année a eu lieu la Révolution française ?","1789",["1792","1804"]],
-["Combien d'os a environ un adulte humain ?","206",["208","200"]],
+["En quelle année a eu lieu la Révolution française ?","1789",["1792","1804","1848"]],
+["Combien d'os a environ un adulte humain ?","206",["208","200","210"]],
 ["Quel organe propulse le sang dans le corps ?","Le cœur",["Le foie","Les poumons","Les reins"]],
 ["Quel est le plus grand organe du corps humain ?","La peau",["Le foie","Le cœur","Les poumons"]],
 ["Quel est l'animal terrestre le plus rapide ?","Le guépard",["Le lion","L'antilope","Le cheval"]],
@@ -2372,37 +2406,37 @@ CULTURE_QUESTIONS.push(
     ["Qui a peint La Persistance de la mémoire ?","Salvador Dalí",["Pablo Picasso","Joan Miró","René Magritte"]],
     ["Qui a peint Les Demoiselles d'Avignon ?","Pablo Picasso",["Georges Braque","Henri Matisse","Salvador Dalí"]],
     ["Qui a peint Guernica ?","Pablo Picasso",["Georges Braque","Henri Matisse","Salvador Dalí"]],
-    ["Qui a peint La Liberté guidant le peuple ?","Eugène Delacroix",["Paris","Londres"]],
-    ["Qui a peint Le Radeau de la Méduse ?","Théodore Géricault",["Paris","Londres"]],
-    ["Qui a peint Olympia ?","Édouard Manet",["Paris","Londres"]],
-    ["Qui a peint Le Déjeuner sur l'herbe ?","Édouard Manet",["Paris","Londres"]],
-    ["Qui a peint Impression, soleil levant ?","Claude Monet",["Paris","Londres"]],
-    ["Qui a peint Les Coquelicots ?","Claude Monet",["Paris","Londres"]],
-    ["Qui a peint La Nuit ?","Vincent van Gogh",["Paris","Londres"]],
-    ["Qui a peint Les Ménines ?","Diego Vélasquez",["Paris","Londres"]],
-    ["Qui a peint Le Baiser ?","Gustav Klimt",["Paris","Londres"]],
-    ["Qui a peint Le Cri ?","Edvard Munch",["Paris","Londres"]],
-    ["Qui a peint La Chambre à coucher ?","Vincent van Gogh",["Paris","Londres"]],
+    ["Qui a peint La Liberté guidant le peuple ?","Eugène Delacroix",["Théodore Géricault","Édouard Manet","Gustav Klimt"]],
+    ["Qui a peint Le Radeau de la Méduse ?","Théodore Géricault",["Eugène Delacroix","Claude Monet","Edvard Munch"]],
+    ["Qui a peint Olympia ?","Édouard Manet",["Claude Monet","Gustav Klimt","Diego Vélasquez"]],
+    ["Qui a peint Le Déjeuner sur l'herbe ?","Édouard Manet",["Claude Monet","Pablo Picasso","Gustav Klimt"]],
+    ["Qui a peint Impression, soleil levant ?","Claude Monet",["Édouard Manet","Vincent van Gogh","Paul Cézanne"]],
+    ["Qui a peint Les Coquelicots ?","Claude Monet",["Édouard Manet","Vincent van Gogh","Paul Cézanne"]],
+    ["Qui a peint La Nuit ?","Vincent van Gogh",["Claude Monet","Paul Cézanne","Edvard Munch"]],
+    ["Qui a peint Les Ménines ?","Diego Vélasquez",["Francisco Goya","El Greco","Pablo Picasso"]],
+    ["Qui a peint Le Baiser ?","Gustav Klimt",["Edvard Munch","Claude Monet","Diego Vélasquez"]],
+    ["Qui a peint Le Cri ?","Edvard Munch",["Gustav Klimt","Vincent van Gogh","Pablo Picasso"]],
+    ["Qui a peint La Chambre à coucher ?","Vincent van Gogh",["Claude Monet","Paul Cézanne","Édouard Manet"]],
     ["Qui a composé La Flûte enchantée ?","Wolfgang Amadeus Mozart",["Ludwig van Beethoven","Johann Sebastian Bach","Joseph Haydn"]],
     ["Qui a composé la Neuvième Symphonie ?","Ludwig van Beethoven",["Wolfgang Amadeus Mozart","Johann Sebastian Bach","Johannes Brahms"]],
-    ["Qui a composé les Quatre Saisons ?","Antonio Vivaldi",["Paris","Londres"]],
-    ["Qui a composé le Boléro ?","Maurice Ravel",["Paris","Londres"]],
-    ["Qui a composé Carmen ?","Georges Bizet",["Paris","Londres"]],
-    ["Qui a composé La Traviata ?","Giuseppe Verdi",["Paris","Londres"]],
-    ["Qui a composé Le Lac des cygnes ?","Pyotr Ilyich Tchaïkovski",["Paris","Londres"]],
-    ["Qui a composé Casse-noisette ?","Pyotr Ilyich Tchaïkovski",["Paris","Londres"]],
+    ["Qui a composé les Quatre Saisons ?","Antonio Vivaldi",["Johann Sebastian Bach","Wolfgang Amadeus Mozart","Georg Friedrich Haendel"]],
+    ["Qui a composé le Boléro ?","Maurice Ravel",["Claude Debussy","Georges Bizet","Camille Saint-Saëns"]],
+    ["Qui a composé Carmen ?","Georges Bizet",["Giuseppe Verdi","Giacomo Puccini","Wolfgang Amadeus Mozart"]],
+    ["Qui a composé La Traviata ?","Giuseppe Verdi",["Georges Bizet","Giacomo Puccini","Gioachino Rossini"]],
+    ["Qui a composé Le Lac des cygnes ?","Pyotr Ilyich Tchaïkovski",["Sergueï Rachmaninov","Igor Stravinsky","Alexandre Borodine"]],
+    ["Qui a composé Casse-noisette ?","Pyotr Ilyich Tchaïkovski",["Sergueï Rachmaninov","Igor Stravinsky","Alexandre Borodine"]],
     ["Qui a composé la Cinquième Symphonie ?","Ludwig van Beethoven",["Wolfgang Amadeus Mozart","Johann Sebastian Bach","Johannes Brahms"]],
     ["Qui a composé l'Ode à la joie ?","Ludwig van Beethoven",["Wolfgang Amadeus Mozart","Johann Sebastian Bach","Johannes Brahms"]],
-    ["Qui a composé la Messe en si mineur ?","Johann Sebastian Bach",["Paris","Londres"]],
-    ["Qui a composé les Brandebourgeois ?","Johann Sebastian Bach",["Paris","Londres"]],
-    ["Qui a composé Le Sacre du printemps ?","Igor Stravinsky",["Paris","Londres"]],
-    ["Qui a composé Pierre et le Loup ?","Serge Prokofiev",["Paris","Londres"]],
-    ["Qui a composé le Carnaval des animaux ?","Camille Saint-Saëns",["Paris","Londres"]],
-    ["Qui a composé la Symphonie du Nouveau Monde ?","Antonín Dvořák",["Paris","Londres"]],
+    ["Qui a composé la Messe en si mineur ?","Johann Sebastian Bach",["Georg Friedrich Haendel","Antonio Vivaldi","Wolfgang Amadeus Mozart"]],
+    ["Qui a composé les Brandebourgeois ?","Johann Sebastian Bach",["Georg Friedrich Haendel","Antonio Vivaldi","Wolfgang Amadeus Mozart"]],
+    ["Qui a composé Le Sacre du printemps ?","Igor Stravinsky",["Serge Prokofiev","Pyotr Ilyich Tchaïkovski","Maurice Ravel"]],
+    ["Qui a composé Pierre et le Loup ?","Serge Prokofiev",["Dmitri Chostakovitch","Pyotr Ilyich Tchaïkovski","Igor Stravinsky"]],
+    ["Qui a composé le Carnaval des animaux ?","Camille Saint-Saëns",["Maurice Ravel","Claude Debussy","Georges Bizet"]],
+    ["Qui a composé la Symphonie du Nouveau Monde ?","Antonín Dvořák",["Bedřich Smetana","Johannes Brahms","Pyotr Ilyich Tchaïkovski"]],
     ["Qui a découvert la pénicilline ?","Alexander Fleming",["Louis Pasteur","Marie Curie","Isaac Newton"]],
-    ["Qui a découvert les rayons X ?","Wilhelm Röntgen",["Paris","Londres"]],
+    ["Qui a découvert les rayons X ?","Wilhelm Röntgen",["Henri Becquerel","Marie Curie","Thomas Edison"]],
     ["Qui a découvert la radioactivité ?","Henri Becquerel",["Marie Curie","Pierre Curie","Ernest Rutherford"]],
-    ["Quels scientifiques ont publié le modèle de la double hélice de l'ADN en 1953 ?","James Watson et Francis Crick",["Paris","Londres"]],
+    ["Quels scientifiques ont publié le modèle de la double hélice de l'ADN en 1953 ?","James Watson et Francis Crick",["Maurice Wilkins et Rosalind Franklin","Linus Pauling et Robert Corey","Erwin Chargaff et Oswald Avery"]],
     ["Qui a formulé la théorie de la relativité ?","Albert Einstein",["Isaac Newton","Galilée","Stephen Hawking"]],
     ["Qui a formulé la loi de la gravitation universelle ?","Isaac Newton",["Albert Einstein","Galilée","Johannes Kepler"]],
     ["Qui a développé la théorie de l'évolution ?","Charles Darwin",["Lamarck","Mendel","Pasteur"]],
@@ -2412,15 +2446,15 @@ CULTURE_QUESTIONS.push(
     ["Qui a inventé la radio ?","Guglielmo Marconi",["Nikola Tesla","Heinrich Hertz","Alexander Popov"]],
     ["Qui a inventé l'avion ?","Les frères Wright",["Louis Blériot","Charles Lindbergh","Amelia Earhart"]],
     ["Qui a inventé la machine à vapeur ?","James Watt",["Thomas Newcomen","Richard Trevithick","George Stephenson"]],
-    ["Qui a inventé le télégraphe ?","Samuel Morse",["Paris","Londres"]],
-    ["Qui a inventé l'appareil photo ?","Nicéphore Niépce",["Paris","Londres"]],
-    ["Quel duo français a organisé la première séance publique payante du Cinématographe en 1895 ?","Les frères Lumière",["Paris","Londres"]],
-    ["Quel mathématicien anglais a conçu la machine analytique, précurseur de l'ordinateur ?","Charles Babbage",["Paris","Londres"]],
-    ["Qui a inventé le World Wide Web ?","Tim Berners-Lee",["Paris","Londres"]],
+    ["Qui a inventé le télégraphe ?","Samuel Morse",["Alexander Graham Bell","Guglielmo Marconi","Thomas Edison"]],
+    ["Qui a inventé l'appareil photo ?","Nicéphore Niépce",["Louis Daguerre","George Eastman","William Henry Fox Talbot"]],
+    ["Quel duo français a organisé la première séance publique payante du Cinématographe en 1895 ?","Les frères Lumière",["Georges Méliès","Alice Guy-Blaché","Thomas Edison"]],
+    ["Quel mathématicien anglais a conçu la machine analytique, précurseur de l'ordinateur ?","Charles Babbage",["Alan Turing","Blaise Pascal","John von Neumann"]],
+    ["Qui a inventé le World Wide Web ?","Tim Berners-Lee",["Vint Cerf","Robert Kahn","Bill Gates"]],
     ["Qui a découvert la gravité ?","Isaac Newton",["Albert Einstein","Galilée","Johannes Kepler"]],
     ["Qui a découvert les lois du mouvement ?","Isaac Newton",["Albert Einstein","Galilée","Johannes Kepler"]],
-    ["Quel chimiste anglais a isolé l'oxygène en 1774 ?","Joseph Priestley",["Paris","Londres"]],
-    ["Quel chimiste anglais a identifié l'hydrogène en 1766 ?","Henry Cavendish",["Paris","Londres"]],
+    ["Quel chimiste anglais a isolé l'oxygène en 1774 ?","Joseph Priestley",["Carl Wilhelm Scheele","Antoine Lavoisier","Henry Cavendish"]],
+    ["Quel chimiste anglais a identifié l'hydrogène en 1766 ?","Henry Cavendish",["Joseph Priestley","Antoine Lavoisier","Robert Boyle"]],
     ["Qui a découvert le radium ?","Marie Curie",["Pierre Curie","Albert Einstein","Isaac Newton"]],
     ["Qui a découvert le polonium ?","Marie Curie",["Pierre Curie","Albert Einstein","Isaac Newton"]],
     ["Quelle est la formule chimique de l'eau ?","H2O",["CO2","O2","NaCl"]],
@@ -2446,7 +2480,7 @@ CULTURE_QUESTIONS.push(
     ["Quelle planète est célèbre pour ses anneaux ?","Saturne",["Jupiter","Uranus","Neptune"]],
     ["Quelle est la plus petite planète du système solaire ?","Mercure",["Vénus","Mars","Pluton"]],
     ["En quelle année l'homme a-t-il marché sur la Lune ?","1969",["1961","1972","1959"]],
-    ["En quelle année a eu lieu la Révolution française ?","1789",["1792","1804"]],
+    ["En quelle année a eu lieu la Révolution française ?","1789",["1792","1804","1848"]],
     ["Quel navigateur européen a atteint les Caraïbes en 1492 ?","Christophe Colomb",["Vasco de Gama","Magellan","Amerigo Vespucci"]],
     ["Quel navigateur a lancé l'expédition de circumnavigation achevée en 1522 ?","Ferdinand de Magellan",["Christophe Colomb","Vasco de Gama","James Cook"]],
     ["Qui a fondé l'Empire mongol ?","Gengis Khan",["Kublai Khan","Tamerlan","Attila"]],
@@ -2463,12 +2497,143 @@ CULTURE_QUESTIONS.push(
 
 const CULTURE_QUESTIONS_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS, "culture");
 
+const GEO_QUESTIONS_EN_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_EN, "geo", GEO_QUESTIONS);
+const CULTURE_QUESTIONS_EN_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_EN, "culture", CULTURE_QUESTIONS);
+const GEO_QUESTIONS_ES_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_ES, "geo", GEO_QUESTIONS);
+const CULTURE_QUESTIONS_ES_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_ES, "culture", CULTURE_QUESTIONS);
+const GEO_QUESTIONS_DE_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_DE, "geo", GEO_QUESTIONS);
+const CULTURE_QUESTIONS_DE_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_DE, "culture", CULTURE_QUESTIONS);
+const GEO_QUESTIONS_ZH_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_ZH, "geo", GEO_QUESTIONS);
+const CULTURE_QUESTIONS_ZH_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_ZH, "culture", CULTURE_QUESTIONS);
+const GEO_QUESTIONS_RU_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_RU, "geo", GEO_QUESTIONS);
+const CULTURE_QUESTIONS_RU_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_RU, "culture", CULTURE_QUESTIONS);
+
+const BANKS_BY_LANG = {
+    fr: { geo: GEO_QUESTIONS_BY_LEVEL, culture: CULTURE_QUESTIONS_BY_LEVEL },
+    en: { geo: GEO_QUESTIONS_EN_BY_LEVEL, culture: CULTURE_QUESTIONS_EN_BY_LEVEL },
+    es: { geo: GEO_QUESTIONS_ES_BY_LEVEL, culture: CULTURE_QUESTIONS_ES_BY_LEVEL },
+    de: { geo: GEO_QUESTIONS_DE_BY_LEVEL, culture: CULTURE_QUESTIONS_DE_BY_LEVEL },
+    zh: { geo: GEO_QUESTIONS_ZH_BY_LEVEL, culture: CULTURE_QUESTIONS_ZH_BY_LEVEL },
+    ru: { geo: GEO_QUESTIONS_RU_BY_LEVEL, culture: CULTURE_QUESTIONS_RU_BY_LEVEL },
+};
+
 // ============================================================================
 // MATHS : difficulté croissante, petits problèmes et réflexion rapide
 // ============================================================================
-function generateVariedMath(diffKey) {
+const MATH_QUESTION_TEXT = {
+    fr: {
+        double: n => `Le double de ${n} ?`,
+        half: n => `La moitié de ${n} ?`,
+        division: (n, d) => `Combien font ${n} ÷ ${d} ?`,
+        sequence: (a, b, c) => `Suite : ${a}, ${b}, ${c}, ?`,
+        percentage: n => `25 % de ${n} ?`,
+        perimeter: (a, b) => `Périmètre d'un rectangle de ${a} cm sur ${b} cm ?`,
+        solve: equation => `Résous : ${equation}`,
+        threeQuarters: n => `3/4 de ${n} ?`,
+        squareRoot: n => `Racine carrée de ${n} ?`,
+        triangle: (a, b) => `Triangle rectangle : côtés ${a} cm et ${b} cm. Hypoténuse ?`,
+        discountedPrice: n => `Prix de ${n} FCFA après une remise de 20 % ?`,
+        leastCommonMultiple: (a, b) => `Quel est le plus petit commun multiple de ${a} et ${b} ?`,
+        quadratic: (equation) => `Résous : ${equation} = 0. Quelle est la plus grande racine ?`,
+        system: (sum, difference) => `Système : x + y = ${sum} et x - y = ${difference}. Quelle est la valeur de x ?`,
+        diagonals: n => `Combien de diagonales possède un polygone régulier à ${n} côtés ?`,
+        changingPrice: n => `Un article à ${n} FCFA augmente de 10 %, puis baisse de 10 %. Prix final ?`
+    },
+    en: {
+        double: n => `What is double ${n}?`,
+        half: n => `What is half of ${n}?`,
+        division: (n, d) => `What is ${n} ÷ ${d}?`,
+        sequence: (a, b, c) => `Sequence: ${a}, ${b}, ${c}, ?`,
+        percentage: n => `What is 25% of ${n}?`,
+        perimeter: (a, b) => `What is the perimeter of a rectangle measuring ${a} cm by ${b} cm?`,
+        solve: equation => `Solve: ${equation}`,
+        threeQuarters: n => `What is 3/4 of ${n}?`,
+        squareRoot: n => `What is the square root of ${n}?`,
+        triangle: (a, b) => `Right triangle: sides ${a} cm and ${b} cm. What is the hypotenuse?`,
+        discountedPrice: n => `What is the price of ${n} CFA after a 20% discount?`,
+        leastCommonMultiple: (a, b) => `What is the least common multiple of ${a} and ${b}?`,
+        quadratic: equation => `Solve: ${equation} = 0. What is the larger root?`,
+        system: (sum, difference) => `System: x + y = ${sum} and x - y = ${difference}. What is x?`,
+        diagonals: n => `How many diagonals does a regular polygon with ${n} sides have?`,
+        changingPrice: n => `An item costing ${n} CFA rises by 10%, then falls by 10%. What is its final price?`
+    },
+    es: {
+        double: n => `¿Cuál es el doble de ${n}?`,
+        half: n => `¿Cuál es la mitad de ${n}?`,
+        division: (n, d) => `¿Cuánto es ${n} ÷ ${d}?`,
+        sequence: (a, b, c) => `Secuencia: ${a}, ${b}, ${c}, ¿?`,
+        percentage: n => `¿Cuánto es el 25 % de ${n}?`,
+        perimeter: (a, b) => `¿Cuál es el perímetro de un rectángulo de ${a} cm por ${b} cm?`,
+        solve: equation => `Resuelve: ${equation}`,
+        threeQuarters: n => `¿Cuánto es 3/4 de ${n}?`,
+        squareRoot: n => `¿Cuál es la raíz cuadrada de ${n}?`,
+        triangle: (a, b) => `Triángulo rectángulo: lados de ${a} cm y ${b} cm. ¿Cuál es la hipotenusa?`,
+        discountedPrice: n => `¿Cuál es el precio de ${n} FCFA después de un descuento del 20 %?`,
+        leastCommonMultiple: (a, b) => `¿Cuál es el mínimo común múltiplo de ${a} y ${b}?`,
+        quadratic: equation => `Resuelve: ${equation} = 0. ¿Cuál es la raíz mayor?`,
+        system: (sum, difference) => `Sistema: x + y = ${sum} y x - y = ${difference}. ¿Cuál es el valor de x?`,
+        diagonals: n => `¿Cuántas diagonales tiene un polígono regular de ${n} lados?`,
+        changingPrice: n => `Un artículo cuesta ${n} FCFA; sube un 10 % y luego baja un 10 %. ¿Cuál es el precio final?`
+    },
+    de: {
+        double: n => `Wie viel ist das Doppelte von ${n}?`,
+        half: n => `Wie viel ist die Hälfte von ${n}?`,
+        division: (n, d) => `Wie viel ist ${n} ÷ ${d}?`,
+        sequence: (a, b, c) => `Folge: ${a}, ${b}, ${c}, ?`,
+        percentage: n => `Wie viel sind 25 % von ${n}?`,
+        perimeter: (a, b) => `Wie groß ist der Umfang eines Rechtecks mit ${a} cm Länge und ${b} cm Breite?`,
+        solve: equation => `Löse: ${equation}`,
+        threeQuarters: n => `Wie viel sind 3/4 von ${n}?`,
+        squareRoot: n => `Was ist die Quadratwurzel aus ${n}?`,
+        triangle: (a, b) => `Rechtwinkliges Dreieck: Seiten ${a} cm und ${b} cm. Wie lang ist die Hypotenuse?`,
+        discountedPrice: n => `Wie viel kostet ${n} FCFA nach einem Rabatt von 20 %?`,
+        leastCommonMultiple: (a, b) => `Was ist das kleinste gemeinsame Vielfache von ${a} und ${b}?`,
+        quadratic: equation => `Löse: ${equation} = 0. Was ist die größere Lösung?`,
+        system: (sum, difference) => `Gleichungssystem: x + y = ${sum} und x - y = ${difference}. Wie groß ist x?`,
+        diagonals: n => `Wie viele Diagonalen hat ein regelmäßiges Vieleck mit ${n} Seiten?`,
+        changingPrice: n => `Ein Artikel kostet ${n} FCFA. Der Preis steigt um 10 % und sinkt dann um 10 %. Wie hoch ist der Endpreis?`
+    },
+    zh: {
+        double: n => `${n} 的两倍是多少？`,
+        half: n => `${n} 的一半是多少？`,
+        division: (n, d) => `${n} ÷ ${d} 等于多少？`,
+        sequence: (a, b, c) => `数列：${a}、${b}、${c}、？`,
+        percentage: n => `${n} 的 25% 是多少？`,
+        perimeter: (a, b) => `一个长 ${a} 厘米、宽 ${b} 厘米的长方形，周长是多少？`,
+        solve: equation => `求解：${equation}`,
+        threeQuarters: n => `${n} 的四分之三是多少？`,
+        squareRoot: n => `${n} 的平方根是多少？`,
+        triangle: (a, b) => `直角三角形的两条直角边分别为 ${a} 厘米和 ${b} 厘米，斜边长多少？`,
+        discountedPrice: n => `${n} FCFA 打八折后的价格是多少？`,
+        leastCommonMultiple: (a, b) => `${a} 和 ${b} 的最小公倍数是多少？`,
+        quadratic: equation => `求解：${equation} = 0。较大的根是多少？`,
+        system: (sum, difference) => `方程组：x + y = ${sum}，x - y = ${difference}。x 等于多少？`,
+        diagonals: n => `一个有 ${n} 条边的正多边形有多少条对角线？`,
+        changingPrice: n => `一件商品原价 ${n} FCFA，先涨价 10%，再降价 10%。最终价格是多少？`
+    },
+    ru: {
+        double: n => `Чему равен удвоенный ${n}?`,
+        half: n => `Чему равна половина числа ${n}?`,
+        division: (n, d) => `Сколько будет ${n} ÷ ${d}?`,
+        sequence: (a, b, c) => `Последовательность: ${a}, ${b}, ${c}, ?`,
+        percentage: n => `Сколько составляет 25 % от ${n}?`,
+        perimeter: (a, b) => `Найдите периметр прямоугольника со сторонами ${a} см и ${b} см.`,
+        solve: equation => `Решите: ${equation}`,
+        threeQuarters: n => `Чему равны 3/4 от ${n}?`,
+        squareRoot: n => `Чему равен квадратный корень из ${n}?`,
+        triangle: (a, b) => `Прямоугольный треугольник: катеты ${a} см и ${b} см. Чему равна гипотенуза?`,
+        discountedPrice: n => `Сколько стоит товар за ${n} FCFA после скидки 20 %?`,
+        leastCommonMultiple: (a, b) => `Чему равно наименьшее общее кратное ${a} и ${b}?`,
+        quadratic: equation => `Решите: ${equation} = 0. Чему равен больший корень?`,
+        system: (sum, difference) => `Система: x + y = ${sum}, x - y = ${difference}. Чему равен x?`,
+        diagonals: n => `Сколько диагоналей у правильного многоугольника с ${n} сторонами?`,
+        changingPrice: n => `Товар стоил ${n} FCFA. Сначала цена выросла на 10 %, затем снизилась на 10 %. Какова итоговая цена?`
+    }
+};
+
+function generateVariedMath(diffKey, language = 'fr') {
     const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const pick = values => values[Math.floor(Math.random() * values.length)];
+    const text = MATH_QUESTION_TEXT[language] || MATH_QUESTION_TEXT.fr;
     let question;
     let value;
 
@@ -2477,41 +2642,41 @@ function generateVariedMath(diffKey) {
         const kind = rand(0, 3);
         if (kind === 0) { question = `${a} + ${b} = ?`; value = a + b; }
         else if (kind === 1) { const high = Math.max(a, b), low = Math.min(a, b); question = `${high} - ${low} = ?`; value = high - low; }
-        else if (kind === 2) { question = `Le double de ${a} ?`; value = 2 * a; }
-        else { const even = a * 2; question = `La moitié de ${even} ?`; value = a; }
+        else if (kind === 2) { question = text.double(a); value = 2 * a; }
+        else { const even = a * 2; question = text.half(even); value = a; }
     } else if (diffKey === 'facile') {
         const a = rand(2, 20), b = rand(2, 12);
         const kind = rand(0, 3);
         if (kind === 0) { question = `${a} + ${b} = ?`; value = a + b; }
         else if (kind === 1) { question = `${a} × ${b} = ?`; value = a * b; }
-        else if (kind === 2) { question = `Combien font ${a * b} ÷ ${b} ?`; value = a; }
-        else { const step = rand(2, 6); question = `Suite : ${a}, ${a + step}, ${a + 2 * step}, ?`; value = a + 3 * step; }
+        else if (kind === 2) { question = text.division(a * b, b); value = a; }
+        else { const step = rand(2, 6); question = text.sequence(a, a + step, a + 2 * step); value = a + 3 * step; }
     } else if (diffKey === 'moyen') {
         const a = rand(5, 30), b = rand(3, 15);
         const kind = rand(0, 3);
         if (kind === 0) { question = `${a} + ${b} × 2 = ?`; value = a + b * 2; }
-        else if (kind === 1) { question = `25 % de ${a * 4} ?`; value = a; }
-        else if (kind === 2) { const perimeter = 2 * (a + b); question = `Périmètre d'un rectangle de ${a} cm sur ${b} cm ?`; value = perimeter; }
-        else { const x = rand(3, 20), result = 2 * x + 5; question = `Résous : 2x + 5 = ${result}`; value = x; }
+        else if (kind === 1) { question = text.percentage(a * 4); value = a; }
+        else if (kind === 2) { const perimeter = 2 * (a + b); question = text.perimeter(a, b); value = perimeter; }
+        else { const x = rand(3, 20), result = 2 * x + 5; question = text.solve(`2x + 5 = ${result}`); value = x; }
     } else if (diffKey === 'difficile') {
         const a = rand(4, 18), b = rand(3, 12);
         const kind = rand(0, 3);
-        if (kind === 0) { const x = rand(4, 25), result = 3 * x - 7; question = `Résous : 3x - 7 = ${result}`; value = x; }
-        else if (kind === 1) { const n = rand(3, 20); question = `3/4 de ${4 * n} ?`; value = 3 * n; }
-        else if (kind === 2) { const root = rand(5, 20); question = `Racine carrée de ${root * root} ?`; value = root; }
+        if (kind === 0) { const x = rand(4, 25), result = 3 * x - 7; question = text.solve(`3x - 7 = ${result}`); value = x; }
+        else if (kind === 1) { const n = rand(3, 20); question = text.threeQuarters(4 * n); value = 3 * n; }
+        else if (kind === 2) { const root = rand(5, 20); question = text.squareRoot(root * root); value = root; }
         else { question = `${a} × (${b} + 5) - ${a * 5} = ?`; value = a * b; }
     } else if (diffKey === 'tres_difficile') {
         const kind = rand(0, 3);
-        if (kind === 0) { const x = rand(5, 25), result = 5 * x + 3; question = `Résous : 5x + 3 = ${result}`; value = x; }
-        else if (kind === 1) { const x = rand(2, 12), y = rand(3, 9); question = `Triangle rectangle : côtés ${3 * x} cm et ${4 * x} cm. Hypoténuse ?`; value = 5 * x; }
-        else if (kind === 2) { const base = rand(2, 15) * 100; question = `Prix de ${base} FCFA après une remise de 20 % ?`; value = base * 0.8; }
-        else { const x = rand(3, 12); question = `Quel est le plus petit commun multiple de ${x} et ${x + 1} ?`; value = x * (x + 1); }
+        if (kind === 0) { const x = rand(5, 25), result = 5 * x + 3; question = text.solve(`5x + 3 = ${result}`); value = x; }
+        else if (kind === 1) { const x = rand(2, 12), y = rand(3, 9); question = text.triangle(3 * x, 4 * x); value = 5 * x; }
+        else if (kind === 2) { const base = rand(2, 15) * 100; question = text.discountedPrice(base); value = base * 0.8; }
+        else { const x = rand(3, 12); question = text.leastCommonMultiple(x, x + 1); value = x * (x + 1); }
     } else {
         const kind = rand(0, 3);
-        if (kind === 0) { const a = rand(2, 10), r1 = rand(1, 12), r2 = rand(1, 12); question = `Résous : x² - ${r1 + r2}x + ${r1 * r2} = 0. Quelle est la plus grande racine ?`; value = Math.max(r1, r2); }
-        else if (kind === 1) { const x = rand(2, 15), y = rand(2, 15); question = `Système : x + y = ${x + y} et x - y = ${x - y}. Quelle est la valeur de x ?`; value = x; }
-        else if (kind === 2) { const n = rand(3, 12); question = `Combien de diagonales possède un polygone régulier à ${n} côtés ?`; value = n * (n - 3) / 2; }
-        else { const a = rand(3, 15), b = rand(3, 15); question = `Un article à ${a * 100} FCFA augmente de 10 %, puis baisse de 10 %. Prix final ?`; value = a * 100 * 1.1 * 0.9; }
+        if (kind === 0) { const r1 = rand(1, 12), r2 = rand(1, 12); question = text.quadratic(`x² - ${r1 + r2}x + ${r1 * r2}`); value = Math.max(r1, r2); }
+        else if (kind === 1) { const x = rand(2, 15), y = rand(2, 15); question = text.system(x + y, x - y); value = x; }
+        else if (kind === 2) { const n = rand(3, 12); question = text.diagonals(n); value = n * (n - 3) / 2; }
+        else { const a = rand(3, 15), b = rand(3, 15); question = text.changingPrice(a * 100); value = a * 100 * 1.1 * 0.9; }
     }
 
     value = Number(value.toFixed(2));
@@ -2519,7 +2684,7 @@ function generateVariedMath(diffKey) {
     const delta = Math.max(1, Math.round(Math.abs(value) * 0.1));
     const choices = new Set([answer]);
     for (const offset of [delta, -delta, delta * 2, -delta * 2, delta * 3, -delta * 3, 1, -1, 2, -2]) {
-        if (choices.size >= 3) break;
+        if (choices.size >= 4) break;
         const candidate = Number((value + offset).toFixed(2));
         if (Number.isFinite(candidate) && String(candidate) !== answer) choices.add(String(candidate));
     }
@@ -2535,12 +2700,11 @@ const QuestionManager = (() => {
 
     function setLangPair(source, target) {
         const languages = ['fr', 'en', 'es', 'de', 'zh', 'ru'];
-        if (!languages.includes(source) || !languages.includes(target)) return;
-        // If the fixed French source is also selected as target, reverse the pair.
-        if (source === target) source = target === 'fr' ? 'en' : 'fr';
+        if (!languages.includes(source) || !languages.includes(target) || source === target) return false;
         langSource = source;
         langTarget = target;
         languageLevelCache.clear();
+        return true;
     }
 
     function resetHistory() {
@@ -2552,20 +2716,23 @@ const QuestionManager = (() => {
         if (languageLevelCache.has(pairKey)) return languageLevelCache.get(pairKey);
 
         let rows = [];
-        if ((source === 'fr' && target === 'en') || (source === 'en' && target === 'fr')) {
-            rows = LANG_PHRASES.map(([fr, en]) => [
-                `Traduis : « ${source === 'fr' ? fr : en} »`,
-                source === 'fr' ? en : fr,
-                [], 'phrase', null, source === 'fr' ? fr : en
-            ]);
-            rows.push(...LANG_ADVANCED_PHRASES.map(([fr, en, levelKey, distractors = []]) => [
-                `Traduis : « ${source === 'fr' ? fr : en} »`, source === 'fr' ? en : fr,
-                source === 'fr' ? distractors : [], 'phrase', levelKey, source === 'fr' ? fr : en
-            ]));
-        } else {
-            rows = [];
-        }
         const languageIndex = { fr: 0, en: 1, es: 2, de: 3, zh: 4, ru: 5 };
+
+        // LANG_PHRASES: [fr, en, es, de, zh, ru]
+        rows = LANG_PHRASES.map(row => {
+            const sourceText = row[languageIndex[source]];
+            const targetText = row[languageIndex[target]];
+            return [`Traduis : « ${sourceText} »`, targetText, [], 'phrase', null, sourceText];
+        });
+
+        // LANG_ADVANCED_PHRASES: [levelKey, fr, en, es, de, zh, ru]
+        rows.push(...LANG_ADVANCED_PHRASES.map(row => {
+            const levelKey = row[0];
+            const sourceText = row[languageIndex[source] + 1];
+            const targetText = row[languageIndex[target] + 1];
+            return [`Traduis : « ${sourceText} »`, targetText, [], 'phrase', levelKey, sourceText];
+        }));
+
         rows.push(...LANG_MULTILINGUAL_CHALLENGES.map(([levelKey, ...translations]) => {
             const sourceText = translations[languageIndex[source]];
             const targetText = translations[languageIndex[target]];
@@ -2594,15 +2761,7 @@ const QuestionManager = (() => {
     function createQuestion(question, answer, distractors, level, theme) {
         const answerText = String(answer ?? '').trim();
         const correctKey = normalizeAnswerChoice(answerText);
-        const choices = new Map([[correctKey, answerText]]);
-        (distractors || []).forEach(choice => {
-            const text = String(choice ?? '').trim();
-            const key = normalizeAnswerChoice(text);
-            if (text && key !== correctKey && !choices.has(key)) choices.set(key, text);
-        });
-        if (!correctKey) throw new Error(`Question sans bonne réponse : ${question}`);
-        if (choices.size < 3) throw new Error(`Pas assez de choix distincts : ${question}`);
-        const options = shuffleOptions([...choices.values()].slice(0, 3));
+        const options = selectQuestionOptions(question, answerText, distractors);
         if (!options.some(option => normalizeAnswerChoice(option) === correctKey)) {
             throw new Error(`La bonne réponse est absente des choix : ${question}`);
         }
@@ -2652,7 +2811,7 @@ const QuestionManager = (() => {
             let generated;
             let tries = 0;
             do {
-                generated = generateVariedMath(level.key);
+                generated = generateVariedMath(level.key, langSource);
                 tries++;
             } while (usedSignatures.has(`maths_${level.key}_${normalizeQuestionText(generated.question)}`) && tries < 20);
             usedSignatures.add(`maths_${level.key}_${normalizeQuestionText(generated.question)}`);
@@ -2661,7 +2820,8 @@ const QuestionManager = (() => {
 
         if (theme === 'anglais') return generateLangQuestion(level);
 
-        const pool = theme === 'geo' ? GEO_QUESTIONS_BY_LEVEL[level.key] : CULTURE_QUESTIONS_BY_LEVEL[level.key];
+        const banks = BANKS_BY_LANG[langSource] || BANKS_BY_LANG.fr;
+        const pool = theme === 'geo' ? banks.geo[level.key] : banks.culture[level.key];
         const row = pickQuestion(theme, level.key, pool);
         if (!row) throw new Error(`Banque vide : ${theme}, niveau ${level.label}`);
         return createQuestion(row[0], row[1], row[2], level, theme);
