@@ -151,17 +151,96 @@ let particles = [];
 let lasers = []; // Faisceaux laser tirés par le canon
 let currentOptions = [];
 let currentButtonTarget = null;
+let announcedQuestionTarget = null;
 const QUESTIONS_PER_TOUR = 20;
 let difficultyIndex = 0;
 let tourNumber = 1;
 let tourQuestionCount = 0;
+const MATH_SPEED_FACTORS = [0.9, 0.89, 0.88, 0.87, 0.86, 0.85];
+const MATH_RESPONSE_SECONDS = [7, 7.5, 8, 8.5, 9, 10];
 const DIFFICULTY_COLORS = ['#2563eb', '#238636', '#b77908', '#c2410c', '#b91c1c', '#7e22ce'];
 const SURVIVAL_QUESTION_LIMIT = 240;
+let survivalQuestionLimit = SURVIVAL_QUESTION_LIMIT;
 let spawnTimer = 0;
 let lastTime = 0;
 let pausedByVisibility = false;
 let gameFrameRequest = null;
 const INTERRUPTION_STORAGE_KEY = 'chrono_run_interrupted';
+const dialogReturnFocus = new WeakMap();
+let activeAccessibleDialog = null;
+
+function getVisibleAccessibleDialog() {
+    return [...document.querySelectorAll('.overlay[role="dialog"][aria-modal="true"]')]
+        .find(dialog => !dialog.classList.contains('hidden')) || null;
+}
+
+function getDialogFocusableElements(dialog) {
+    const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    return [...dialog.querySelectorAll(selector)].filter(element =>
+        !element.closest('.hidden') && element.getClientRects().length > 0
+        && getComputedStyle(element).visibility !== 'hidden'
+    );
+}
+
+function canRestoreDialogFocus(element) {
+    return element instanceof HTMLElement && element.isConnected
+        && !element.disabled && !element.closest('.hidden')
+        && !element.closest('[aria-hidden="true"]')
+        && element.getClientRects().length > 0;
+}
+
+function syncAccessibleOverlayState() {
+    const dialog = getVisibleAccessibleDialog();
+    const hud = document.getElementById('hud');
+    const startScreen = document.getElementById('start-screen');
+    const blockingOverlayVisible = [...document.querySelectorAll('.overlay')]
+        .some(overlay => overlay.id !== 'start-screen' && !overlay.classList.contains('hidden'));
+    if (hud) hud.setAttribute('aria-hidden', String(Boolean(blockingOverlayVisible || !startScreen.classList.contains('hidden'))));
+
+    if (dialog === activeAccessibleDialog) return;
+    const previousDialog = activeAccessibleDialog;
+    activeAccessibleDialog = dialog;
+    if (dialog) {
+        const returnTarget = previousDialog
+            ? dialogReturnFocus.get(previousDialog)
+            : document.activeElement;
+        dialogReturnFocus.set(dialog, returnTarget);
+        const focusTarget = getDialogFocusableElements(dialog)[0] || dialog;
+        focusTarget.focus({ preventScroll: true });
+    } else if (previousDialog) {
+        const returnTarget = dialogReturnFocus.get(previousDialog);
+        if (canRestoreDialogFocus(returnTarget)) returnTarget.focus({ preventScroll: true });
+    }
+}
+
+document.addEventListener('keydown', event => {
+    if (event.key !== 'Tab' || !activeAccessibleDialog) return;
+    const focusable = getDialogFocusableElements(activeAccessibleDialog);
+    if (!focusable.length) {
+        event.preventDefault();
+        activeAccessibleDialog.focus({ preventScroll: true });
+        return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!activeAccessibleDialog.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+});
+
+new MutationObserver(syncAccessibleOverlayState).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class'],
+    subtree: true
+});
+syncAccessibleOverlayState();
 
 // === COMBO & FEVER MODE ===
 let combo = 0;           // streak de bonnes réponses consécutives
@@ -184,12 +263,12 @@ let retryKeys = parseInt(getStoredValue('chrono_retry_keys')) || 0;
 let pendingAdReward = null;
 let selectedSkin = getStoredValue('chrono_selected_skin', 'blue');
 const SKINS = {
-    blue: { name: 'Blue Defender', cost: 0, owned: true, color: '#38bdf8', glow: '#58a6ff' },
-    emerald: { name: 'Emerald', cost: 150, owned: false, color: '#34d399', glow: '#10b981' },
-    solar: { name: 'Solar', cost: 400, owned: false, color: '#fef08a', glow: '#facc15' },
-    neon: { name: 'Neon Plasma', cost: 800, owned: false, color: '#f472b6', glow: '#d946ef' },
-    crystal: { name: 'Crystal', cost: 250, owned: false, color: '#a5f3fc', glow: '#22d3ee' },
-    void: { name: 'Void', cost: 600, owned: false, color: '#c4b5fd', glow: '#a855f7' }
+    blue: { name: 'Blue Defender', cost: 0, owned: true, color: '#38bdf8', glow: '#58a6ff', beamAccent: '#e0f2fe', beamStyle: 'bolt' },
+    emerald: { name: 'Emerald', cost: 400, owned: false, color: '#34d399', glow: '#10b981', beamAccent: '#d1fae5', beamStyle: 'vines' },
+    solar: { name: 'Solar', cost: 1000, owned: false, color: '#fef08a', glow: '#facc15', beamAccent: '#fff7b2', beamStyle: 'flare' },
+    neon: { name: 'Neon Plasma', cost: 1500, owned: false, color: '#f472b6', glow: '#d946ef', beamAccent: '#fce7f3', beamStyle: 'arc' },
+    crystal: { name: 'Crystal', cost: 700, owned: false, color: '#a5f3fc', glow: '#22d3ee', beamAccent: '#ffffff', beamStyle: 'prism' },
+    void: { name: 'Void', cost: 1200, owned: false, color: '#c4b5fd', glow: '#a855f7', beamAccent: '#f5d0fe', beamStyle: 'rift' }
 };
 let cannonRankCacheSkin = null;
 let cannonRankCacheValue = 0;
@@ -379,7 +458,7 @@ function updateDifficultyBadge() {
     const level = DIFFICULTY_LEVELS[difficultyIndex];
     const levelName = window.UI18n?.tier(difficultyIndex) || level.label;
     badge.textContent = gameMode === 'survival'
-        ? `SURVIVAL · ${levelName.toUpperCase()} · ${survivalQuestionsAnswered}/${SURVIVAL_QUESTION_LIMIT}`
+        ? `SURVIVAL · ${levelName.toUpperCase()} · ${QuestionManager.getRunHistory().length}/${survivalQuestionLimit}`
         : `${levelName.toUpperCase()} · ${window.UI18n?.t('round') || 'TOUR'} ${tourNumber}/2 · ${tourQuestionCount}/${QUESTIONS_PER_TOUR}`;
     badge.style.background = DIFFICULTY_COLORS[difficultyIndex];
 }
@@ -422,10 +501,11 @@ function saveGameProgress() {
     if (!sessionCanResume || !['tours', 'survival'].includes(gameMode)) return;
     savedRunProgress = {
         mode: gameMode, theme: selectedTheme, score, lives,
-        difficultyIndex, tourNumber, tourQuestionCount, survivalQuestionsAnswered,
+        difficultyIndex, tourNumber, tourQuestionCount, survivalQuestionsAnswered, survivalQuestionLimit,
         combo, comboMultiplier, feverActive, feverTimer,
         meteorsSinceSpecial, meteorsDestroyed, nextStarMeteorThreshold, nextRetryMeteorThreshold,
         retryFigureHistory: RetryTrace.getRunHistory(),
+        questionHistory: QuestionManager.getRunHistory(),
         reviveAdUsedThisRun,
         savedAt: Date.now()
     };
@@ -506,12 +586,23 @@ function resumeSavedGame() {
         reviveAdUsedThisRun = Boolean(saved.reviveAdUsedThisRun);
         if (gameMode === 'survival') survivalDifficulty = DIFFICULTY_LEVELS[difficultyIndex].key;
         enemies = []; particles = []; lasers = []; floatingTexts = []; currentOptions = []; currentButtonTarget = null;
-        QuestionManager.resetHistory();
+        QuestionManager.restoreHistory(saved.questionHistory);
+        survivalQuestionLimit = gameMode === 'survival'
+            ? Math.max(survivalQuestionsAnswered + 1, Math.min(
+                SURVIVAL_QUESTION_LIMIT,
+                Number(saved.survivalQuestionLimit) || getSurvivalQuestionLimit(selectedTheme, DIFFICULTY_LEVELS[difficultyIndex].key)
+            ))
+            : SURVIVAL_QUESTION_LIMIT;
         document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
         document.getElementById('controls').classList.remove('hidden');
         selectTheme(selectedTheme);
         updateDifficultyBadge(); updateHUD(); updateCatapultSkin(); startHUDAnimation();
+        if (gameMode === 'survival' && QuestionManager.getRunHistory().length >= survivalQuestionLimit) {
+            triggerSurvivalComplete();
+            return;
+        }
         isPaused = false; spawnTimer = 0; spawnEnemy();
+        document.getElementById('btn0').focus({ preventScroll: true });
         lastTime = performance.now();
         saveGameProgress();
         scheduleGameFrame();
@@ -619,7 +710,6 @@ function syncQuestionLanguages(source) {
         if (targetSelect) targetSelect.value = targetLanguage;
     }
     setLangPair(source, targetLanguage);
-    QuestionManager.resetHistory();
 }
 
 function setTargetLanguage(target) {
@@ -634,7 +724,6 @@ function setTargetLanguage(target) {
     Storage.setItem('chrono_target_language', targetLanguage);
     document.getElementById('setting-language-target').value = targetLanguage;
     setLangPair(source, targetLanguage);
-    QuestionManager.resetHistory();
 }
 
 function openSettings() {
@@ -791,6 +880,17 @@ function setLangPair(source, target) {
     }
 }
 
+function getSurvivalQuestionLimit(theme, levelKey) {
+    if (theme === 'random' || theme === 'maths') return SURVIVAL_QUESTION_LIMIT;
+    const levelBanks = QuestionManager.getBankStats()[levelKey];
+    if (!levelBanks) throw new Error(`Niveau de difficulté invalide : ${levelKey}`);
+    const bankCount = levelBanks[theme];
+    if (!Number.isInteger(bankCount) || bankCount < 1) {
+        throw new Error(`Banque de questions indisponible : ${theme}, niveau ${levelKey}`);
+    }
+    return Math.min(SURVIVAL_QUESTION_LIMIT, bankCount);
+}
+
 function pauseGame() {
     saveGameProgress();
     isPaused = true;
@@ -841,6 +941,9 @@ function showMenu() {
     document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
     document.getElementById('start-screen').classList.remove('hidden');
     document.getElementById('controls').classList.add('hidden');
+    const selectedButton = document.querySelector(`#home-theme-grid .theme-${selectedTheme}.selected`)
+        || document.querySelector('#home-theme-grid .theme-btn');
+    selectedButton?.focus({ preventScroll: true });
 }
 
 function wrapCanvasText(text, maxWidth) {
@@ -881,6 +984,39 @@ function drawWrappedText(text, x, y, maxWidth, lineHeight, lines = wrapCanvasTex
     return lines.length;
 }
 
+function drawMeteorQuestion(meteor) {
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (canvasLogicalWidth() <= 520) {
+        if (meteor.specialLabel) {
+            ctx.font = `bold ${Math.max(14, Math.min(24, meteor.radius * 0.7))}px sans-serif`;
+            ctx.fillText(meteor.specialLabel, meteor.x, meteor.y);
+        }
+        return;
+    }
+
+    let fontSize = meteor.isText
+        ? Math.max(12, meteor.radius * 0.32)
+        : Math.max(16, meteor.radius * 0.38);
+    if (meteor.isText) {
+        const maxWidth = meteor.radius * 1.38;
+        let lines;
+        let lineHeight;
+        do {
+            ctx.font = `bold ${fontSize}px sans-serif`;
+            lineHeight = fontSize * 1.12;
+            lines = wrapCanvasText(meteor.question, maxWidth);
+            if (lines.length * lineHeight <= meteor.radius * 1.25 || fontSize <= 6) break;
+            fontSize = Math.max(6, fontSize - 0.5);
+        } while (true);
+        drawWrappedText(meteor.question, meteor.x, meteor.y, maxWidth, lineHeight, lines);
+    } else {
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.fillText(meteor.question, meteor.x, meteor.y);
+    }
+}
+
 function getMeteorSpawnX(radius) {
     const hud = document.getElementById('hud');
     const canvasRect = canvas.getBoundingClientRect();
@@ -890,6 +1026,27 @@ function getMeteorSpawnX(radius) {
     const maxX = Math.max(radius * 1.1, canvasLogicalWidth() - radius * 1.1);
     const safeMin = Math.min(minX, maxX);
     return safeMin + Math.random() * Math.max(0, maxX - safeMin);
+}
+
+function calculateMeteorFallSpeed(theme, isText, levelIndex, mode, tourNumber, tourQuestions, survivalQuestions, defenseLineY) {
+    const level = Math.max(0, Math.min(MATH_SPEED_FACTORS.length - 1, Number(levelIndex) || 0));
+    const isMathQuestion = theme === 'maths';
+    const factor = MATH_SPEED_FACTORS[level];
+    const survivalBaseSpeed = ((isText ? 35 : 44) + level * 8) * 1.12;
+    const survivalRamp = Math.min(survivalQuestions * 0.055, 13);
+    const campaignQuestions = (Math.max(1, tourNumber) - 1) * QUESTIONS_PER_TOUR + tourQuestions;
+    const campaignProgressSpeed = campaignQuestions * 0.175;
+    const speed = mode === 'survival'
+        ? survivalBaseSpeed * (isMathQuestion ? factor : 1)
+            + survivalRamp * (isMathQuestion ? 0.65 : 1)
+        : ((isText ? 35 : 44) + level * 8 + campaignProgressSpeed)
+            * (isMathQuestion ? factor : 1);
+    if (!isMathQuestion) return speed;
+    return Math.min(speed, Math.max(1, defenseLineY) / MATH_RESPONSE_SECONDS[level]);
+}
+
+function getMaxActiveMeteorCount(theme, activeEnemies) {
+    return theme === 'maths' || activeEnemies.some(enemy => enemy.theme === 'maths') ? 1 : 2;
 }
 
 function spawnEnemy() {
@@ -911,14 +1068,10 @@ function spawnEnemy() {
             : Math.min(maxTextRadius, 32 + Math.sqrt(Math.max(0, data.question.length - 20)) * 4.5))
         : (isMobile ? 23 : 26);
     const x = getMeteorSpawnX(radius);
-    const survivalBaseSpeed = ((isText ? 35 : 44) + difficultyIndex * 8) * 1.12;
-    const survivalRamp = Math.min(survivalQuestionsAnswered * 0.055, 13);
-    const isSurvivalMathQuestion = data.theme === 'maths';
-    const mathSpeedFactor = difficultyIndex >= 3 ? 0.86 : 0.94;
-    const baseSpeed = gameMode === 'survival'
-        ? survivalBaseSpeed * (isSurvivalMathQuestion ? mathSpeedFactor : 1)
-        + survivalRamp * (isSurvivalMathQuestion ? 0.75 : 1)
-        : (isText ? 35 : 44) + difficultyIndex * 8 + Math.min(tourQuestionCount * 0.35, 7);
+    const fallSpeed = calculateMeteorFallSpeed(
+        data.theme, isText, difficultyIndex, gameMode, tourNumber, tourQuestionCount,
+        survivalQuestionsAnswered, getDefenseLineY()
+    );
 
     // Couleur spéciale selon le type
     let meteorColor = ['#58a6ff', '#34d399', '#facc15', '#fb923c', '#f43f5e', '#c084fc'][difficultyIndex];
@@ -949,10 +1102,12 @@ function spawnEnemy() {
         x: x,
         y: -radius,
         radius: radius,
-        speed: baseSpeed,
+        speed: fallSpeed,
         question: specialLabel ? specialLabel + ' ' + data.question : data.question,
+        specialLabel,
         answer: data.answer,
         options: data.options,
+        theme: data.theme,
         isText: isText,
         color: meteorColor,
         isSpecial: isSpecial,
@@ -972,13 +1127,29 @@ function getPriorityTarget() {
 
 function updateButtons() {
     const target = getPriorityTarget();
+    const activeQuestion = document.getElementById('active-question');
+    const announcement = document.getElementById('game-question-announcement');
     if (!target) {
         currentOptions = [];
         currentButtonTarget = null;
+        announcedQuestionTarget = null;
+        activeQuestion?.classList.add('hidden');
+        if (announcement) announcement.textContent = '';
         return;
     }
     currentOptions = target.options;
     currentButtonTarget = target;
+    if (activeQuestion) {
+        activeQuestion.textContent = target.question;
+        activeQuestion.style.setProperty('--question-color', target.color);
+        activeQuestion.classList.remove('hidden');
+    }
+    if (target !== announcedQuestionTarget && announcement) {
+        const questionLabel = window.UI18n?.t('question') || 'Question';
+        const choicesLabel = window.UI18n?.t('answerChoices') || 'Answer choices';
+        announcement.textContent = `${questionLabel}: ${target.question}. ${choicesLabel}: ${target.options.join(', ')}.`;
+        announcedQuestionTarget = target;
+    }
     for (let i = 0; i < 3; i++) {
         const button = document.getElementById(`btn${i}`);
         const answer = String(currentOptions[i] ?? '');
@@ -991,7 +1162,7 @@ function updateButtons() {
         }
         label.textContent = answer;
         button.title = answer;
-        button.setAttribute('aria-label', answer);
+        button.setAttribute('aria-label', `${window.UI18n?.t('answerOption') || 'Answer'}: ${answer}`);
         // 1. Taille de départ plus grande et lisible
         const baseSize = canvasLogicalWidth() <= 360 ? 15 : 18;
 
@@ -1011,6 +1182,23 @@ function updateButtons() {
         }
     }
 }
+    function createCannonBeam(x1, y1, x2, y2, life, lane = 0) {
+        const skin = SKINS[selectedSkin] || SKINS.blue;
+        return {
+            x1, y1, x2, y2,
+            color: skin.color,
+            glow: skin.glow,
+            accent: skin.beamAccent,
+            style: skin.beamStyle,
+            life,
+            maxLife: life,
+            tier: getSelectedCannonRank(),
+            combo,
+            lane,
+            phase: Math.random() * Math.PI * 2
+        };
+    }
+
     function checkAnswer(btnIndex) {
         if (isPaused || enemies.length === 0) return;
 
@@ -1026,21 +1214,26 @@ function updateButtons() {
         if (chosenValue === target.answer) {
             // --- Combo & Fever ---
             combo++;
+            const enteringFever = combo >= FEVER_COMBO_THRESHOLD && !feverActive;
             if (combo >= FEVER_COMBO_THRESHOLD) {
                 comboMultiplier = 3;
                 feverActive = true;
                 feverTimer = FEVER_DURATION;
-                AudioEngine.playFever();
+                if (enteringFever) AudioEngine.playFever(selectedSkin);
+                else AudioEngine.playCombo(combo, selectedSkin);
                 addFloatingText(target.x, target.y, '🔥 FEVER!', '#fef08a');
             } else if (combo >= 6) {
                 comboMultiplier = 3;
-                AudioEngine.playCombo(combo);
+                AudioEngine.playCombo(combo, selectedSkin);
             } else if (combo >= 4) {
                 comboMultiplier = 2;
-                AudioEngine.playCombo(combo);
+                AudioEngine.playCombo(combo, selectedSkin);
             } else {
                 comboMultiplier = 1;
-                AudioEngine.playCombo(combo);
+                AudioEngine.playCombo(combo, selectedSkin);
+            }
+            if (combo === 4 || combo === 6 || (combo >= 10 && combo % 5 === 0)) {
+                addFloatingText(target.x, target.y - 20, `COMBO x${combo}!`, (SKINS[selectedSkin] || SKINS.blue).beamAccent);
             }
 
             // Points avec multiplicateur
@@ -1051,20 +1244,18 @@ function updateButtons() {
 
             if (feverActive) {
                 // Double laser en fever
-                AudioEngine.playDoubleLaser();
+                AudioEngine.playCannonShot(getSelectedCannonRank(), selectedSkin, combo);
+                AudioEngine.playDoubleLaser(getSelectedCannonRank(), selectedSkin, combo);
                 addFloatingText(target.x, target.y, `x${comboMultiplier} FEVER +${ptsEarned}`, '#fef08a');
-                triggerScreenShake(8);
+                triggerScreenShake(Math.min(9, 2.5 + getSelectedCannonRank() * 0.6 + Math.min(combo, 12) * 0.35));
                 // Second laser rapide vers la même cible
                 const aimAngle2 = Math.atan2(target.y - turret.y, target.x - turret.x);
                 const barrelLength = 36;
                 const startX = turret.x + Math.cos(aimAngle2) * barrelLength;
                 const startY = turret.y + Math.sin(aimAngle2) * barrelLength;
-                lasers.push({
-                    x1: startX, y1: startY, x2: target.x, y2: target.y,
-                    color: SKINS[selectedSkin].glow, life: 0.18, maxLife: 0.18, tier: getSelectedCannonRank()
-                });
+                lasers.push(createCannonBeam(startX, startY, target.x, target.y, 0.18, -1));
             } else {
-                AudioEngine.playCannonShot(getSelectedCannonRank());
+                AudioEngine.playCannonShot(getSelectedCannonRank(), selectedSkin, combo);
                 addFloatingText(target.x, target.y, `+${ptsEarned}`, target.color);
             }
 
@@ -1084,25 +1275,18 @@ function updateButtons() {
             const startX = turret.x + Math.cos(aimAngle) * barrelLength;
             const startY = turret.y + Math.sin(aimAngle) * barrelLength;
 
-            lasers.push({
-                x1: startX,
-                y1: startY,
-                x2: target.x,
-                y2: target.y,
-                color: SKINS[selectedSkin].color,
-                glow: SKINS[selectedSkin].glow,
-                life: feverActive ? 0.3 : 0.22,
-                maxLife: feverActive ? 0.3 : 0.22,
-                tier: getSelectedCannonRank()
-            });
+            lasers.push(createCannonBeam(
+                startX, startY, target.x, target.y, feverActive ? 0.3 : 0.22, feverActive ? 1 : 0
+            ));
 
             const cannonRank = getSelectedCannonRank();
             const isStarRewardMeteor = target.isStarMeteor || target.specialType === 'gold';
             const explosionKind = target.isRetryMeteor ? 'retry' : (isStarRewardMeteor ? 'star' : 'normal');
-            createExplosion(target.x, target.y, feverActive ? '#fef08a' : target.color, explosionKind, cannonRank);
-            if (target.isRetryMeteor) AudioEngine.playRetryExplosion(cannonRank);
-            else if (isStarRewardMeteor) AudioEngine.playStarExplosion(cannonRank);
-            else AudioEngine.playMeteorExplosion(cannonRank);
+            const skin = SKINS[selectedSkin] || SKINS.blue;
+            createExplosion(target.x, target.y, feverActive ? '#fef08a' : target.color, explosionKind, cannonRank, combo, skin.glow);
+            if (target.isRetryMeteor) AudioEngine.playRetryExplosion(cannonRank, combo, selectedSkin);
+            else if (isStarRewardMeteor) AudioEngine.playStarExplosion(cannonRank, combo, selectedSkin);
+            else AudioEngine.playMeteorExplosion(cannonRank, combo, selectedSkin);
             enemies = enemies.filter(e => e !== target);
 
             // Compteur météores détruits et étoiles aléatoires
@@ -1135,7 +1319,7 @@ function updateButtons() {
                 survivalQuestionsAnswered++;
                 updateSurvivalHomeRecord();
                 updateDifficultyBadge();
-                if (survivalQuestionsAnswered >= SURVIVAL_QUESTION_LIMIT) {
+                if (QuestionManager.getRunHistory().length >= survivalQuestionLimit) {
                     triggerSurvivalComplete();
                     return;
                 }
@@ -1165,31 +1349,50 @@ function updateButtons() {
         }
     }
 
-    function createExplosion(x, y, color, kind = 'normal', tier = 0) {
+    function createExplosion(x, y, color, kind = 'normal', tier = 0, streak = 0, accent = null) {
         const specialBurst = kind === 'star' || kind === 'retry';
+        const comboPower = Math.min(1.5, Math.max(0, streak - 1) / 8);
         // Fewer independent glow particles on narrow/mobile canvases keeps Survival smooth.
         const density = canvasLogicalWidth() <= 520 ? 0.45 : 0.85;
-        const count = Math.ceil((16 + tier * 5 + (specialBurst ? 12 : 0)) * density);
+        const count = Math.ceil((22 + tier * 5 + (specialBurst ? 12 : 0) + comboPower * 24) * density);
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = 80 + Math.random() * (150 + tier * 18);
+            const speed = 105 + Math.random() * (190 + tier * 22 + comboPower * 95);
             particles.push({
                 x, y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                life: 0.48 + Math.random() * 0.24 + tier * 0.025,
-                maxLife: 0.48 + tier * 0.025,
-                size: 3 + tier * 0.65 + (specialBurst ? 1 : 0),
-                shape: kind === 'star' ? 'star' : (kind === 'retry' ? 'diamond' : (tier >= 3 ? 'spark' : 'square')),
-                color
+                life: 0.55 + Math.random() * 0.28 + tier * 0.025 + comboPower * 0.1,
+                maxLife: 0.55 + tier * 0.025 + comboPower * 0.1,
+                size: 3.5 + tier * 0.75 + comboPower * 2 + (specialBurst ? 1 : 0),
+                shape: kind === 'star' ? 'star' : (kind === 'retry' ? 'diamond' : (tier >= 2 || streak >= 4 ? 'spark' : 'square')),
+                color: i % 4 === 0 && accent ? accent : color
             });
         }
-        if (specialBurst || tier >= 2) {
+        const ringCount = 2 + (tier >= 2 ? 1 : 0) + (streak >= 4 ? 1 : 0);
+        for (let ring = 0; ring < ringCount; ring++) {
+            const life = 0.32 + ring * 0.045 + tier * 0.025 + comboPower * 0.1;
             particles.push({
-                x, y, vx: 0, vy: 0, life: 0.34 + tier * 0.04, maxLife: 0.34 + tier * 0.04,
-                radius: 8, ring: true, color: kind === 'retry' ? '#67e8f9' : (kind === 'star' ? '#fde047' : color)
+                x, y, vx: 0, vy: 0, life, maxLife: life,
+                radius: 2 + ring * 4,
+                maxRadius: (34 + tier * 8 + comboPower * 34) * (1 - ring * 0.13),
+                expandSpeed: 175 + tier * 26 + comboPower * 105 - ring * 20,
+                width: 3.2 + tier * 0.45 + comboPower * 2 - ring * 0.35,
+                ring: true,
+                color: kind === 'retry' ? '#67e8f9' : (kind === 'star' ? '#fde047' : (ring === 0 ? '#ffffff' : (accent || color)))
             });
         }
+        particles.push({
+            x, y, vx: 0, vy: 0,
+            life: 0.12 + comboPower * 0.04,
+            maxLife: 0.12 + comboPower * 0.04,
+            radius: 6 + tier * 1.5,
+            maxRadius: 22 + tier * 5 + comboPower * 20,
+            flash: true,
+            color: '#ffffff'
+        });
+        const shake = (1.3 + tier * 0.45 + comboPower * 4.2) * (canvasLogicalWidth() <= 520 ? 0.65 : 1);
+        triggerScreenShake(shake);
     }
 
     // Texte flottant qui monte et s'estompe
@@ -1444,30 +1647,103 @@ function updateButtons() {
             }
 
             const alpha = l.life / l.maxLife;
-            ctx.save();
-            // Halo externe : couleur de glow du skin sélectionné
-            ctx.strokeStyle = l.glow || '#58a6ff';
-            ctx.globalAlpha = alpha * 0.6;
-            ctx.lineWidth = (8 + (l.tier || 0) * 1.8) * alpha;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(l.x1, l.y1);
-            ctx.lineTo(l.x2, l.y2);
-            ctx.stroke();
+            const rank = l.tier || 0;
+            const comboPower = Math.min(1.5, Math.max(0, (l.combo || 0) - 1) / 8);
+            const dx = l.x2 - l.x1;
+            const dy = l.y2 - l.y1;
+            const length = Math.max(1, Math.hypot(dx, dy));
+            const normalX = -dy / length;
+            const normalY = dx / length;
+            const laneOffset = (l.lane || 0) * (2.5 + rank * 0.35);
+            const travel = 1 - alpha;
 
-            // Cœur du laser : couleur du skin
-            ctx.strokeStyle = l.color || '#38bdf8';
-            ctx.globalAlpha = alpha * 0.9;
-            ctx.lineWidth = (3 + (l.tier || 0) * 0.7) * alpha;
-            ctx.beginPath();
-            ctx.moveTo(l.x1, l.y1);
-            ctx.lineTo(l.x2, l.y2);
-            ctx.stroke();
-            if ((l.tier || 0) >= 3) {
-                ctx.globalAlpha = alpha * 0.36;
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 1.2 + (l.tier || 0) * 0.25;
-                ctx.beginPath(); ctx.moveTo(l.x1, l.y1); ctx.lineTo(l.x2, l.y2); ctx.stroke();
+            function strokeBeam(offset, color, width, opacity, dash = []) {
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = alpha * opacity;
+                ctx.lineWidth = width;
+                ctx.lineCap = 'round';
+                ctx.setLineDash(dash);
+                ctx.beginPath();
+                ctx.moveTo(l.x1 + normalX * offset, l.y1 + normalY * offset);
+                ctx.lineTo(l.x2 + normalX * offset, l.y2 + normalY * offset);
+                ctx.stroke();
+            }
+
+            ctx.save();
+            strokeBeam(laneOffset, l.glow || '#58a6ff', (8 + rank * 1.8 + comboPower * 3) * alpha, 0.62);
+            strokeBeam(laneOffset, l.color || '#38bdf8', (3 + rank * 0.7 + comboPower * 1.6) * alpha, 0.94);
+            if (rank >= 3 || comboPower > 0) {
+                strokeBeam(laneOffset, l.accent || '#ffffff', (1.1 + rank * 0.2 + comboPower) * alpha, 0.72);
+            }
+
+            if (l.style === 'vines') {
+                const amplitude = 2.5 + rank * 0.45 + comboPower * 2.2;
+                for (const side of [-1, 1]) {
+                    ctx.beginPath();
+                    for (let step = 0; step <= 10; step++) {
+                        const t = step / 10;
+                        const wave = Math.sin(t * Math.PI * 4 + l.phase - travel * 7) * amplitude * Math.sin(t * Math.PI);
+                        const offset = laneOffset + side * (3 + rank * 0.25) + wave;
+                        const x = l.x1 + dx * t + normalX * offset;
+                        const y = l.y1 + dy * t + normalY * offset;
+                        if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.strokeStyle = l.accent || '#d1fae5';
+                    ctx.globalAlpha = alpha * 0.78;
+                    ctx.lineWidth = 1.4 + rank * 0.18 + comboPower;
+                    ctx.stroke();
+                }
+            } else if (l.style === 'flare') {
+                const radius = (4 + rank * 1.1 + comboPower * 6) * alpha;
+                ctx.save();
+                ctx.translate(l.x2 + normalX * laneOffset, l.y2 + normalY * laneOffset);
+                ctx.rotate(l.phase + travel * 2);
+                ctx.strokeStyle = l.accent || '#fff7b2';
+                ctx.globalAlpha = alpha * 0.9;
+                ctx.lineWidth = 1.4 + rank * 0.22 + comboPower;
+                ctx.beginPath();
+                for (let ray = 0; ray < 8; ray++) {
+                    const angle = ray * Math.PI / 4;
+                    ctx.moveTo(Math.cos(angle) * radius * 0.35, Math.sin(angle) * radius * 0.35);
+                    ctx.lineTo(Math.cos(angle) * radius * 1.8, Math.sin(angle) * radius * 1.8);
+                }
+                ctx.stroke();
+                ctx.restore();
+            } else if (l.style === 'arc') {
+                const amplitude = 4 + rank * 0.55 + comboPower * 4;
+                ctx.beginPath();
+                for (let step = 0; step <= 8; step++) {
+                    const t = step / 8;
+                    const zigzag = (step === 0 || step === 8 ? 0 : (step % 2 ? 1 : -1) * amplitude);
+                    const pulse = Math.sin(t * Math.PI * 2 + l.phase - travel * 8) * amplitude * 0.25;
+                    const offset = laneOffset + (zigzag + pulse) * Math.sin(t * Math.PI);
+                    const x = l.x1 + dx * t + normalX * offset;
+                    const y = l.y1 + dy * t + normalY * offset;
+                    if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = l.accent || '#fce7f3';
+                ctx.globalAlpha = alpha * 0.95;
+                ctx.lineWidth = 1.7 + rank * 0.25 + comboPower;
+                ctx.setLineDash([]);
+                ctx.stroke();
+            } else if (l.style === 'prism') {
+                const split = 2.8 + rank * 0.45 + comboPower * 2.2;
+                strokeBeam(laneOffset - split, l.accent || '#ffffff', (1.6 + rank * 0.2) * alpha, 0.82);
+                strokeBeam(laneOffset + split, l.glow || '#22d3ee', (1.6 + rank * 0.2) * alpha, 0.76);
+            } else if (l.style === 'rift') {
+                strokeBeam(laneOffset, '#211747', (9 + rank * 1.5 + comboPower * 4) * alpha, 0.92);
+                strokeBeam(laneOffset, l.glow || '#a855f7', (4 + rank * 0.7) * alpha, 0.9, [3, 5]);
+                strokeBeam(laneOffset, l.accent || '#f5d0fe', (1.4 + comboPower) * alpha, 0.95);
+            } else {
+                const orbX = l.x1 + dx * travel + normalX * laneOffset;
+                const orbY = l.y1 + dy * travel + normalY * laneOffset;
+                ctx.fillStyle = l.accent || '#e0f2fe';
+                ctx.globalAlpha = alpha;
+                ctx.shadowColor = l.glow || '#58a6ff';
+                ctx.shadowBlur = 7 + rank * 2 + comboPower * 7;
+                ctx.beginPath();
+                ctx.arc(orbX, orbY, 2.8 + rank * 0.45 + comboPower * 2, 0, Math.PI * 2);
+                ctx.fill();
             }
             ctx.restore();
         }
@@ -1556,6 +1832,9 @@ function updateButtons() {
         turret.recoil = 0;
         turret.damageFlash = 0;
         QuestionManager.resetHistory();
+        survivalQuestionLimit = gameMode === 'survival'
+            ? getSurvivalQuestionLimit(selectedTheme, DIFFICULTY_LEVELS[difficultyIndex].key)
+            : SURVIVAL_QUESTION_LIMIT;
         document.getElementById('settings-screen').classList.add('hidden');
         document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
         document.getElementById('controls').classList.remove('hidden');
@@ -1563,6 +1842,7 @@ function updateButtons() {
         updateHUD();
         startHUDAnimation();
         spawnEnemy();
+        document.getElementById('btn0').focus({ preventScroll: true });
         saveGameProgress();
         lastTime = performance.now();
         scheduleGameFrame();
@@ -1712,7 +1992,7 @@ function updateButtons() {
             : (window.UI18n?.t('campaignMode') || 'MODE PARCOURS');
         document.getElementById('end-difficulty').innerText = window.UI18n?.tier(difficultyIndex) || DIFFICULTY_LEVELS[difficultyIndex].label;
         document.getElementById('end-progress').innerText = gameMode === 'survival'
-            ? `${survivalQuestionsAnswered} / ${SURVIVAL_QUESTION_LIMIT}`
+            ? `${QuestionManager.getRunHistory().length} / ${survivalQuestionLimit}`
             : `${tourQuestionCount} / ${QUESTIONS_PER_TOUR} · tour ${tourNumber}/2`;
         document.getElementById('best-score').innerText = gameMode === 'survival'
             ? (survivalRecords[survivalRecordKey()] || 0)
@@ -1736,7 +2016,7 @@ function updateButtons() {
         document.getElementById('end-theme').innerText = localizedThemeLabel(selectedTheme);
         document.getElementById('end-mode').innerText = window.UI18n?.t('missionMode') || 'MISSION ACCOMPLIE';
         document.getElementById('end-difficulty').innerText = window.UI18n?.tier(difficultyIndex) || DIFFICULTY_LEVELS[difficultyIndex].label;
-        document.getElementById('end-progress').innerText = `${SURVIVAL_QUESTION_LIMIT} / ${SURVIVAL_QUESTION_LIMIT}`;
+        document.getElementById('end-progress').innerText = `${survivalQuestionLimit} / ${survivalQuestionLimit}`;
         document.getElementById('final-score').innerText = score;
         document.getElementById('best-score').innerText = survivalRecords[survivalRecordKey()] || 0;
         updateResourceDisplays();
@@ -1909,6 +2189,7 @@ function updateButtons() {
         updateHUD();
         startHUDAnimation();
         spawnEnemy();
+        document.getElementById('btn0').focus({ preventScroll: true });
         lastTime = performance.now();
         saveGameProgress();
         setCrazyGameplayActive(true);
@@ -1993,6 +2274,7 @@ function updateButtons() {
                 updateHUD();
                 isPaused = false;
                 spawnEnemy();
+                document.getElementById('btn0').focus({ preventScroll: true });
                 saveGameProgress();
                 lastTime = performance.now();
                 setCrazyGameplayActive(true);
@@ -2030,7 +2312,8 @@ function updateButtons() {
             ctx.clearRect(0, 0, canvasLogicalWidth(), canvasLogicalHeight());
         }
         spawnTimer += dt;
-        if (enemies.length === 0 || (score > 140 && enemies.length < 2 && spawnTimer > 3.8)) {
+        const maxActiveEnemies = getMaxActiveMeteorCount(selectedTheme, enemies);
+        if (enemies.length === 0 || (score > 140 && enemies.length < maxActiveEnemies && spawnTimer > 3.8)) {
             spawnEnemy();
             spawnTimer = 0;
         }
@@ -2082,29 +2365,7 @@ function updateButtons() {
                 : (e.specialType === 'life' ? 20 : (e.isRetryMeteor ? 21 : (e.isStarMeteor ? 16 : getSelectedCannonRank() * 2)));
             ctx.stroke();
             ctx.shadowBlur = 0;
-            // Texte de la question
-            ctx.fillStyle = '#ffffff';
-            let meteorFontSize = e.isText
-                ? (canvasLogicalWidth() > 520 ? Math.max(12, e.radius * 0.32) : Math.max(7, e.radius * 0.16))
-                : (canvasLogicalWidth() > 520 ? Math.max(16, e.radius * 0.38) : Math.max(10, e.radius * 0.20));
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            if (e.isText) {
-                const meteorMaxWidth = e.radius * 1.38;
-                let meteorLines;
-                let meteorLineHeight;
-                do {
-                    ctx.font = `bold ${meteorFontSize}px sans-serif`;
-                    meteorLineHeight = meteorFontSize * 1.12;
-                    meteorLines = wrapCanvasText(e.question, meteorMaxWidth);
-                    if (meteorLines.length * meteorLineHeight <= e.radius * 1.25 || meteorFontSize <= 6) break;
-                    meteorFontSize = Math.max(6, meteorFontSize - 0.5);
-                } while (true);
-                drawWrappedText(e.question, e.x, e.y, meteorMaxWidth, meteorLineHeight, meteorLines);
-            } else {
-                ctx.font = `bold ${meteorFontSize}px sans-serif`;
-                ctx.fillText(e.question, e.x, e.y);
-            }
+            drawMeteorQuestion(e);
             // Collision avec la ligne de défense / vaisseau en bas
             if (e.y + e.radius >= getDefenseLineY()) {
                 AudioEngine.playDamage();
@@ -2162,29 +2423,7 @@ function updateButtons() {
                 : (e.specialType === 'life' ? 20 : (e.isRetryMeteor ? 21 : (e.isStarMeteor ? 16 : getSelectedCannonRank() * 2)));
             ctx.stroke();
             ctx.shadowBlur = 0;
-            // Texte de la question
-            ctx.fillStyle = '#ffffff';
-            let meteorFontSize = e.isText
-                ? (canvasLogicalWidth() > 520 ? Math.max(12, e.radius * 0.32) : Math.max(7, e.radius * 0.16))
-                : (canvasLogicalWidth() > 520 ? Math.max(16, e.radius * 0.38) : Math.max(10, e.radius * 0.20));
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            if (e.isText) {
-                const meteorMaxWidth = e.radius * 1.38;
-                let meteorLines;
-                let meteorLineHeight;
-                do {
-                    ctx.font = `bold ${meteorFontSize}px sans-serif`;
-                    meteorLineHeight = meteorFontSize * 1.12;
-                    meteorLines = wrapCanvasText(e.question, meteorMaxWidth);
-                    if (meteorLines.length * meteorLineHeight <= e.radius * 1.25 || meteorFontSize <= 6) break;
-                    meteorFontSize = Math.max(6, meteorFontSize - 0.5);
-                } while (true);
-                drawWrappedText(e.question, e.x, e.y, meteorMaxWidth, meteorLineHeight, meteorLines);
-            } else {
-                ctx.font = `bold ${meteorFontSize}px sans-serif`;
-                ctx.fillText(e.question, e.x, e.y);
-            }
+            drawMeteorQuestion(e);
             // Collision avec la ligne de défense / vaisseau en bas
             if (e.y + e.radius >= getDefenseLineY()) {
                 AudioEngine.playDamage();
@@ -2218,10 +2457,17 @@ function updateButtons() {
             } else {
                 ctx.globalAlpha = Math.min(1, p.life / (p.maxLife || 0.5));
                 ctx.fillStyle = p.color;
-                if (p.ring) {
-                    p.radius += dt * (100 + getSelectedCannonRank() * 20);
+                if (p.flash) {
+                    const progress = 1 - p.life / p.maxLife;
+                    const radius = p.radius + (p.maxRadius - p.radius) * progress;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 5 : 18 + getSelectedCannonRank() * 3;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, radius, 0, Math.PI * 2); ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (p.ring) {
+                    p.radius = Math.min(p.maxRadius, p.radius + dt * p.expandSpeed);
                     ctx.strokeStyle = p.color;
-                    ctx.lineWidth = 2 + getSelectedCannonRank() * 0.45;
+                    ctx.lineWidth = p.width * Math.max(0.35, p.life / p.maxLife);
                     ctx.shadowColor = p.color;
                     ctx.shadowBlur = canvasLogicalWidth() <= 520 ? 3 : 9 + getSelectedCannonRank() * 3;
                     ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.stroke();

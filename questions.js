@@ -1448,7 +1448,7 @@ function questionDifficultyScore(theme, row) {
     let score = Math.min(2.5, wordCount / 14) + Math.min(1.5, answer.length / 24);
 
     if (theme === "geo") {
-        const familiarCountries = /\b(france|allemagne|italie|espagne|royaume uni|etats unis|chine|inde|japon|bresil|canada|australie|cameroun|senegal|maroc|egypte)\b/;
+        const familiarCountries = /\b(france|allemagne|italie|espagne|royaume uni|etats unis|chine|inde|japon|bresil|canada|australie|cameroun|senegal|maroc|egypte|afrique du sud|argentine|mexique|perou|chili|colombie|nigeria|kenya|ethiopie|indonesie|nouvelle zelande|islande|grece|norvege|pays bas|portugal|suede|turquie|russie)\b/;
         const familiarPlaces = /\b(paris|berlin|rome|madrid|londres|moscou|pekin|new delhi|tokyo|brasilia|ottawa|canberra|yaounde|dakar|rabat|le caire|nil|amazone|everest|pacifique)\b/;
         if (question.includes("capitale")) score += familiarCountries.test(question) ? 0 : 1.8;
         else if (question.includes("continent")) score += familiarCountries.test(question) ? 0.4 : 1.7;
@@ -1462,6 +1462,9 @@ function questionDifficultyScore(theme, row) {
         if (/en quelle annee|quelle annee|combien d|vitesse de|distance|pourcentage|symbole chimique/.test(question)) score += 1.1;
         if (/qui a ecrit|qui a peint|qui a compose|qui a invente|qui a decouvert/.test(question)) score += 1.7;
         if (/theorie|theoreme|classification|mecanisme|reaction|philosophie|courant litteraire/.test(question)) score += 2.2;
+        if (/world wide web|harry potter|petit prince|romeo et juliette|joconde|tournesols|la cene|penicilline|machine a vapeur|ampoule electrique|seigneur des anneaux|ferme des animaux|trois mousquetaires|hamlet|macbeth|le cid|imprimerie|quatre saisons|ode a la joie/.test(question)) {
+            score -= 1.6;
+        }
     } else if (theme === "anglais") {
         score += Math.min(2, answer.split(" ").length * 0.35);
         if (/yesterday|although|nevertheless|would have|could have|has been|had been|unless|despite/.test(question + " " + answer)) score += 1.5;
@@ -1602,13 +1605,17 @@ function buildLanguageLevels(rows) {
         return score(aSource) - score(bSource);
     });
     vocabulary.forEach((row, index) => {
-        const levelIndex = Math.min(5, Math.floor(index * 6 / Math.max(1, vocabulary.length)));
+        const levelIndex = Math.min(2, Math.floor(index * 3 / Math.max(1, vocabulary.length)));
         levels[DIFFICULTY_LEVELS[levelIndex].key].push(row);
     });
     return levels;
 }
 
+const translationAnswerProfileCache = new WeakMap();
+
 function translationAnswerProfile(row) {
+    const cached = translationAnswerProfileCache.get(row);
+    if (cached) return cached;
     const answer = String(row[1]).trim();
     const text = normalizeQuestionText(answer);
     const wordPrompt = row[3] === 'word';
@@ -1626,13 +1633,30 @@ function translationAnswerProfile(row) {
     const afterLead = questionLead ? text.slice(questionLead.length).trim() : text;
     const auxiliary = afterLead.match(/^(do|does|did|am|is|are|was|were|can|could|will|would|have|has|had|should|must)\b/)?.[1] || '';
     const subject = text.match(/^(?:how\s+\w+\s+)?(?:do|does|did|am|is|are|was|were|can|could|will|would|have|has|had|should|must)?\s*(i|you|he|she|we|they|it)\b/)?.[1] || '';
-    return { kind: wordPrompt ? 'word' : 'phrase', interrogative, questionLead, auxiliary, imperative: !interrogative && startsWithVerb, negative, tense, subject, text };
+    const tokens = text.split(' ').filter(token => token.length > 2 && !['the', 'and', 'you', 'your', 'that', 'this', 'with', 'have', 'has', 'had', 'are', 'was', 'were'].includes(token));
+    const profile = {
+        kind: wordPrompt ? 'word' : 'phrase',
+        interrogative,
+        questionLead,
+        auxiliary,
+        imperative: !interrogative && startsWithVerb,
+        negative,
+        tense,
+        subject,
+        text,
+        normalizedAnswer: normalizeAnswerChoice(answer),
+        tokens,
+        answerLength: answer.length
+    };
+    translationAnswerProfileCache.set(row, profile);
+    return profile;
 }
 
 function translationDistractors(levelRows, allRows, answerRow) {
-    const answer = normalizeAnswerChoice(answerRow[1]);
     const profile = translationAnswerProfile(answerRow);
-    const makeCandidates = rows => rows.filter(row => row !== answerRow && row[3] === profile.kind && normalizeAnswerChoice(row[1]) !== answer);
+    const answer = profile.normalizedAnswer;
+    const makeCandidates = rows => rows.filter(row => row !== answerRow && row[3] === profile.kind &&
+        translationAnswerProfile(row).normalizedAnswer !== answer);
     let candidates = makeCandidates(levelRows || []);
     if (candidates.length < 2) candidates = makeCandidates(allRows);
     let sameForm = candidates.filter(row => {
@@ -1662,14 +1686,13 @@ function translationDistractors(levelRows, allRows, answerRow) {
         if (sameAuxiliary.length >= 2) pool = sameAuxiliary;
     }
 
-    const tokens = value => normalizeQuestionText(value).split(' ').filter(token => token.length > 2 && !['the', 'and', 'you', 'your', 'that', 'this', 'with', 'have', 'has', 'had', 'are', 'was', 'were'].includes(token));
-    const answerTokens = new Set(tokens(answerRow[1]));
+    const answerTokens = new Set(profile.tokens);
     const ranked = pool.map(row => {
         const other = translationAnswerProfile(row);
-        const overlap = tokens(row[1]).filter(token => answerTokens.has(token)).length;
+        const overlap = other.tokens.filter(token => answerTokens.has(token)).length;
         const leadBonus = profile.questionLead && other.questionLead === profile.questionLead ? 3 : 0;
         const auxiliaryBonus = profile.auxiliary && other.auxiliary === profile.auxiliary ? 2 : 0;
-        const lengthPenalty = Math.abs(String(row[1]).length - String(answerRow[1]).length) / 18;
+        const lengthPenalty = Math.abs(other.answerLength - profile.answerLength) / 18;
         return { row, score: overlap * 3 + leadBonus + auxiliaryBonus + (strictSet.has(row) ? 6 : 0) - lengthPenalty };
     }).sort((a, b) => b.score - a.score).slice(0, 12).map(item => item.row);
     const chosen = (answerRow[2] || []).filter(value => {
@@ -1686,8 +1709,8 @@ function translationDistractors(levelRows, allRows, answerRow) {
     if (chosen.length < 2) {
         const fallback = (levelRows || []).filter(row => row !== answerRow && row[3] === profile.kind &&
             translationAnswerProfile(row).interrogative === profile.interrogative &&
-            !chosen.some(value => normalizeAnswerChoice(value) === normalizeAnswerChoice(row[1])) &&
-            normalizeAnswerChoice(row[1]) !== answer);
+            !chosen.some(value => normalizeAnswerChoice(value) === translationAnswerProfile(row).normalizedAnswer) &&
+            translationAnswerProfile(row).normalizedAnswer !== answer);
         while (fallback.length && chosen.length < 2) chosen.push(fallback.splice(Math.floor(Math.random() * fallback.length), 1)[0][1]);
     }
     // Some target-language banks have only one question-form sentence per
@@ -1695,10 +1718,10 @@ function translationDistractors(levelRows, allRows, answerRow) {
     // than two distractors and crashing question creation.
     if (chosen.length < 2) {
         const fallback = makeCandidates(levelRows).concat(makeCandidates(allRows))
-            .filter(row => normalizeAnswerChoice(row[1]) !== answer &&
-                !chosen.some(value => normalizeAnswerChoice(value) === normalizeAnswerChoice(row[1])))
-            .sort((a, b) => Math.abs(String(a[1]).length - String(answerRow[1]).length) -
-                Math.abs(String(b[1]).length - String(answerRow[1]).length));
+            .filter(row => translationAnswerProfile(row).normalizedAnswer !== answer &&
+                !chosen.some(value => normalizeAnswerChoice(value) === translationAnswerProfile(row).normalizedAnswer))
+            .sort((a, b) => Math.abs(translationAnswerProfile(a).answerLength - profile.answerLength) -
+                Math.abs(translationAnswerProfile(b).answerLength - profile.answerLength));
         while (fallback.length && chosen.length < 2) {
             const candidate = fallback.shift()[1];
             if (!chosen.some(value => normalizeAnswerChoice(value) === normalizeAnswerChoice(candidate))) chosen.push(candidate);
@@ -1951,7 +1974,7 @@ const LANG_PHRASES = [
     ["Le dossier est prêt.", "The file is ready.", "El expediente está listo.", "Die Akte ist bereit.", "文件准备好了。", "Дело готово."],
     ["Envoyez-moi le document demain.", "Send me the document tomorrow.", "Envíeme el documento mañana.", "Schicken Sie mir das Dokument morgen.", "明天把文件发给我。", "Пришлите мне документ завтра."],
     ["Je vous rappellerai demain matin.", "I will call you tomorrow morning.", "Le llamaré mañana por la mañana.", "Ich rufe Sie morgen früh an.", "我明早给你打电话。", "Я перезвоню вам утром."],
-    ["Il a beaucoup progressé.", "He has made great progress.", "Ha progresado mucho.", "Er hat große Fortschritte gemacht.", "他进步很大。", "Он fez большие успехи."],
+    ["Il a beaucoup progressé.", "He has made great progress.", "Ha progresado mucho.", "Er hat große Fortschritte gemacht.", "他进步很大。", "Он добился больших успехов."],
     ["N'oubliez pas votre rendez-vous.", "Do not forget your appointment.", "No olvide su cita.", "Vergessen Sie Ihren Termin nicht.", "不要忘记你的预约。", "Не забудьте о своей встрече."],
     ["La route est très longue.", "The road is very long.", "El camino es muy largo.", "Die Straße ist sehr lang.", "这条路很长。", "Дорога очень длинная."],
     ["Le travail est presque terminé.", "The work is almost finished.", "El trabajo está casi terminado.", "Die Arbeit ist fast fertig.", "工作快完成了。", "Работа почти завершена."],
@@ -2016,7 +2039,7 @@ const LANG_ADVANCED_PHRASES = [
     ["difficile", "Depuis combien de temps attendiez-vous que le train arrive ?", "How long had you been waiting for the train to arrive?", "¿Cuánto tiempo llevaba esperando que llegara el tren?", "Wie lange hatten Sie auf den Zug gewartet?", "你等火车等了多久？", "Как долго вы ждали поезд?"],
     ["difficile", "Elle aurait accepté si on lui avait expliqué les conséquences.", "She would have accepted if we had explained the consequences to her.", "Ella habría aceptado si le hubiéramos explicado las consecuencias.", "Sie hätte angenommen, wenn wir ihr die Folgen erklärt hätten.", "如果我们向她解释后果，她本会接受。", "Она бы согласилась, если бы мы объяснили ей последствия."],
     ["difficile", "Il est peu probable qu'ils aient terminé avant midi.", "It is unlikely that they will have finished before noon.", "Es poco probable que hayan terminado antes del mediodía.", "Es unwahrscheinlich, dass sie vor Mittag fertig sein werden.", "不太可能他们中午前完成。", "Вряд ли они закончат до полудня."],
-    ["difficile", "Ce n'est pas la première fois qu'il oublie de nous prévenir.", "This is not the first time he has forgotten to let us know.", "No es la primera vez que se olvida de avisarnos.", "Es nicht das erste Mal, dass er uns nicht Bescheid gesagt hat.", "这不是他第一次忘了通知我们。", "Это не первый раз, когда он забыл нас предупредить."],
+    ["difficile", "Ce n'est pas la première fois qu'il oublie de nous prévenir.", "This is not the first time he has forgotten to let us know.", "No es la primera vez que se olvida de avisarnos.", "Es ist nicht das erste Mal, dass er vergisst, uns Bescheid zu sagen.", "这不是他第一次忘了通知我们。", "Это не первый раз, когда он забыл нас предупредить."],
     ["difficile", "Pourquoi ne leur avez-vous pas demandé s'ils pouvaient rester ?", "Why didn't you ask them whether they could stay?", "¿Por qué no les preguntó si podían quedarse?", "Warum hast du sie nicht gefragt, ob sie bleiben könnten?", "你为什么不问他们能否留下？", "Почему вы не спросили их, могут ли они остаться?"],
     ["difficile", "Le rapport doit être envoyé avant que le directeur ne revienne.", "The report must be sent before the director comes back.", "El informe debe enviarse antes de que el director regrese.", "Der Bericht muss abgeschickt werden, bevor der Direktor zurückkommt.", "报告必须在主任回来前发出。", "Отчёт должен быть отправлен до возвращения директора."],
     ["difficile", "Plus tôt vous partirez, moins vous risquez de manquer le train.", "The earlier you leave, the less likely you are to miss the train.", "Cuanto antes se vaya, menos probabilidades tendrá de perder el tren.", "Je früher Sie losfahren, desto geringer ist das Risiko, den Zug zu verpassen.", "你走得越早，错过火车的风险就越小。", "Чем раньше вы уйдете, тем меньше риск опоздать на поезд."],
@@ -2024,16 +2047,16 @@ const LANG_ADVANCED_PHRASES = [
     ["difficile", "Depuis qu'il a déménagé, nous ne nous sommes pas revus.", "We have not seen each other since he moved.", "Desde que se mudó, no nos hemos vuelto a ver.", "Seit er umgezogen ist, haben wir uns nicht mehr gesehen.", "自从他搬家后，我们就没再见过面。", "Мы не виделись с тех пор, как он переехал."],
     ["difficile", "Aurais-tu le temps de m'expliquer ce qui a changé ?", "Would you have time to explain what has changed?", "¿Tendrías tiempo de explicarme qué ha cambiado?", "Hättest du Zeit, mir zu erklären, was sich geändert hat?", "你有时间解释一下变化了什么吗？", "У вас есть время объяснить, что изменилось?"],
     ["difficile", "Elle m'a demandé si je pouvais lui prêter le livre que j'avais acheté.", "She asked me whether I could lend her the book I had bought.", "Ella me preguntó si podía prestarle el libro que había comprado.", "Sie fragte mich, ob ich ihr das Buch, das ich gekauft hatte, leihen könne.", "她问我是否可以借她我买的书。", "Она спросила меня, могу ли я одолжить ей книгу, которую я купил."],
-    ["difficile", "Les résultats seront publiés dès que le comité aura terminé son examen.", "The results will be published as soon as the committee has finished its review.", "Los resultados se publicarán tan pronto como el comité termine su examen.", "Die Ergebnisse werden veröffentlicht, sobald das Ausschuss seine Prüfung abgeschlossen hat.", "结果将在委员会审查结束后尽快公布。", "Результаты будут опубликованы, как только комитет закончит проверку."],
+    ["difficile", "Les résultats seront publiés dès que le comité aura terminé son examen.", "The results will be published as soon as the committee has finished its review.", "Los resultados se publicarán tan pronto como el comité termine su examen.", "Die Ergebnisse werden veröffentlicht, sobald der Ausschuss seine Prüfung abgeschlossen hat.", "结果将在委员会审查结束后尽快公布。", "Результаты будут опубликованы, как только комитет закончит проверку."],
     ["difficile", "Je ne pensais pas que le trajet prendrait autant de temps.", "I did not think the journey would take so long.", "No pensé que el viaje tomaría tanto tiempo.", "Ich dachte nicht, dass die Reise so lange dauern würde.", "我没想到旅程会花这么长时间。", "Я не думал, что поездка займет столько времени."],
     ["difficile", "Pourquoi a-t-il fallu attendre que tout le monde soit parti ?", "Why did we have to wait until everyone had left?", "¿Por qué tuvimos que esperar hasta que todos se fueran?", "Warum mussten wir warten, bis alle gegangen waren?", "为什么我们必须等所有人都走后？", "Зачем нам пришлось ждать, пока все уйдут?"],
     ["difficile", "Elle aurait pu réussir si elle avait suivi les instructions.", "She could have succeeded if she had followed the instructions.", "Ella podría haber tenido éxito si hubiera seguido las instrucciones.", "Sie hätte Erfolg haben können, wenn sie den Anweisungen gefolgt wäre.", "如果她遵循了指示，她本可以成功。", "Она бы смогла преуспеть, если бы следовала инструкциям."],
     ["difficile", "À moins qu'il ne pleuve, nous commencerons à l'heure prévue.", "Unless it rains, we will start at the scheduled time.", "A menos que llueva, comenzaremos a la hora prevista.", "Es sei denn, es regnet, werden wir zur geplanten Zeit beginnen.", "除非下雨，否则我们将按时开始。", "Если не пойдет дождь, мы начнем в запланированное время."],
-    ["difficile", "Je me demande si tu as eu le temps de lire le message que je t'ai envoyé.", "I wonder whether you had time to read the message I sent you.", "Me pregunto si tuvo tiempo de leer el mensaje que le envié.", "Ich frage mich, ob du Zeit hattest, die Nachricht zu lesen, die ich dir geschickt habe.", "我想知道你是否有时间读我发给你的消息。", "Я интересуюсь, было ли у вас время прочитать сообщение, которое я вам прислал."],
+    ["difficile", "Je me demande si tu as eu le temps de lire le message que je t'ai envoyé.", "I wonder whether you had time to read the message I sent you.", "Me pregunto si tuvo tiempo de leer el mensaje que le envié.", "Ich frage mich, ob du Zeit hattest, die Nachricht zu lesen, die ich dir geschickt habe.", "我想知道你是否有时间读我发给你的消息。", "Интересно, успел ли ты прочитать сообщение, которое я тебе отправил."],
     ["difficile", "Le colis aurait dû arriver hier, mais personne n'a sonné.", "The parcel should have arrived yesterday, but nobody rang the bell.", "El paquete debería haber llegado ayer, pero nadie tocó el timbre.", "Das Paket hätte gestern ankommen sollen, aber niemand hat geklingelt.", "包裹本应昨天到，但没人按门铃。", "Посылка должна была прийти вчера, но никто не позвонил."],
     ["difficile", "Il a expliqué pourquoi la réunion avait été reportée sans prévenir les participants.", "He explained why the meeting had been postponed without notifying the participants.", "Él explicó por qué la reunión se había pospuesto sin notificar a los participantes.", "Er erklärte, warum das Meeting verschoben worden war, ohne die Teilnehmer zu benachrichtigen.", "他解释了为什么会议在没有通知参与者的情况下被推迟。", "Он объяснил, почему встреча была отложена без уведомления участников."],
     ["tres_difficile", "À peine avions-nous commencé qu'il s'est mis à pleuvoir.", "Hardly had we started when it began to rain.", "Apenas habíamos empezado cuando empezó a llover.", "Kaum hatten wir angefangen, fing es an zu regnen.", "我们刚开始就下雨了。", "Едва мы начали, как пошел дождь."],
-    ["tres_difficile", "Je me demande ce qu'elle aurait répondu si tu le lui avais demandé.", "I wonder what she would have answered if you had asked her.", "Me pregunto qué habría respondido si se le hubiera preguntado.", "Ich frage mich, was sie geantwortet hätte, wenn du sie gefragt hättest.", "我想知道如果你问她，她会怎么回答。", "Я интересуюсь, что бы она ответила, если бы вы спросили её."],
+    ["tres_difficile", "Je me demande ce qu'elle aurait répondu si tu le lui avais demandé.", "I wonder what she would have answered if you had asked her.", "Me pregunto qué habría respondido si se le hubiera preguntado.", "Ich frage mich, was sie geantwortet hätte, wenn du sie gefragt hättest.", "我想知道如果你问她，她会怎么回答。", "Интересно, что бы она ответила, если бы ты её спросил."],
     ["tres_difficile", "Bien qu'il ait reconnu son erreur, il refuse toujours de s'excuser.", "Although he has admitted his mistake, he still refuses to apologize.", "Aunque haya reconocido su error, todavía se niega a disculparse.", "Obwohl er seinen Fehler eingeräumt hat, weigert er sich immer noch, sich zu entschuldigen.", "虽然他承认了错误，但他仍拒绝道歉。", "Хотя он признал свою ошибку, он всё ещё отказывается извиняться."],
     ["tres_difficile", "Auriez-vous pu me dire pourquoi cette porte est restée ouverte ?", "Could you have told me why this door was left open?", "¿Podría haberme dicho por qué esta puerta quedó abierta?", "Hätten Sie mir sagen können, warum diese Tür offen gelassen wurde?", "你能告诉我为什么这扇门开着吗？", "Не могли бы вы сказать мне, почему эта дверь была открыта?"],
     ["tres_difficile", "Il faut que chacun puisse exprimer ce qu'il aurait préféré faire.", "Everyone must be able to express what they would have preferred to do.", "Todos deben poder expresar lo que habrían preferido hacer.", "Jeder muss in der Lage sein, auszudrücken, was er lieber getan hätte.", "每个人都必须能够表达他们本想做什么。", "Каждый должен иметь возможность выразить, чем бы он предпочел заниматься."],
@@ -2042,7 +2065,7 @@ const LANG_ADVANCED_PHRASES = [
     ["tres_difficile", "Qu'auriez-vous fait à ma place si vous aviez su la vérité ?", "What would you have done in my place if you had known the truth?", "¿Qué habría hecho usted en mi lugar si hubiera sabido la verdad?", "Was hätten Sie an meiner Stelle getan, wenn Sie die Wahrheit gekannt hätten?", "如果你知道真相，你会怎么做？", "Что бы вы сделали на моем месте, если бы знали правду?"],
     ["tres_difficile", "Si j'avais su qu'ils viendraient si tard, je ne les aurais pas attendus.", "If I had known they were coming so late, I would not have waited for them.", "Si hubiera sabido que venirían tan tarde, no los habría esperado.", "Wenn ich gewusst hätte, dass sie so spät kommen, hätte ich nicht auf sie gewartet.", "如果我知道他们会这么晚来，我就不会等他们了。", "Если бы я знал, что они придут так поздно, я бы не ждал их."],
     ["tres_difficile", "Elle aurait voulu que nous ayons terminé avant son retour.", "She would have wanted us to have finished before she returned.", "Ella habría querido que hubiéramos terminado antes de que ella regresara.", "Sie hätte gewollt, dass wir fertig sind, bevor sie zurückkommt.", "她希望我们在她回来前完成。", "Она хотела бы, чтобы мы закончили до её возвращения."],
-    ["tres_difficile", "Il a beau prétendre qu'il n'en savait rien, son nom figure sur le document.", "Much as he claims he knew nothing about it, his name appears on the document.", "Por mucho que afirme que no sabía nada, su nombre figura en el documento.", "So sehr er auch behauptet, nichts davon gewusst zu haben, sein Name steht auf dem Dokument.", "尽管他声称一无所知，但他的名字出现在文件上。", "Насколько бы он ни утверждал, что ничего не knew, его имя figure в документе."],
+    ["tres_difficile", "Il a beau prétendre qu'il n'en savait rien, son nom figure sur le document.", "Much as he claims he knew nothing about it, his name appears on the document.", "Por mucho que afirme que no sabía nada, su nombre figura en el documento.", "So sehr er auch behauptet, nichts davon gewusst zu haben, sein Name steht auf dem Dokument.", "尽管他声称一无所知，但他的名字出现在文件上。", "Как бы он ни утверждал, что ничего об этом не знал, его имя указано в документе."],
     ["tres_difficile", "À moins que vous n'ayez une meilleure proposition, nous garderons celle-ci.", "Unless you have a better proposal, we will keep this one.", "A menos que tenga una propuesta mejor, guardaremos esta.", "Es sei denn, Sie haben einen besseren Vorschlag, werden wir diesen behalten.", "除非你有更好的提议，否则我们保留这个。", "Если у вас нет лучшего предложения, мы оставим это."],
     ["tres_difficile", "Ce que je lui reproche, ce n'est pas d'être parti, mais de n'avoir rien dit.", "What I blame him for is not leaving, but saying nothing.", "Lo que le reprocho no es que se haya ido, sino no haber dicho nada.", "Was ich ihm vorwerfe, ist nicht, dass er gegangen ist, sondern, dass er nichts gesagt hat.", "我责备他并不是因为他走了，而是因为他什么都没说。", "То, в чем я виню его, — не то, что он ушел, а то, что он ничего не сказал."],
     ["tres_difficile", "Quand elle a enfin répondu, j'avais déjà envoyé le formulaire.", "By the time she finally replied, I had already sent the form.", "Cuando ella finalmente respondió, ya había enviado el formulario.", "Als sie endlich antwortete, hatte ich das Formular bereits abgeschickt.", "当她终于回复时，我已经发送了表格。", "К тому времени, как она наконец ответила, я уже отправил форму."],
@@ -2069,7 +2092,7 @@ const LANG_ADVANCED_PHRASES = [
     ["master", "Encore faut-il que les témoins puissent confirmer ce qu'ils ont déclaré.", "The witnesses still need to be able to confirm what they said.", "Aún hace falta que los testigos puedan confirmar lo que declararon.", "Es noch erforderlich, dass die Zeugen bestätigen können, was sie ausgesagt haben.", "证人仍需能够确认他们的陈述。", "Все ещё необходимо, чтобы свидетели могли подтвердить свои показания."],
     ["master", "Si complexe qu'elle paraisse, la règle ne souffre aucune exception.", "However complex it may seem, the rule allows no exceptions.", "Por compleja que parezca, la regla no admite excepciones.", "So komplex sie auch erscheinen mag, die Regel kennt keine Ausnahmen.", "无论规则看起来多么复杂，都不允许例外。", "Как бы сложным оно ни казалось, правило не допускает исключений."],
     ["master", "Eût-elle été avertie plus tôt, elle n'aurait sans doute pas pris la même décision.", "Had she been warned earlier, she probably would not have made the same decision.", "Si la hubieran advertido más temprano, probablemente no habría tomado la misma decisión.", "Wäre sie früher gewarnt worden, hätte sie wahrscheinlich nicht dieselbe Entscheidung getroffen.", "如果她早些被警告，她可能就不会做出同样的决定。", "Если бы её предупредили раньше, она, вероятно, не приняла бы того же решения."],
-    ["master", "À supposer qu'il se soit trompé, cela ne justifierait pas qu'on l'exclue.", "Even assuming he was wrong, that would not justify excluding him.", "Incluso suponiendo que se equivocara, eso no justificaría excluirlo.", "Selbst wenn man annähme, dass er sich geirrt hätte, würde das ihn nicht ausschließen rechtfertigen.", "即使假设他错了，那也不能证明把他排除在外是合理的。", "Даже если предположить, что он ошибся, это не оправдывает его исключение."],
+    ["master", "À supposer qu'il se soit trompé, cela ne justifierait pas qu'on l'exclue.", "Even assuming he was wrong, that would not justify excluding him.", "Incluso suponiendo que se equivocara, eso no justificaría excluirlo.", "Selbst wenn man annähme, dass er sich geirrt hätte, würde das seinen Ausschluss nicht rechtfertigen.", "即使假设他错了，那也不能证明把他排除在外是合理的。", "Даже если предположить, что он ошибся, это не оправдывает его исключение."],
     ["master", "Ce n'est pas faute de lui avoir répété qu'il aurait à répondre de ses actes.", "It is not as if we had failed to tell him he would be held accountable for his actions.", "No es que no le hayamos dicho repetidamente que tendría que responder de sus actos.", "Es nicht so, dass wir ihm nicht wiederholt gesagt hätten, dass er für seine Taten zur Rechenschaft gezogen werden würde.", "这不是因为我们没告诉他要为自己的行为负责。", "Это не потому, что мы не говорили ему, что он будет нести ответственность за свои действия."],
     ["master", "Quelque convaincant que son argument puisse paraître, il repose sur une hypothèse erronée.", "However convincing his argument may seem, it is based on a false assumption.", "Por convincente que parezca su argumento, se basa en una suposición errónea.", "So überzeugend sein Argument auch erscheinen mag, es beruht auf einer falschen Annahme.", "无论他的论点看起来多么有说服力，它都建立在错误的假设上。", "Каким бы убедительным ни казался его аргумент, он основан на ошибочном предположении."]
 ];
@@ -2106,9 +2129,135 @@ const LANG_MULTILINGUAL_CHALLENGES = [
     ["master", "Fût-ce au prix d'un retard considérable, il aurait fallu vérifier chaque pièce avant que l'ensemble ne soit scellé.", "Even at the cost of a considerable delay, every component should have been checked before the assembly was sealed.", "Aunque hubiera supuesto un retraso considerable, habría sido necesario revisar cada pieza antes de sellar el conjunto.", "Selbst um den Preis einer erheblichen Verzögerung hätte jedes Teil geprüft werden müssen, bevor die Baugruppe versiegelt wurde.", "即使会造成严重延误，也应该在整体封存之前逐一检查每个部件。", "Даже ценой значительной задержки следовало проверить каждую деталь до того, как узел опечатали."],
     ["master", "Il ne s'ensuit nullement que les témoins aient menti ; leurs souvenirs ont simplement pu être altérés par le temps.", "It by no means follows that the witnesses lied; their memories may simply have been altered by time.", "De ningún modo se deduce que los testigos mintieran; el paso del tiempo pudo simplemente alterar sus recuerdos.", "Daraus folgt keineswegs, dass die Zeugen gelogen haben; ihre Erinnerungen könnten sich lediglich im Laufe der Zeit verändert haben.", "这绝不意味着证人说了谎；他们的记忆可能只是随着时间发生了偏差。", "Из этого вовсе не следует, что свидетели лгали: их воспоминания могли просто исказиться со временем."],
     ["master", "N'eût été la précision qu'elle avait ajoutée en marge, personne n'aurait remarqué que les deux versions se contredisaient.", "Had it not been for the clarification she had added in the margin, no one would have noticed that the two versions contradicted each other.", "De no ser por la aclaración que añadió al margen, nadie habría advertido que las dos versiones se contradecían.", "Hätte sie nicht am Rand eine Präzisierung hinzugefügt, hätte niemand bemerkt, dass sich die beiden Fassungen widersprachen.", "要不是她在页边补充了说明，就没人会发现这两个版本互相矛盾。", "Если бы не уточнение, которое она добавила на полях, никто бы не заметил противоречия между двумя версиями."],
+    ["difficile", "Elle s'est rendu compte qu'elle avait envoyé l'ancienne version du rapport.", "She realized that she had sent the old version of the report.", "Se dio cuenta de que había enviado la versión anterior del informe.", "Ihr wurde klar, dass sie die alte Fassung des Berichts geschickt hatte.", "她意识到自己发出的是报告的旧版本。", "Она поняла, что отправила старую версию отчёта."],
+    ["difficile", "Nous aurions pu terminer plus tôt si chacun avait reçu les mêmes instructions.", "We could have finished earlier if everyone had received the same instructions.", "Podríamos haber terminado antes si todos hubieran recibido las mismas instrucciones.", "Wir hätten früher fertig werden können, wenn alle dieselben Anweisungen erhalten hätten.", "如果每个人都收到相同的指示，我们本可以更早完成。", "Мы могли бы закончить раньше, если бы все получили одинаковые инструкции."],
+    ["difficile", "Le responsable vérifiera les références avant que l'article ne soit publié.", "The editor will check the references before the article is published.", "El responsable comprobará las referencias antes de que se publique el artículo.", "Die zuständige Person prüft die Quellen, bevor der Artikel veröffentlicht wird.", "负责人会在文章发表前核对参考资料。", "Ответственный проверит источники до публикации статьи."],
+    ["difficile", "Je ne savais pas depuis combien de temps ils attendaient devant l'entrée.", "I did not know how long they had been waiting outside the entrance.", "No sabía cuánto tiempo llevaban esperando delante de la entrada.", "Ich wusste nicht, wie lange sie schon vor dem Eingang warteten.", "我不知道他们在入口外等了多久。", "Я не знал, как долго они ждали у входа."],
+    ["difficile", "Bien qu'il ait promis de revenir, personne ne l'a revu depuis lundi.", "Although he promised to come back, no one has seen him since Monday.", "Aunque prometió volver, nadie lo ha vuelto a ver desde el lunes.", "Obwohl er versprochen hatte zurückzukommen, hat ihn seit Montag niemand mehr gesehen.", "尽管他答应会回来，但自星期一以来没人再见过他。", "Хотя он обещал вернуться, с понедельника его никто не видел."],
+    ["difficile", "Elle a demandé si le changement affecterait les résultats déjà obtenus.", "She asked whether the change would affect the results already obtained.", "Preguntó si el cambio afectaría a los resultados ya obtenidos.", "Sie fragte, ob die Änderung die bereits erzielten Ergebnisse beeinflussen würde.", "她询问这项变更是否会影响已经取得的结果。", "Она спросила, повлияет ли изменение на уже полученные результаты."],
+    ["difficile", "Au moment où nous sommes arrivés, la réunion avait déjà commencé.", "By the time we arrived, the meeting had already started.", "Cuando llegamos, la reunión ya había empezado.", "Als wir ankamen, hatte die Sitzung bereits begonnen.", "我们到达时，会议已经开始了。", "К моменту нашего приезда встреча уже началась."],
+    ["difficile", "Il faudra conserver une copie au cas où le système tomberait en panne.", "A copy will have to be kept in case the system fails.", "Habrá que guardar una copia por si falla el sistema.", "Eine Kopie muss für den Fall aufbewahrt werden, dass das System ausfällt.", "必须保留一份副本，以防系统发生故障。", "Нужно сохранить копию на случай сбоя системы."],
+    ["difficile", "Je pensais qu'ils avaient compris pourquoi la décision devait être reportée.", "I thought they had understood why the decision had to be postponed.", "Pensaba que habían entendido por qué había que aplazar la decisión.", "Ich dachte, sie hätten verstanden, warum die Entscheidung verschoben werden musste.", "我以为他们已经明白为什么必须推迟决定。", "Я думал, они поняли, почему решение нужно было отложить."],
+    ["difficile", "Les documents seront envoyés dès que la traduction aura été relue.", "The documents will be sent as soon as the translation has been reviewed.", "Los documentos se enviarán en cuanto se haya revisado la traducción.", "Die Unterlagen werden verschickt, sobald die Übersetzung überprüft worden ist.", "翻译校对完成后，文件就会寄出。", "Документы отправят, как только перевод будет вычитан."],
+    ["difficile", "Il a reconnu qu'il n'avait pas vérifié les chiffres avant de les publier.", "He admitted that he had not checked the figures before publishing them.", "Reconoció que no había comprobado las cifras antes de publicarlas.", "Er räumte ein, die Zahlen vor ihrer Veröffentlichung nicht überprüft zu haben.", "他承认发布数据前没有核实。", "Он признал, что не проверил цифры перед публикацией."],
+    ["tres_difficile", "Si nous avions su que les données étaient incomplètes, nous aurions demandé une nouvelle analyse.", "Had we known the data were incomplete, we would have requested a new analysis.", "Si hubiéramos sabido que los datos estaban incompletos, habríamos solicitado un nuevo análisis.", "Hätten wir gewusst, dass die Daten unvollständig waren, hätten wir eine neue Analyse angefordert.", "如果我们知道数据不完整，就会要求重新分析。", "Если бы мы знали, что данные неполные, мы бы запросили новый анализ."],
+    ["tres_difficile", "À peine avait-elle terminé son exposé que plusieurs questions furent soulevées.", "No sooner had she finished her presentation than several questions were raised.", "Apenas había terminado su exposición cuando se plantearon varias preguntas.", "Kaum hatte sie ihren Vortrag beendet, wurden mehrere Fragen aufgeworfen.", "她刚结束演讲，就有人提出了几个问题。", "Едва она закончила выступление, как возникло несколько вопросов."],
+    ["tres_difficile", "Quoiqu'il eût reconnu la contradiction, il refusa d'en tirer les conséquences.", "Although he had acknowledged the contradiction, he refused to draw the consequences.", "Aunque había reconocido la contradicción, se negó a extraer las consecuencias.", "Obwohl er den Widerspruch eingeräumt hatte, weigerte er sich, die Konsequenzen daraus zu ziehen.", "尽管他承认存在矛盾，却拒绝由此得出相应结论。", "Хотя он признал противоречие, он отказался сделать из этого выводы."],
+    ["tres_difficile", "Il aurait fallu que les deux parties s'accordent sur une méthode avant de commencer.", "The two parties should have agreed on a method before starting.", "Habría sido necesario que ambas partes acordaran un método antes de empezar.", "Beide Seiten hätten sich vor Beginn auf eine Methode einigen müssen.", "双方本应在开始前就方法达成一致。", "Сторонам следовало согласовать метод до начала работы."],
+    ["tres_difficile", "Non seulement la mesure n'a pas produit l'effet attendu, mais elle a accru les coûts.", "Not only did the measure fail to produce the expected effect, it also increased costs.", "La medida no solo no produjo el efecto esperado, sino que además aumentó los costes.", "Die Maßnahme erzielte nicht nur nicht die erwartete Wirkung, sondern erhöhte auch die Kosten.", "这项措施不仅没有达到预期效果，还增加了成本。", "Мера не только не дала ожидаемого эффекта, но и повысила расходы."],
+    ["tres_difficile", "Sans que personne s'en aperçoive, le document avait été modifié après sa signature.", "Without anyone noticing, the document had been altered after it was signed.", "Sin que nadie se diera cuenta, el documento había sido modificado después de firmarse.", "Unbemerkt war das Dokument nach der Unterzeichnung geändert worden.", "没人察觉到文件在签署后被修改了。", "Никто не заметил, что документ изменили после подписания."],
+    ["tres_difficile", "Pour autant que les archives soient exactes, la décision avait été prise avant le vote.", "As far as the records are accurate, the decision had been made before the vote.", "Siempre que los archivos sean exactos, la decisión se había tomado antes de la votación.", "Sofern die Akten korrekt sind, war die Entscheidung vor der Abstimmung getroffen worden.", "如果档案记录准确，这项决定是在投票前作出的。", "Если архивные записи точны, решение приняли до голосования."],
+    ["tres_difficile", "Elle ne comprenait pas pourquoi on lui reprochait d'avoir suivi les consignes.", "She did not understand why she was being blamed for following the instructions.", "No entendía por qué le reprochaban haber seguido las instrucciones.", "Sie verstand nicht, warum man ihr vorwarf, die Anweisungen befolgt zu haben.", "她不明白为什么别人责怪她遵守了指示。", "Она не понимала, почему ей ставили в вину то, что она следовала инструкциям."],
+    ["tres_difficile", "Le comité aurait pu aboutir à une conclusion différente si certains éléments avaient été examinés.", "The committee might have reached a different conclusion if certain pieces of evidence had been examined.", "El comité podría haber llegado a otra conclusión si se hubieran examinado ciertos elementos.", "Der Ausschuss hätte zu einem anderen Ergebnis kommen können, wenn bestimmte Umstände geprüft worden wären.", "如果审查了某些材料，委员会本可能得出不同结论。", "Комитет мог бы прийти к иному выводу, если бы рассмотрели некоторые материалы."],
+    ["tres_difficile", "Ce n'est qu'en recoupant les dates qu'ils ont découvert l'origine de l'erreur.", "Only by cross-checking the dates did they discover the source of the error.", "Solo al contrastar las fechas descubrieron el origen del error.", "Erst durch den Abgleich der Daten entdeckten sie die Ursache des Fehlers.", "他们通过核对日期才发现错误的根源。", "Лишь сопоставив даты, они обнаружили источник ошибки."],
+    ["master", "Eût-on examiné les pièces dans leur ensemble, la contradiction aurait été manifeste.", "Had the documents been examined as a whole, the contradiction would have been obvious.", "De haberse examinado los documentos en su conjunto, la contradicción habría sido evidente.", "Hätte man die Unterlagen als Ganzes geprüft, wäre der Widerspruch offensichtlich gewesen.", "如果当时把这些材料作为整体审查，矛盾就会显而易见。", "Если бы материалы рассмотрели в совокупности, противоречие было бы очевидным."],
+    ["master", "À supposer que l'hypothèse soit exacte, elle ne saurait à elle seule justifier cette conclusion.", "Even if the hypothesis is correct, it cannot by itself justify this conclusion.", "Aunque la hipótesis sea correcta, no puede justificar por sí sola esta conclusión.", "Selbst wenn die Hypothese zutrifft, kann sie diese Schlussfolgerung allein nicht rechtfertigen.", "即便假设正确，它本身也不足以证明这一结论合理。", "Даже если гипотеза верна, сама по себе она не может обосновать этот вывод."],
+    ["master", "Encore faudrait-il que l'exception invoquée s'applique aux circonstances de l'espèce.", "The exception being invoked would still have to apply to the circumstances of this case.", "Aun así, la excepción invocada tendría que aplicarse a las circunstancias del caso.", "Die angeführte Ausnahme müsste allerdings auf die Umstände dieses Falls zutreffen.", "不过，所援引的例外还必须适用于本案的具体情况。", "Однако указанное исключение должно применяться к обстоятельствам данного дела."],
+    ["master", "Nulle preuve ne permet d'affirmer que l'omission fut délibérée.", "No evidence allows us to claim that the omission was deliberate.", "Ninguna prueba permite afirmar que la omisión fuera deliberada.", "Es gibt keinen Beweis dafür, dass die Auslassung absichtlich war.", "没有证据可以证明这项遗漏是故意的。", "Нет доказательств, позволяющих утверждать, что пропуск был преднамеренным."],
+    ["master", "Fût-elle tenue pour recevable, cette déposition ne suffirait pas à établir les faits.", "Even if admitted, this testimony would not be sufficient to establish the facts.", "Aunque se admitiera, esta declaración no bastaría para demostrar los hechos.", "Selbst wenn diese Aussage zugelassen würde, reichte sie nicht aus, um den Sachverhalt festzustellen.", "即使这份证词被采纳，也不足以证实这些事实。", "Даже если эти показания допустят, их будет недостаточно для установления фактов."],
+    ["master", "Bien qu'il ne soit pas contesté que les règles aient changé, leur portée demeure incertaine.", "Although it is undisputed that the rules have changed, their scope remains uncertain.", "Aunque nadie discute que las reglas hayan cambiado, su alcance sigue siendo incierto.", "Obwohl unbestritten ist, dass sich die Regeln geändert haben, bleibt ihre Tragweite unklar.", "尽管规则已经改变这一点没有争议，但其适用范围仍不明确。", "Хотя никто не оспаривает, что правила изменились, их значение остаётся неясным."],
+    ["master", "Le silence du rapport ne saurait être interprété comme une confirmation de cette hypothèse.", "The report's silence cannot be interpreted as confirmation of this hypothesis.", "El silencio del informe no puede interpretarse como una confirmación de esta hipótesis.", "Das Schweigen des Berichts darf nicht als Bestätigung dieser Hypothese ausgelegt werden.", "不能把报告没有提及此事解读为对这一假设的确认。", "Молчание отчёта нельзя истолковывать как подтверждение этой гипотезы."],
+    ["master", "Si les versions successives avaient été conservées, il eût été possible d'identifier l'origine de l'altération.", "Had the successive versions been preserved, it would have been possible to identify the source of the alteration.", "Si se hubieran conservado las versiones sucesivas, habría sido posible identificar el origen de la modificación.", "Wären die aufeinanderfolgenden Fassungen aufbewahrt worden, hätte man die Ursache der Veränderung feststellen können.", "如果保留了各个版本，就有可能查明改动的来源。", "Если бы сохранили все версии, можно было бы установить источник изменений."],
+    ["master", "À peine la décision fut-elle prononcée que son bien-fondé fut remis en question.", "Hardly had the decision been announced when its validity was called into question.", "Apenas se anunció la decisión cuando se cuestionó su validez.", "Kaum war die Entscheidung verkündet, wurde ihre Rechtmäßigkeit infrage gestellt.", "决定刚一宣布，其合理性就受到质疑。", "Едва решение объявили, как его обоснованность была поставлена под сомнение."],
+    ["master", "Ce n'est pas tant la conclusion qui pose problème que le raisonnement par lequel on y parvient.", "It is not so much the conclusion that is problematic as the reasoning used to reach it.", "El problema no reside tanto en la conclusión como en el razonamiento que conduce a ella.", "Problematisch ist weniger die Schlussfolgerung als vielmehr die Argumentation, die zu ihr führt.", "问题不在于结论本身，而在于得出结论的推理过程。", "Проблема заключается не столько в выводе, сколько в рассуждении, которое к нему привело."],
     ["master", "Ce n'est pas tant qu'il ait refusé de coopérer, mais qu'il ait choisi de le faire au moment où cela ne pouvait plus rien changer.", "It is not so much that he refused to cooperate as that he chose to do so when it could no longer change anything.", "No es tanto que se negara a colaborar, sino que eligiera hacerlo cuando ya nada podía cambiar.", "Es geht weniger darum, dass er die Zusammenarbeit verweigerte, als darum, dass er sich erst dazu entschloss, als sich nichts mehr ändern ließ.", "问题不在于他拒绝配合，而在于他选择配合时已经无法改变任何结果。", "Дело не столько в том, что он отказался сотрудничать, сколько в том, что он согласился, когда это уже ничего не могло изменить."],
     ["master", "Quel que soit le sens qu'on prête à cette formule, rien ne permet d'affirmer qu'elle ait été comprise de la même manière par tous.", "Whatever meaning one assigns to this wording, nothing suggests that everyone understood it in the same way.", "Sea cual sea el sentido que se atribuya a esta formulación, nada permite afirmar que todos la entendieran del mismo modo.", "Welche Bedeutung man dieser Formulierung auch beimisst, nichts deutet darauf hin, dass sie von allen gleich verstanden wurde.", "无论如何理解这句话，都没有依据断言所有人对它的理解都相同。", "Какой бы смысл ни вкладывали в эту формулировку, ничто не позволяет утверждать, что все поняли её одинаково."]
 ];
+
+const LANG_EXPANSION_OBJECTS = [
+    ["la clé", "the key", "la llave", "den Schlüssel", "钥匙", "ключ"],
+    ["le livre", "the book", "el libro", "das Buch", "书", "книгу"],
+    ["le téléphone", "the phone", "el teléfono", "das Telefon", "电话", "телефон"],
+    ["le sac", "the bag", "el bolso", "die Tasche", "包", "сумку"],
+    ["la lettre", "the letter", "la carta", "den Brief", "信", "письмо"],
+    ["la carte", "the map", "el mapa", "die Karte", "地图", "карту"],
+    ["le billet", "the ticket", "el billete", "das Ticket", "车票", "билет"],
+    ["le parapluie", "the umbrella", "el paraguas", "den Regenschirm", "雨伞", "зонт"],
+    ["le manteau", "the coat", "el abrigo", "den Mantel", "外套", "пальто"],
+    ["le vélo", "the bicycle", "la bicicleta", "das Fahrrad", "自行车", "велосипед"],
+    ["l'appareil photo", "the camera", "la cámara", "die Kamera", "相机", "фотоаппарат"],
+    ["l'ordinateur", "the computer", "el ordenador", "den Computer", "电脑", "компьютер"],
+    ["la tasse", "the cup", "la taza", "die Tasse", "杯子", "чашку"],
+    ["la bouteille", "the bottle", "la botella", "die Flasche", "瓶子", "бутылку"],
+    ["la chaise", "the chair", "la silla", "den Stuhl", "椅子", "стул"],
+    ["la table", "the table", "la mesa", "den Tisch", "桌子", "стол"],
+    ["la valise", "the suitcase", "la maleta", "den Koffer", "行李箱", "чемодан"],
+    ["le passeport", "the passport", "el pasaporte", "den Pass", "护照", "паспорт"],
+    ["le portefeuille", "the wallet", "la cartera", "die Geldbörse", "钱包", "кошелёк"],
+    ["la veste", "the jacket", "la chaqueta", "die Jacke", "夹克", "куртку"],
+    ["le pull", "the sweater", "el suéter", "den Pullover", "毛衣", "свитер"],
+    ["le crayon", "the pencil", "el lápiz", "den Bleistift", "铅笔", "карандаш"],
+    ["le cahier", "the notebook", "el cuaderno", "das Heft", "笔记本", "тетрадь"],
+    ["le journal", "the newspaper", "el periódico", "die Zeitung", "报纸", "газету"],
+    ["la boîte", "the box", "la caja", "die Schachtel", "盒子", "коробку"],
+    ["le paquet", "the package", "el paquete", "das Paket", "包裹", "посылку"],
+    ["le sandwich", "the sandwich", "el sándwich", "das Sandwich", "三明治", "сэндвич"],
+    ["la pomme", "the apple", "la manzana", "den Apfel", "苹果", "яблоко"],
+    ["l'orange", "the orange", "la naranja", "die Orange", "橙子", "апельсин"],
+    ["le gâteau", "the cake", "el pastel", "den Kuchen", "蛋糕", "торт"],
+    ["le jouet", "the toy", "el juguete", "das Spielzeug", "玩具", "игрушку"],
+    ["le ballon", "the ball", "la pelota", "den Ball", "球", "мяч"],
+    ["l'outil", "the tool", "la herramienta", "das Werkzeug", "工具", "инструмент"],
+    ["la couverture", "the blanket", "la manta", "die Decke", "毯子", "одеяло"],
+    ["la lampe", "the lamp", "la lámpara", "die Lampe", "灯", "лампу"],
+    ["le miroir", "the mirror", "el espejo", "den Spiegel", "镜子", "зеркало"],
+    ["le réveil", "the alarm clock", "el despertador", "den Wecker", "闹钟", "будильник"],
+    ["le cadeau", "the gift", "el regalo", "das Geschenk", "礼物", "подарок"],
+    ["le vase", "the vase", "el jarrón", "die Vase", "花瓶", "вазу"],
+    ["le dossier", "the folder", "la carpeta", "den Ordner", "文件夹", "папку"]
+];
+
+const LANG_EXPANSION_TEMPLATES = [
+    ["basique", [
+        ["Je cherche {item}.", "I am looking for {item}.", "Busco {item}.", "Ich suche {item}.", "我在找{item}。", "Я ищу {item}."],
+        ["Elle a trouvé {item}.", "She found {item}.", "Ella encontró {item}.", "Sie hat {item} gefunden.", "她找到了{item}。", "Она нашла {item}."],
+        ["Nous avons acheté {item}.", "We bought {item}.", "Compramos {item}.", "Wir haben {item} gekauft.", "我们买了{item}。", "Мы купили {item}."],
+        ["Il prend {item}.", "He takes {item}.", "Él toma {item}.", "Er nimmt {item}.", "他拿起{item}。", "Он берёт {item}."],
+        ["Ils gardent {item}.", "They keep {item}.", "Ellos guardan {item}.", "Sie behalten {item}.", "他们收好{item}。", "Они хранят {item}."]
+    ]],
+    ["facile", [
+        ["Je vais apporter {item} demain.", "I will bring {item} tomorrow.", "Voy a traer {item} mañana.", "Ich werde {item} morgen mitbringen.", "我明天会带来{item}。", "Я принесу {item} завтра."],
+        ["Elle a rangé {item} avant de partir.", "She put away {item} before leaving.", "Guardó {item} antes de irse.", "Sie räumte {item} weg, bevor sie ging.", "她离开前收好了{item}。", "Перед уходом она убрала {item}."],
+        ["Nous avons acheté {item} hier.", "We bought {item} yesterday.", "Ayer compramos {item}.", "Wir haben {item} gestern gekauft.", "我们昨天买了{item}。", "Мы купили {item} вчера."],
+        ["Il est en train de réparer {item}.", "He is repairing {item}.", "Está reparando {item}.", "Er repariert gerade {item}.", "他正在修理{item}。", "Он сейчас чинит {item}."],
+        ["Ils apporteront {item} après le déjeuner.", "They will bring {item} after lunch.", "Traerán {item} después del almuerzo.", "Sie bringen {item} nach dem Mittagessen mit.", "他们午饭后会带来{item}。", "Они принесут {item} после обеда."]
+    ]],
+    ["moyen", [
+        ["Quand elle a retrouvé {item}, elle a appelé son collègue.", "When she found {item}, she called her colleague.", "Cuando encontró {item}, llamó a su colega.", "Als sie {item} wiederfand, rief sie ihren Kollegen an.", "她找到{item}后，给同事打了电话。", "Когда она нашла {item}, она позвонила коллеге."],
+        ["Avant de déplacer {item}, ils ont vérifié la pièce.", "Before moving {item}, they checked the room.", "Antes de mover {item}, revisaron la habitación.", "Bevor sie {item} bewegten, prüften sie den Raum.", "移动{item}之前，他们检查了房间。", "Прежде чем переместить {item}, они проверили комнату."],
+        ["Il cherchait {item} pendant que nous préparions la salle.", "He was looking for {item} while we were preparing the room.", "Buscaba {item} mientras preparábamos la sala.", "Er suchte {item}, während wir den Raum vorbereiteten.", "我们准备房间时，他一直在找{item}。", "Он искал {item}, пока мы готовили комнату."],
+        ["Après avoir emballé {item}, elle a fermé la valise.", "After packing {item}, she closed the suitcase.", "Después de empaquetar {item}, cerró la maleta.", "Nachdem sie {item} eingepackt hatte, schloss sie den Koffer.", "她把{item}装好后，关上了行李箱。", "Упаковав {item}, она закрыла чемодан."],
+        ["Ils ont gardé {item} jusqu'à l'arrivée du technicien.", "They kept {item} until the technician arrived.", "Guardaron {item} hasta que llegó el técnico.", "Sie behielten {item}, bis der Techniker eintraf.", "他们把{item}留着，直到技术员到来。", "Они хранили {item}, пока не приехал техник."]
+    ]],
+    ["difficile", [
+        ["Si tu avais apporté {item}, nous aurions pu partir plus tôt.", "If you had brought {item}, we could have left earlier.", "Si hubieras traído {item}, habríamos podido salir antes.", "Wenn du {item} mitgebracht hättest, hätten wir früher aufbrechen können.", "如果你带了{item}，我们本可以早点出发。", "Если бы ты принёс {item}, мы могли бы уйти раньше."],
+        ["Bien qu'elle ait soigneusement emballé {item}, le retard a bouleversé ses plans.", "Although she had carefully packed {item}, the delay disrupted her plans.", "Aunque había embalado cuidadosamente {item}, el retraso trastocó sus planes.", "Obwohl sie {item} sorgfältig eingepackt hatte, brachte die Verspätung ihre Pläne durcheinander.", "尽管她仔细包装了{item}，延误还是打乱了她的计划。", "Хотя она тщательно упаковала {item}, задержка нарушила её планы."],
+        ["Si nous avions inspecté {item} plus tôt, nous aurions peut-être évité le retard.", "Had we inspected {item} sooner, we might have avoided the delay.", "Si hubiéramos inspeccionado {item} antes, quizá habríamos evitado el retraso.", "Hätten wir {item} früher überprüft, hätten wir die Verspätung vielleicht vermieden.", "如果我们早点检查{item}，也许就能避免延误。", "Если бы мы проверили {item} раньше, возможно, нам удалось бы избежать задержки."],
+        ["Nous n'aurions pas remplacé {item} sans l'accord du technicien.", "We would not have replaced {item} without the technician's approval.", "No habríamos reemplazado {item} sin la aprobación del técnico.", "Ohne die Zustimmung des Technikers hätten wir {item} nicht ersetzt.", "没有技术员的同意，我们本不会更换{item}。", "Без разрешения техника мы бы не стали заменять {item}."],
+        ["S'ils avaient vérifié {item} avant de partir, ils auraient remarqué les dégâts.", "If they had checked {item} before leaving, they would have noticed the damage.", "Si hubieran revisado {item} antes de salir, habrían notado los daños.", "Wenn sie {item} vor der Abfahrt überprüft hätten, hätten sie den Schaden bemerkt.", "如果他们离开前检查了{item}，就会发现损坏。", "Если бы они проверили {item} перед уходом, они бы заметили повреждение."]
+    ]],
+    ["tres_difficile", [
+        ["Ce n'est qu'après avoir examiné {item} que nous avons compris pourquoi la livraison avait été retardée.", "Only after examining {item} did we understand why the delivery had been delayed.", "Solo después de examinar {item} comprendimos por qué se había retrasado la entrega.", "Erst nachdem wir {item} untersucht hatten, verstanden wir, warum sich die Lieferung verzögert hatte.", "检查{item}之后，我们才明白交付为何被延迟。", "Только после проверки {item} мы поняли, почему доставка задержалась."],
+        ["Bien qu'ils aient vérifié {item} deux fois, ils n'ont pas réussi à expliquer le problème.", "Although they had checked {item} twice, they could not explain the problem.", "Aunque habían revisado {item} dos veces, no lograron explicar el problema.", "Obwohl sie {item} zweimal überprüft hatten, konnten sie das Problem nicht erklären.", "尽管他们检查了{item}两次，还是无法解释这个问题。", "Хотя они дважды проверили {item}, им не удалось объяснить проблему."],
+        ["Elle a insisté pour que {item} soit rendu avant la fermeture du bureau.", "She insisted that {item} be returned before the office closed.", "Insistió en que devolvieran {item} antes de que cerrara la oficina.", "Sie bestand darauf, dass {item} vor Büroschluss zurückgegeben wird.", "她坚持要求在办公室关门前归还{item}。", "Она настаивала на том, чтобы {item} вернули до закрытия офиса."],
+        ["Il a nié avoir déplacé {item}, bien que l'inventaire indique le contraire.", "He denied moving {item}, even though the inventory says otherwise.", "Negó haber movido {item}, aunque el inventario indicaba lo contrario.", "Er bestritt, {item} bewegt zu haben, obwohl das Inventar auf das Gegenteil hinwies.", "他否认移动过{item}，尽管清单显示事实并非如此。", "Он отрицал, что перемещал {item}, хотя опись свидетельствовала об обратном."],
+        ["Quelle qu'ait été la raison d'utiliser {item}, la décision devait être consignée.", "Whatever the reason for using {item}, the decision had to be recorded.", "Cualquiera que fuera la razón para usar {item}, había que dejar constancia de la decisión.", "Was auch immer der Grund dafür war, {item} zu verwenden, die Entscheidung musste dokumentiert werden.", "无论使用{item}的理由是什么，都必须记录这一决定。", "Какой бы ни была причина использовать {item}, решение следовало зафиксировать."]
+    ]],
+    ["master", [
+        ["Si l'équipe avait examiné {item} avant l'échéance, l'erreur aurait pu être découverte.", "Had the team examined {item} before the deadline, the error might have been discovered.", "Si el equipo hubiera examinado {item} antes del plazo, quizá se habría descubierto el error.", "Hätte das Team {item} vor Ablauf der Frist untersucht, wäre der Fehler möglicherweise entdeckt worden.", "如果团队在截止日期前检查了{item}，就有可能发现这个错误。", "Если бы команда проверила {item} до истечения срока, ошибку, возможно, удалось бы обнаружить."],
+        ["Le responsable a exigé que {item} soit remplacé avant la reprise de la réunion.", "The manager insisted that {item} be replaced before the meeting resumed.", "El responsable exigió que se sustituyera {item} antes de reanudar la reunión.", "Der Verantwortliche verlangte, dass {item} ersetzt wird, bevor die Sitzung fortgesetzt wird.", "负责人要求在会议继续前更换{item}。", "Руководитель потребовал заменить {item} до возобновления заседания."],
+        ["S'ils livraient {item} aujourd'hui, nous pourrions encore terminer l'examen.", "Were they to deliver {item} today, we could still complete the review.", "Si entregaran {item} hoy, aún podríamos terminar la revisión.", "Würden sie {item} heute liefern, könnten wir die Prüfung noch abschließen.", "如果他们今天交付{item}，我们仍有可能完成审查。", "Если бы они доставили {item} сегодня, мы всё ещё могли бы завершить проверку."],
+        ["Ce n'est qu'après que l'équipe a récupéré {item} que l'enquête a pu être close.", "Only after the team recovered {item} could the investigation be closed.", "Solo después de que el equipo recuperó {item} se pudo cerrar la investigación.", "Erst nachdem das Team {item} zurückerhalten hatte, konnte die Untersuchung abgeschlossen werden.", "团队找回{item}后，调查才得以结束。", "Расследование удалось завершить только после того, как команда вернула {item}."],
+        ["Sans l'accord du directeur, personne n'aurait osé déplacer {item} pendant l'inspection.", "Without the manager's approval, no one would have dared to move {item} during the inspection.", "Sin la aprobación del director, nadie se habría atrevido a mover {item} durante la inspección.", "Ohne die Zustimmung des Leiters hätte niemand gewagt, {item} während der Inspektion zu bewegen.", "没有主管的批准，没人敢在检查期间移动{item}。", "Без разрешения руководителя никто не осмелился бы переместить {item} во время проверки."]
+    ]]
+];
+
+const LANG_GENERATED_CHALLENGES = LANG_EXPANSION_TEMPLATES.flatMap(([levelKey, templates]) =>
+    templates.flatMap(template => LANG_EXPANSION_OBJECTS.map(item => [
+        levelKey,
+        ...template.map((sentence, languageIndex) => sentence.replace(/\{item\}/g, item[languageIndex]))
+    ]))
+);
 
 const CULTURE_QUESTIONS = [
 ["Quelle est la planète la plus proche du Soleil ?","Mercure",["Vénus","Terre","Mars"]],
@@ -2508,13 +2657,20 @@ const CULTURE_QUESTIONS_ZH_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_ZH, 
 const GEO_QUESTIONS_RU_BY_LEVEL = buildQuestionLevels(GEO_QUESTIONS_RU, "geo", GEO_QUESTIONS);
 const CULTURE_QUESTIONS_RU_BY_LEVEL = buildQuestionLevels(CULTURE_QUESTIONS_RU, "culture", CULTURE_QUESTIONS);
 
+function mergeQuestionLevels(primary, additions) {
+    return Object.fromEntries(DIFFICULTY_LEVELS.map(({ key }) => [
+        key,
+        [...primary[key], ...(additions[key] || [])]
+    ]));
+}
+
 const BANKS_BY_LANG = {
-    fr: { geo: GEO_QUESTIONS_BY_LEVEL, culture: CULTURE_QUESTIONS_BY_LEVEL },
-    en: { geo: GEO_QUESTIONS_EN_BY_LEVEL, culture: CULTURE_QUESTIONS_EN_BY_LEVEL },
-    es: { geo: GEO_QUESTIONS_ES_BY_LEVEL, culture: CULTURE_QUESTIONS_ES_BY_LEVEL },
-    de: { geo: GEO_QUESTIONS_DE_BY_LEVEL, culture: CULTURE_QUESTIONS_DE_BY_LEVEL },
-    zh: { geo: GEO_QUESTIONS_ZH_BY_LEVEL, culture: CULTURE_QUESTIONS_ZH_BY_LEVEL },
-    ru: { geo: GEO_QUESTIONS_RU_BY_LEVEL, culture: CULTURE_QUESTIONS_RU_BY_LEVEL },
+    fr: { geo: mergeQuestionLevels(GEO_QUESTIONS_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.fr), culture: mergeQuestionLevels(CULTURE_QUESTIONS_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.fr) },
+    en: { geo: mergeQuestionLevels(GEO_QUESTIONS_EN_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.en), culture: mergeQuestionLevels(CULTURE_QUESTIONS_EN_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.en) },
+    es: { geo: mergeQuestionLevels(GEO_QUESTIONS_ES_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.es), culture: mergeQuestionLevels(CULTURE_QUESTIONS_ES_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.es) },
+    de: { geo: mergeQuestionLevels(GEO_QUESTIONS_DE_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.de), culture: mergeQuestionLevels(CULTURE_QUESTIONS_DE_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.de) },
+    zh: { geo: mergeQuestionLevels(GEO_QUESTIONS_ZH_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.zh), culture: mergeQuestionLevels(CULTURE_QUESTIONS_ZH_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.zh) },
+    ru: { geo: mergeQuestionLevels(GEO_QUESTIONS_RU_BY_LEVEL, GEO_WIKIDATA_QUESTIONS.ru), culture: mergeQuestionLevels(CULTURE_QUESTIONS_RU_BY_LEVEL, CULTURE_WIKIDATA_QUESTIONS.ru) },
 };
 
 // ============================================================================
@@ -2638,7 +2794,7 @@ function generateVariedMath(diffKey, language = 'fr') {
     let value;
 
     if (diffKey === 'basique') {
-        const a = rand(1, 10), b = rand(1, 10);
+        const a = rand(1, 99), b = rand(1, 99);
         const kind = rand(0, 3);
         if (kind === 0) { question = `${a} + ${b} = ?`; value = a + b; }
         else if (kind === 1) { const high = Math.max(a, b), low = Math.min(a, b); question = `${high} - ${low} = ?`; value = high - low; }
@@ -2659,24 +2815,23 @@ function generateVariedMath(diffKey, language = 'fr') {
         else if (kind === 2) { const perimeter = 2 * (a + b); question = text.perimeter(a, b); value = perimeter; }
         else { const x = rand(3, 20), result = 2 * x + 5; question = text.solve(`2x + 5 = ${result}`); value = x; }
     } else if (diffKey === 'difficile') {
-        const a = rand(4, 18), b = rand(3, 12);
         const kind = rand(0, 3);
-        if (kind === 0) { const x = rand(4, 25), result = 3 * x - 7; question = text.solve(`3x - 7 = ${result}`); value = x; }
-        else if (kind === 1) { const n = rand(3, 20); question = text.threeQuarters(4 * n); value = 3 * n; }
-        else if (kind === 2) { const root = rand(5, 20); question = text.squareRoot(root * root); value = root; }
-        else { question = `${a} × (${b} + 5) - ${a * 5} = ?`; value = a * b; }
+        if (kind === 0) { const x = rand(4, 50), result = 3 * x - 7; question = text.solve(`3x - 7 = ${result}`); value = x; }
+        else if (kind === 1) { const n = rand(3, 60); question = text.threeQuarters(4 * n); value = 3 * n; }
+        else if (kind === 2) { const root = rand(5, 50); question = text.squareRoot(root * root); value = root; }
+        else { const factor = rand(4, 30), offset = rand(3, 24); question = `${factor} × (${offset} + 5) - ${factor * 5} = ?`; value = factor * offset; }
     } else if (diffKey === 'tres_difficile') {
         const kind = rand(0, 3);
-        if (kind === 0) { const x = rand(5, 25), result = 5 * x + 3; question = text.solve(`5x + 3 = ${result}`); value = x; }
-        else if (kind === 1) { const x = rand(2, 12), y = rand(3, 9); question = text.triangle(3 * x, 4 * x); value = 5 * x; }
-        else if (kind === 2) { const base = rand(2, 15) * 100; question = text.discountedPrice(base); value = base * 0.8; }
-        else { const x = rand(3, 12); question = text.leastCommonMultiple(x, x + 1); value = x * (x + 1); }
+        if (kind === 0) { const x = rand(5, 125), result = 5 * x + 3; question = text.solve(`5x + 3 = ${result}`); value = x; }
+        else if (kind === 1) { const x = rand(2, 75); question = text.triangle(3 * x, 4 * x); value = 5 * x; }
+        else if (kind === 2) { const base = rand(2, 150) * 100; question = text.discountedPrice(base); value = base * 0.8; }
+        else { const x = rand(3, 100); question = text.leastCommonMultiple(x, x + 1); value = x * (x + 1); }
     } else {
         const kind = rand(0, 3);
-        if (kind === 0) { const r1 = rand(1, 12), r2 = rand(1, 12); question = text.quadratic(`x² - ${r1 + r2}x + ${r1 * r2}`); value = Math.max(r1, r2); }
-        else if (kind === 1) { const x = rand(2, 15), y = rand(2, 15); question = text.system(x + y, x - y); value = x; }
-        else if (kind === 2) { const n = rand(3, 12); question = text.diagonals(n); value = n * (n - 3) / 2; }
-        else { const a = rand(3, 15), b = rand(3, 15); question = text.changingPrice(a * 100); value = a * 100 * 1.1 * 0.9; }
+        if (kind === 0) { const r1 = rand(1, 30), r2 = rand(1, 30); question = text.quadratic(`x² - ${r1 + r2}x + ${r1 * r2}`); value = Math.max(r1, r2); }
+        else if (kind === 1) { const x = rand(2, 30), y = rand(2, 30); question = text.system(x + y, x - y); value = x; }
+        else if (kind === 2) { const n = rand(3, 60); question = text.diagonals(n); value = n * (n - 3) / 2; }
+        else { const a = rand(3, 50), b = rand(3, 50); question = text.changingPrice(a * b * 100); value = a * b * 100 * 1.1 * 0.9; }
     }
 
     value = Number(value.toFixed(2));
@@ -2707,8 +2862,25 @@ const QuestionManager = (() => {
         return true;
     }
 
+    function questionSignature(theme, row) {
+        const question = theme === 'anglais' && row[5] != null ? row[5] : row[0];
+        return normalizeQuestionText(question);
+    }
+
     function resetHistory() {
         usedSignatures.clear();
+    }
+
+    function getRunHistory() {
+        return [...usedSignatures];
+    }
+
+    function restoreHistory(history) {
+        usedSignatures = new Set(
+            Array.isArray(history)
+                ? history.filter(signature => typeof signature === 'string' && signature.length > 0)
+                : []
+        );
     }
 
     function getLanguageLevels(source, target) {
@@ -2738,6 +2910,11 @@ const QuestionManager = (() => {
             const targetText = translations[languageIndex[target]];
             return [`Traduis : « ${sourceText} »`, targetText, [], 'phrase', levelKey, sourceText];
         }).filter(row => row[0] && row[1]));
+        rows.push(...LANG_GENERATED_CHALLENGES.map(([levelKey, ...translations]) => {
+            const sourceText = translations[languageIndex[source]];
+            const targetText = translations[languageIndex[target]];
+            return [`Traduis : « ${sourceText} »`, targetText, [], 'phrase', levelKey, sourceText];
+        }));
         rows.push(...LANG_VOCAB.map(item => [
             `Traduis le mot « ${item[source]} »`, item[target], [], 'word', null, item[source]
         ]).filter(row => row[0] && row[1] && !String(row[1]).includes('undefined')));
@@ -2748,14 +2925,24 @@ const QuestionManager = (() => {
 
     function pickQuestion(theme, levelKey, pool) {
         if (!pool || pool.length === 0) return null;
-        const unused = pool.filter(row => !usedSignatures.has(`${theme}_${levelKey}_${normalizeQuestionText(row[0])}`));
-        const available = unused.length ? unused : pool;
-        if (!unused.length) {
-            pool.forEach(row => usedSignatures.delete(`${theme}_${levelKey}_${normalizeQuestionText(row[0])}`));
+        const unused = pool.filter(row => !usedSignatures.has(questionSignature(theme, row)));
+        if (unused.length === 0) {
+            throw new Error(`Banque épuisée sans répétition : ${theme}, niveau ${levelKey}`);
         }
-        const row = available[Math.floor(Math.random() * available.length)];
-        usedSignatures.add(`${theme}_${levelKey}_${normalizeQuestionText(row[0])}`);
+        const row = unused[Math.floor(Math.random() * unused.length)];
+        usedSignatures.add(questionSignature(theme, row));
         return row;
+    }
+
+    function hasUnusedQuestion(theme, levelKey) {
+        if (theme === 'maths') return true;
+        if (theme === 'anglais') {
+            const pool = getLanguageLevels(langSource, langTarget)[levelKey];
+            return pool.some(row => !usedSignatures.has(questionSignature(theme, row)));
+        }
+        const banks = BANKS_BY_LANG[langSource] || BANKS_BY_LANG.fr;
+        const pool = theme === 'geo' ? banks.geo[levelKey] : banks.culture[levelKey];
+        return pool.some(row => !usedSignatures.has(questionSignature(theme, row)));
     }
 
     function createQuestion(question, answer, distractors, level, theme) {
@@ -2803,18 +2990,27 @@ const QuestionManager = (() => {
 
     function getNextQuestion(selectedTheme, difficultyKey) {
         const level = DIFFICULTY_LEVELS.find(item => item.key === difficultyKey) || DIFFICULTY_LEVELS[0];
-        const theme = selectedTheme === 'random'
-            ? ['maths', 'geo', 'anglais', 'culture'][Math.floor(Math.random() * 4)]
-            : selectedTheme;
+        let theme = selectedTheme;
+        if (selectedTheme === 'random') {
+            const availableThemes = ['maths', 'geo', 'anglais', 'culture']
+                .filter(item => hasUnusedQuestion(item, level.key));
+            theme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
+        }
 
+        if (!theme) throw new Error(`Aucun thème ne contient de question disponible : niveau ${level.key}`);
         if (theme === 'maths') {
             let generated;
+            let signature;
             let tries = 0;
             do {
                 generated = generateVariedMath(level.key, langSource);
+                signature = normalizeQuestionText(generated.question);
                 tries++;
-            } while (usedSignatures.has(`maths_${level.key}_${normalizeQuestionText(generated.question)}`) && tries < 20);
-            usedSignatures.add(`maths_${level.key}_${normalizeQuestionText(generated.question)}`);
+            } while (usedSignatures.has(signature) && tries < 1000);
+            if (usedSignatures.has(signature)) {
+                throw new Error(`Générateur de maths épuisé sans répétition : niveau ${level.key}`);
+            }
+            usedSignatures.add(signature);
             return createQuestion(generated.question, generated.answer, generated.options.filter(value => value !== generated.answer), level, 'maths');
         }
 
@@ -2827,19 +3023,23 @@ const QuestionManager = (() => {
         return createQuestion(row[0], row[1], row[2], level, theme);
     }
 
-    function getBankStats() {
+    function getBankStats(source = langSource, target = langTarget) {
         const levels = {};
+        const banks = BANKS_BY_LANG[source] || BANKS_BY_LANG.fr;
         for (const level of DIFFICULTY_LEVELS) {
+            const geoPool = banks.geo[level.key];
+            const translationPool = getLanguageLevels(source, target)[level.key];
+            const culturePool = banks.culture[level.key];
             levels[level.key] = {
-                geo: GEO_QUESTIONS_BY_LEVEL[level.key].length,
-                anglais: getLanguageLevels('fr', 'en')[level.key].length,
-                culture: CULTURE_QUESTIONS_BY_LEVEL[level.key].length,
-                maths: 'généré'
+                geo: new Set(geoPool.map(row => questionSignature('geo', row))).size,
+                anglais: new Set(translationPool.map(row => questionSignature('anglais', row))).size,
+                culture: new Set(culturePool.map(row => questionSignature('culture', row))).size,
+                maths: 240
             };
         }
         return levels;
     }
 
-    return { getNextQuestion, resetHistory, setLangPair, getBankStats };
+    return { getNextQuestion, resetHistory, restoreHistory, getRunHistory, setLangPair, getBankStats };
 })();
 

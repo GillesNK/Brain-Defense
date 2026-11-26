@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Brain Defense - Jeu éducatif où tu défends ta base avec ton cerveau. Choisis un thème (Maths, Géographie, Traduction, Culture G.) et élimine les météores en répondant aux questions.">
     <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
     <title>Brain Defense — jeu éducatif</title>
-    <link rel="stylesheet" href="style.css?v=bd-20261120-mobile-home-4">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css?v=bd-20261125-accessibility-2">
 </head>
 <body>
 
     <!-- HUD vertical à gauche : contrôles puis ressources et score -->
-    <div id="hud" class="hud">
+    <div id="hud" class="hud" aria-hidden="true">
         <div class="hud-card hud-controls">
             <button id="pause-btn" onclick="pauseGame()" title="Pause" aria-label="Pause">⏸️</button>
         </div>
@@ -44,10 +45,12 @@
 
     <!-- Zone de jeu + Modales -->
     <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" aria-hidden="true"></canvas>
+        <div id="active-question" class="active-question hidden" aria-hidden="true"></div>
+        <div id="game-question-announcement" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
         <!-- Boutons tactiles QCM (cachés à l'accueil, affichés uniquement pendant la partie) -->
-        <div id="controls" class="hidden">
+        <div id="controls" class="hidden" role="group" aria-label="Choix de réponses">
             <button class="ans-btn" onclick="checkAnswer(0)" id="btn0">-</button>
             <button class="ans-btn" onclick="checkAnswer(1)" id="btn1">-</button>
             <button class="ans-btn" onclick="checkAnswer(2)" id="btn2">-</button>
@@ -256,10 +259,10 @@
         </section>
     </div>
 
-    <div id="settings-screen" class="overlay hidden">
+    <div id="settings-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title" tabindex="-1">
         <div class="modal-panel settings-panel">
             <span class="panel-kicker">CONFIGURATION</span>
-            <h1>Paramètres</h1>
+            <h1 id="settings-title">Paramètres</h1>
             <p>Personnalise ta défense avant le lancement.</p>
             <label class="setting-row"><span><b>🔊 Son</b><small>Effets audio du jeu</small></span><input id="setting-sound" type="checkbox" checked onchange="setSoundEnabled(this.checked)"><i></i></label>
             <label class="setting-row"><span><b>📳 Vibrations</b><small>Retour tactile sur mobile</small></span><input id="setting-vibration" type="checkbox" onchange="setVibrationEnabled(this.checked)"><i></i></label>
@@ -279,7 +282,7 @@
     </div>
 
     <!-- Pause entre les tours -->
-    <div id="pause-screen" class="overlay hidden">
+    <div id="pause-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
         <div class="king-quote" aria-live="polite">
             <svg class="king-viking" viewBox="0 0 100 100" role="img" aria-label="Le Roi Paresse, Viking barbu, réfléchit la main sur la joue">
                 <path d="M17 36 7 17Q23 16 31 30M83 36l10-19Q77 16 69 30" fill="#f8d477" stroke="#653a22" stroke-width="4" stroke-linejoin="round"/>
@@ -311,14 +314,14 @@
     </div>
 
     <!-- Pause manuelle -->
-    <div id="pause-menu" class="overlay hidden">
-        <h1>⏸️ Pause</h1>
+    <div id="pause-menu" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="manual-pause-title" tabindex="-1">
+        <h1 id="manual-pause-title">⏸️ Pause</h1>
         <p>Le jeu est en pause. Que veux-tu faire ?</p>
         <button class="btn-main" onclick="resumeGame()">▶️ Reprendre</button>
         <button class="btn-main btn-secondary" onclick="quitGame()">❌ Quitter au menu</button>
     </div>
 
-    <div id="interruption-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="interruption-title">
+    <div id="interruption-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="interruption-title" tabindex="-1">
         <div class="modal-panel interruption-panel">
             <span class="panel-kicker">REPRISE DE PARTIE</span>
             <h1 id="interruption-title">Partie interrompue</h1>
@@ -329,7 +332,7 @@
     </div>
 
     <!-- Game Over -->
-    <div id="gameover-screen" class="overlay hidden">
+    <div id="gameover-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="gameover-title" tabindex="-1">
         <div class="king-quote" aria-live="polite">
             <svg class="king-viking" viewBox="0 0 100 100" role="img" aria-label="Le Roi Paresse, Viking barbu, réfléchit la main sur la joue">
                 <path d="M17 36 7 17Q23 16 31 30M83 36l10-19Q77 16 69 30" fill="#f8d477" stroke="#653a22" stroke-width="4" stroke-linejoin="round"/>
@@ -362,7 +365,7 @@
         <button class="btn-main btn-secondary" onclick="showMenu()">🏠 Changer de thème</button>
     </div>
 
-    <div id="retry-challenge-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="retry-figure-title">
+    <div id="retry-challenge-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="retry-figure-title" tabindex="-1">
         <div class="modal-panel retry-challenge-panel">
             <span class="panel-kicker">ÉPREUVE DE REPRISE</span>
             <h1 id="retry-figure-title">Trace la figure</h1>
@@ -380,10 +383,10 @@
     </div>
 
     <!-- Garage -->
-    <div id="garage-screen" class="overlay hidden">
+    <div id="garage-screen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="garage-title" tabindex="-1">
         <div class="modal-panel garage-panel">
             <span class="panel-kicker">ATELIER DE DÉFENSE</span>
-            <h1>Garage Défense</h1>
+            <h1 id="garage-title">Garage Défense</h1>
             <p>Équipe ton canon et personnalise ta base.</p>
             <div class="garage-wallet"><span>RESSOURCES DISPONIBLES</span><strong><b id="garage-stars">0</b> ⭐</strong></div>
             <div id="garage-skins" class="garage-skins-grid"></div>
@@ -392,7 +395,7 @@
     </div>
 
     <!-- Chargement des modules dans l'ordre -->
-    <script src="audio.js"></script>
+    <script src="audio.js?v=bd-20261124-cannon-audio"></script>
     <script src="geo_en.js"></script>
     <script src="culture_en.js"></script>
     <script src="geo_es.js"></script>
@@ -403,11 +406,13 @@
     <script src="culture_zh.js"></script>
     <script src="geo_ru.js"></script>
     <script src="culture_ru.js"></script>
-    <script src="questions.js"></script>
+    <script src="geo_wikidata.js?v=bd-20261125-geo-bank"></script>
+    <script src="culture_wikidata.js?v=bd-20261125-culture-bank"></script>
+    <script src="questions.js?v=bd-20261125-translation-survival"></script>
     <script src="background.js?v=bd-20261120-e"></script>
     <script src="retry.js?v=bd-20261124-polyomino-trails"></script>
     <script src="king-dialogue.js"></script>
-    <script src="i18n.js?v=bd-20261124-random-options-localization"></script>
-    <script src="game.js?v=bd-20261124-random-options-localization"></script>
+    <script src="i18n.js?v=bd-20261125-accessibility"></script>
+    <script src="game.js?v=bd-20261125-accessibility"></script>
 </body>
 </html>

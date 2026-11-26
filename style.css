@@ -596,7 +596,7 @@ p { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; line-height: 1.4; max-
 .home-footer-actions .btn-main { width:100%; max-width:none; min-height:42px; margin:0; padding:8px 10px; border:1px solid rgba(255,255,255,.2); border-bottom:4px solid rgba(3,9,24,.7); border-radius:12px; font-size:12px; box-shadow:0 5px 0 rgba(3,9,24,.5),inset 0 1px 0 rgba(255,255,255,.2); }
 .home-footer-actions .garage-open-btn { background:linear-gradient(145deg,#34496f,#172340); color:#dbeafe; }
 .home-footer-actions .resume-run-btn { border-color:rgba(103,232,249,.7); background:linear-gradient(145deg,#0e7490,#0c4a6e); color:#ffffff; }
-.home-footer-actions .resume-run-btn small { color:#cffafe; }
+.home-footer-actions .resume-run-btn small { display:block; margin-top:3px; color:#cffafe; }
 .home-actions .campaign-btn { background: linear-gradient(145deg,#138b68,#075448); }
 .home-actions .survival-btn { background: linear-gradient(145deg,#a94717,#782716); }
 .home-actions .btn-main:hover { transform: translateY(-2px); filter: brightness(1.13); }
@@ -1362,4 +1362,64 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
     #gameover-screen .btn-main { max-width: 400px; min-height: 50px; font-size: 14px; padding: 12px 18px; }
     #controls { gap: 5px; padding: 5px; }
     #controls .ans-btn { padding: 10px 6px; font-size: 14px; }
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.settings-panel {
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+@supports (height: 100dvh) {
+    .settings-panel { max-height: calc(100dvh - 24px); }
+}
+
+.settings-panel :focus-visible,
+.overlay[role="dialog"] :focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+.active-question { display: none; }
+
+@media (max-width: 520px) {
+    #hud .hud-card .hud-label { font-size: clamp(8px, 2.4vw, 10px); letter-spacing: .06em; }
+    #hud .hud-score .hud-sub { font-size: 8px; }
+    #settings-screen { padding: 12px; }
+    .settings-panel { width: min(100%, 400px); padding: 14px; }
+    .active-question:not(.hidden) {
+        display: block;
+        position: absolute;
+        z-index: 12;
+        top: max(10px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        left: calc(max(5px, env(safe-area-inset-left)) + 70px);
+        max-height: min(30vh, 150px);
+        max-height: min(30dvh, 150px);
+        overflow-y: auto;
+        padding: 9px 11px;
+        border: 1px solid rgba(255, 255, 255, .22);
+        border-left: 3px solid var(--question-color, #58a6ff);
+        border-radius: 12px;
+        background: rgba(7, 15, 34, .94);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, .32), 0 0 18px rgba(88, 166, 255, .24);
+        color: #fff;
+        font-size: clamp(14px, 4vw, 16px);
+        font-weight: 800;
+        line-height: 1.35;
+        text-align: center;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+    }
 }

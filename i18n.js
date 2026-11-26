@@ -59,6 +59,14 @@
         zh: { round: '回合', completed: '已完成', next: '下一步', missionComplete: '任务完成！', campaignComplete: '你完成了全部 6 个难度和 12 个回合，防守成功！', gameoverSurvival: '基地被摧毁 · 生存模式', survivalComplete: '生存模式完成！', points: '分', recovery: '你离开期间游戏已暂停，进度已保存。' },
         ru: { round: 'раунд', completed: 'завершён', next: 'Далее', missionComplete: 'Миссия выполнена!', campaignComplete: 'Пройдены все 6 уровней и 12 раундов. Отличная защита!', gameoverSurvival: 'База уничтожена · Выживание', survivalComplete: 'Выживание завершено!', points: 'очков', recovery: 'Игра была приостановлена, пока вас не было. Прогресс сохранён.' }
     };
+    const accessibilityCopy = {
+        fr: { question: 'Question', answerChoices: 'Choix de réponses', answerOption: 'Réponse' },
+        en: { question: 'Question', answerChoices: 'Answer choices', answerOption: 'Answer' },
+        es: { question: 'Pregunta', answerChoices: 'Opciones de respuesta', answerOption: 'Respuesta' },
+        de: { question: 'Frage', answerChoices: 'Antwortmöglichkeiten', answerOption: 'Antwort' },
+        zh: { question: '问题', answerChoices: '答案选项', answerOption: '答案' },
+        ru: { question: 'Вопрос', answerChoices: 'Варианты ответа', answerOption: 'Ответ' }
+    };
     Object.assign(selectors, {
         pauseQuote: '#pause-screen .king-quote-copy > span', gameoverQuote: '#gameover-screen .king-quote-copy > span',
         scoreLine: '#pause-screen > p:first-of-type', pauseBreather: '#pause-screen > p:last-of-type',
@@ -185,6 +193,8 @@
         }
         const themeGrid = document.getElementById('home-theme-grid');
         if (themeGrid) themeGrid.setAttribute('aria-label', extra[language]?.chooseTheme || 'Choose a theme');
+        const answerControls = document.getElementById('controls');
+        if (answerControls) answerControls.setAttribute('aria-label', accessibilityCopy[language].answerChoices);
         const mascot = document.querySelector('.mascot-svg');
         if (mascot) mascot.setAttribute('aria-label', extra[language]?.mascotLabel || '');
         const retryCanvas = document.getElementById('retry-trace-canvas');
@@ -265,7 +275,7 @@
     });
     window.UI18n = {
         supported, labels, get language() { return language; }, get preference() { return preference; },
-        setLanguage, apply, t(key) { return extra[language]?.[key] || (copy[language] || copy.en)[key] || copy.en[key] || key; },
+        setLanguage, apply, t(key) { return extra[language]?.[key] || accessibilityCopy[language]?.[key] || (copy[language] || copy.en)[key] || copy.en[key] || key; },
         tier(index) { return this.t(['tier_basic', 'tier_easy', 'tier_medium', 'tier_hard', 'tier_very_hard', 'tier_master'][index] || 'tier_basic'); }
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply, { once: true });
