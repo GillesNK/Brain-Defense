@@ -10,11 +10,15 @@ const questionsPerTour = source.match(/const QUESTIONS_PER_TOUR = \d+;/);
 const speedFunction = source.match(/function calculateMeteorFallSpeed\([^\n]*\) \{[\s\S]*?\n\}/);
 const meteorLimitFunction = source.match(/function getMaxActiveMeteorCount\([^\n]*\) \{[\s\S]*?\n\}/);
 const survivalLimitFunction = source.match(/function getSurvivalQuestionLimit\([^\n]*\) \{[\s\S]*?\n\}/);
+const meteorRemovalFunction = source.match(/function removeMeteorByReference\([^\n]*\) \{[\s\S]*?\n\}/);
+const retryLabelFunction = source.match(/function formatRetryButtonLabel\([^\n]*\) \{[\s\S]*?\n\}/);
 assert.ok(constants, 'Math speed profiles are present');
 assert.ok(questionsPerTour, 'Campaign round length is present');
 assert.ok(speedFunction, 'Meteor fall speed calculation is present');
 assert.ok(meteorLimitFunction, 'Concurrent meteor limit calculation is present');
 assert.ok(survivalLimitFunction, 'Survival question limit respects the selected bank capacity');
+assert.ok(meteorRemovalFunction, 'Meteor collision removes the exact meteor instance');
+assert.ok(retryLabelFunction, 'Retry button labels are localized');
 
 const context = {};
 vm.runInNewContext(
@@ -77,4 +81,39 @@ test('fixed-theme survival ends before a question bank would have to repeat', ()
     assert.equal(context.survivalQuestionLimit('maths', 'basique'), 240);
     assert.equal(context.survivalQuestionLimit('random', 'basique'), 240);
     assert.throws(() => context.survivalQuestionLimit('culture', 'unknown'), /Niveau de difficulté invalide/);
+});
+
+test('collisions remove the meteor by identity when a non-priority meteor reaches the line first', () => {
+    const priority = { y: 430, speed: 80, radius: 25 };
+    const fasterNonPriority = { y: 300, speed: 360, radius: 90 };
+    const activeEnemies = [priority, fasterNonPriority];
+    const collisionContext = {};
+    vm.runInNewContext(
+        `${meteorRemovalFunction[0]}\nglobalThis.removeMeteor = removeMeteorByReference;`,
+        collisionContext
+    );
+
+    assert.equal(collisionContext.removeMeteor(fasterNonPriority, activeEnemies), true);
+    assert.deepEqual(activeEnemies, [priority]);
+    assert.equal(fasterNonPriority.speed, 360);
+    assert.equal(fasterNonPriority.radius, 90);
+    assert.equal(collisionContext.removeMeteor(fasterNonPriority, activeEnemies), false);
+});
+
+test('retry button labels use the selected interface language and count', () => {
+    const translations = {
+        retryContinue: 'Continue with a Retry Key',
+        retryNoKey: 'No Retry Keys'
+    };
+    const retryContext = {
+        window: { UI18n: { t: key => translations[key] } }
+    };
+    vm.runInNewContext(
+        `${retryLabelFunction[0]}\nglobalThis.retryLabel = formatRetryButtonLabel;`,
+        retryContext
+    );
+
+    assert.equal(retryContext.retryLabel(2), 'Continue with a Retry Key · 2');
+    assert.equal(retryContext.retryLabel(0), 'No Retry Keys');
+    assert.equal(retryContext.retryLabel(-3), 'No Retry Keys');
 });

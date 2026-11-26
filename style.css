@@ -1308,6 +1308,35 @@ body:not(.mobile-controls) #controls .ans-btn { min-height:0; }
     #start-screen .resource-ad-btn { min-height:29px; padding:3px 5px; font-size:7px; }
     #start-screen .home-footer-actions .btn-main { min-height:34px; }
 }
+@media (max-width:520px) and (max-height:600px) {
+    #start-screen .game-logo { margin-bottom:7px; }
+    #start-screen .theme-grid { gap:6px; margin-bottom:4px; }
+    #start-screen .theme-btn { min-height:40px; }
+    #start-screen .theme-btn.full-width { min-height:36px; }
+    #start-screen .home-actions .btn-main { min-height:40px; }
+    #start-screen .hero-scene { width:min(100%,125px); max-width:125px; margin:1px auto 3px; }
+    #start-screen .home-footer-actions .btn-main { min-height:30px; }
+}
+@media (max-width:520px) and (max-height:520px) {
+    #start-screen .game-logo { min-height:0; height:34px; gap:4px; padding:0 6px; margin-bottom:4px; }
+    #start-screen .game-logo-mark { flex-basis:48px; width:48px; }
+    #start-screen .logo-brain { font-size:clamp(25px,8vw,30px); }
+    #start-screen .logo-defense { font-size:clamp(22px,7vw,27px); }
+    #start-screen .logo-tagline { margin-top:1px; font-size:4px; }
+    #start-screen .theme-grid { gap:4px; margin-bottom:3px; }
+    #start-screen .theme-btn { min-height:34px; gap:4px; padding:3px 4px; }
+    #start-screen .theme-btn.full-width { min-height:32px; }
+    #start-screen .theme-icon { flex-basis:20px; width:20px; height:20px; font-size:12px; }
+    #start-screen .theme-name { font-size:9px; }
+    #start-screen .record-pill { padding:1px 3px; font-size:7px; }
+    #start-screen .home-actions .btn-main { min-height:34px; padding:4px; font-size:9px; }
+    #start-screen .home-actions .btn-main small { margin-top:1px; font-size:7px; }
+    #start-screen .hero-scene { width:min(100%,90px); max-width:90px; margin:0 auto 2px; }
+    #start-screen .home-resource-station { gap:2px; padding:3px; }
+    #start-screen .resource-count { min-height:24px; padding:2px 4px; }
+    #start-screen .resource-ad-btn { min-height:25px; padding:2px 4px; font-size:7px; }
+    #start-screen .home-footer-actions .btn-main { min-height:28px; padding:3px 6px; font-size:9px; }
+}
 .hud-lives .hud-value { white-space:nowrap; }
 
 /* === GRANDS ÉCRANS DESKTOP (>=1400px) === */

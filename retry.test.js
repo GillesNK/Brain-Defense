@@ -31,6 +31,7 @@ test('retry tiers produce valid, varied trails without central articulation poin
             assert.equal(figure.connected, true);
             assert.equal(figure.articulationPoints, 0);
             assert.ok(figure.oddEndpoints === 0 || figure.oddEndpoints === 2);
+            assert.ok(figure.drawingExtent >= 0.93, `tier ${tier} should use at least 93% of the drawing frame`);
             assert.equal(figure.hasFixedEndpoints, figure.oddEndpoints === 2);
             assert.ok(figure.maxDegree <= 4);
             if (figure.hasFixedEndpoints) {
@@ -42,7 +43,7 @@ test('retry tiers produce valid, varied trails without central articulation poin
                 assert.equal(figure.endHint, -1);
             }
         }
-        if (tier >= 2) assert.ok(shapes.size > 1, `tier ${tier} should vary its geometry`);
+        assert.equal(shapes.size, figures.length, `tier ${tier} should use a different geometry for every trace`);
 
         const minEdges = Math.min(...edgeCounts);
         const maxEdges = Math.max(...edgeCounts);
@@ -72,6 +73,7 @@ test('retry traces stay unique across difficulties and saved-run restoration', (
         removeEventListener() {}
     };
     const seen = new Set();
+    const seenShapes = new Set();
     retry.resetRun();
 
     for (let tier = 0; tier < 6; tier++) {
@@ -80,10 +82,15 @@ test('retry traces stay unique across difficulties and saved-run restoration', (
             retry.stop();
             const history = JSON.parse(JSON.stringify(retry.getRunHistory()));
             const signatures = history.traceSignatures;
+            const shapeSignatures = history.shapeSignatures;
             assert.equal(signatures.length, seen.size + 1);
             assert.equal(new Set(signatures).size, signatures.length);
             seen.add(signatures[signatures.length - 1]);
             assert.equal(seen.size, signatures.length);
+            assert.equal(shapeSignatures.length, seenShapes.size + 1);
+            assert.equal(new Set(shapeSignatures).size, shapeSignatures.length);
+            seenShapes.add(shapeSignatures[shapeSignatures.length - 1]);
+            assert.equal(seenShapes.size, shapeSignatures.length);
 
             if (tier === 2 && index === 3) {
                 retry.resetRun(history);

@@ -1,16 +1,16 @@
 (() => {
     const TIERS = [
-        { name: 'BASIQUE', steps: 7, cells: 2 },
-        { name: 'FACILE', steps: 10, cells: 3 },
-        { name: 'MOYEN', steps: 13, cells: 4 },
-        { name: 'DIFFICILE', steps: 16, cells: 5 },
-        { name: 'TRÈS DIFFICILE', steps: 19, cells: 6 },
-        { name: 'MASTER', steps: 25, cells: 8 }
+        { name: 'BASIQUE', steps: 7 },
+        { name: 'FACILE', steps: 10 },
+        { name: 'MOYEN', steps: 13 },
+        { name: 'DIFFICILE', steps: 16 },
+        { name: 'TRÈS DIFFICILE', steps: 19 },
+        { name: 'MASTER', steps: 25 }
     ];
     const NODE_HIT_RADIUS = [27, 24, 22, 20, 18, 16];
-    const GRID_DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    const FIGURE_FRAME_SIZE = 400;
+    const FIGURE_PADDING = 24;
     const MAX_FIGURE_ID = 0x100000000;
-    const MAX_GENERATION_ATTEMPTS = 512;
     function emptyRunHistory() {
         return Array.from({ length: TIERS.length }, () => ({
             figureIndices: new Set()
@@ -18,6 +18,7 @@
     }
     let runHistory = emptyRunHistory();
     let usedTraceSignatures = new Set();
+    let usedShapeSignatures = new Set();
     let active = null;
 
     function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
@@ -32,62 +33,38 @@
             return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
         };
     }
-    function growCells(count, rand) {
-        const cells = [{ x: 0, y: 0 }];
-        const occupied = new Set(['0,0']);
-        while (cells.length < count) {
-            const frontier = new Map();
-            cells.forEach(cell => GRID_DIRECTIONS.forEach(([dx, dy]) => {
-                const x = cell.x + dx, y = cell.y + dy, key = `${x},${y}`;
-                if (!occupied.has(key)) frontier.set(key, { x, y });
-            }));
-            const choices = [...frontier.values()];
-            const next = choices[Math.floor(rand() * choices.length)];
-            cells.push(next);
-            occupied.add(`${next.x},${next.y}`);
-        }
-        return cells;
+    function buildLoopGraph(edgeCount, rand) {
+        const step = Math.PI * 2 / edgeCount;
+        const offset = rand() * Math.PI * 2;
+        const nodes = Array.from({ length: edgeCount }, (_, index) => {
+            const angle = offset + (index + 0.5 + (rand() - 0.5) * 0.36) * step;
+            const radius = 0.68 + rand() * 0.28;
+            return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius };
+        });
+        const edges = nodes.map((_, u) => ({ u, v: (u + 1) % edgeCount, done: false }));
+        return { nodes, edges };
     }
-    function canonicalCellSignature(cells) {
+    function canonicalLoopSignature(nodes) {
+        const angles = nodes.map(node => Math.atan2(node.y, node.x));
+        const radii = nodes.map(node => Math.hypot(node.x, node.y));
+        const averageRadius = radii.reduce((sum, radius) => sum + radius, 0) / radii.length;
+        const averageGap = Math.PI * 2 / nodes.length;
+        const gaps = angles.map((angle, index) => {
+            const next = angles[(index + 1) % angles.length];
+            return (next - angle + Math.PI * 2) % (Math.PI * 2);
+        });
         const signatures = [];
-        for (const swap of [false, true]) for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
-            const transformed = cells.map(({ x, y }) => ({
-                x: (swap ? y : x) * sx,
-                y: (swap ? x : y) * sy
-            }));
-            const minX = Math.min(...transformed.map(cell => cell.x));
-            const minY = Math.min(...transformed.map(cell => cell.y));
-            signatures.push(transformed
-                .map(cell => `${cell.x - minX},${cell.y - minY}`)
-                .sort()
-                .join(';'));
+        for (const direction of [1, -1]) {
+            for (let start = 0; start < nodes.length; start++) {
+                const sequence = Array.from({ length: nodes.length }, (_, offset) => {
+                    const index = (start + direction * offset + nodes.length) % nodes.length;
+                    const gapIndex = direction === 1 ? index : (index - 1 + nodes.length) % nodes.length;
+                    return `${(radii[index] / averageRadius).toFixed(3)},${(gaps[gapIndex] / averageGap).toFixed(3)}`;
+                });
+                signatures.push(sequence.join(';'));
+            }
         }
         return signatures.sort()[0];
-    }
-    function buildCellGraph(cells) {
-        const nodes = [], nodeIds = new Map(), edgeIds = new Set(), edges = [];
-        function getNodeId(x, y) {
-            const key = `${x},${y}`;
-            if (!nodeIds.has(key)) {
-                nodeIds.set(key, nodes.length);
-                nodes.push({ x, y });
-            }
-            return nodeIds.get(key);
-        }
-        function addEdge(u, v) {
-            const key = u < v ? `${u},${v}` : `${v},${u}`;
-            if (edgeIds.has(key)) return;
-            edgeIds.add(key);
-            edges.push({ u, v, done: false });
-        }
-        cells.forEach(({ x, y }) => {
-            const corners = [
-                getNodeId(x, y), getNodeId(x + 1, y),
-                getNodeId(x + 1, y + 1), getNodeId(x, y + 1)
-            ];
-            for (let i = 0; i < corners.length; i++) addEdge(corners[i], corners[(i + 1) % corners.length]);
-        });
-        return { nodes, edges, shapeSignature: canonicalCellSignature(cells) };
     }
     function analyzeGraph(nodes, edges) {
         const adjacency = nodes.map(() => []);
@@ -140,9 +117,9 @@
         const maxX = Math.max(...transformed.map(node => node.x));
         const minY = Math.min(...transformed.map(node => node.y));
         const maxY = Math.max(...transformed.map(node => node.y));
-        const scale = 300 / Math.max(maxX - minX, maxY - minY);
-        const offsetX = (400 - (maxX - minX) * scale) / 2;
-        const offsetY = (400 - (maxY - minY) * scale) / 2;
+        const scale = (FIGURE_FRAME_SIZE - FIGURE_PADDING) / Math.max(maxX - minX, maxY - minY);
+        const offsetX = (FIGURE_FRAME_SIZE - (maxX - minX) * scale) / 2;
+        const offsetY = (FIGURE_FRAME_SIZE - (maxY - minY) * scale) / 2;
         return transformed.map(node => ({
             x: offsetX + (node.x - minX) * scale,
             y: offsetY + (node.y - minY) * scale
@@ -159,37 +136,20 @@
         const tier = TIERS[tierIndex];
         if (!tier) throw new RangeError(`Unknown retry difficulty: ${tierIndex}`);
         const rand = createPRNG((figureIndex ^ Math.imul(tierIndex + 1, 0x9E3779B9)) >>> 0);
-        const exactCandidates = [];
-        let closestCandidate = null, closestDistance = Infinity;
-        for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
-            const graph = buildCellGraph(growCells(tier.cells, rand));
-            const analysis = analyzeGraph(graph.nodes, graph.edges);
-            if (!analysis.connected || (analysis.oddNodes.length !== 0 && analysis.oddNodes.length !== 2) ||
-                analysis.articulationPoints > 0) continue;
-            const distance = Math.abs(graph.edges.length - tier.steps);
-            if (distance < closestDistance || (distance === closestDistance && rand() < 0.5)) {
-                closestCandidate = { ...graph, analysis };
-                closestDistance = distance;
-            }
-            if (distance === 0) {
-                exactCandidates.push({ ...graph, analysis });
-                if (exactCandidates.length >= 6) break;
-            }
-        }
-        const candidates = exactCandidates.length ? exactCandidates : (closestCandidate ? [closestCandidate] : []);
-        if (!candidates.length) throw new Error(`Could not generate a valid retry figure for ${tier.name}.`);
-        const selected = candidates[Math.floor(rand() * candidates.length)];
-        const oddNodes = selected.analysis.oddNodes;
+        const graph = buildLoopGraph(tier.steps, rand);
+        const analysis = analyzeGraph(graph.nodes, graph.edges);
+        const shapeSignature = canonicalLoopSignature(graph.nodes);
+        const oddNodes = analysis.oddNodes;
         const startHint = oddNodes.length === 2 && rand() < 0.5 ? oddNodes[1] : (oddNodes[0] ?? -1);
         const endHint = oddNodes.length === 2 ? oddNodes.find(node => node !== startHint) : -1;
-        const nodes = transformNodes(selected.nodes, rand);
+        const nodes = transformNodes(graph.nodes, rand);
         return {
             nodes,
-            edges: selected.edges,
+            edges: graph.edges,
             startHint,
             endHint,
-            shapeSignature: selected.shapeSignature,
-            traceSignature: createTraceSignature(nodes, selected.edges),
+            shapeSignature,
+            traceSignature: createTraceSignature(nodes, graph.edges),
             level: tierIndex,
             index: figureIndex
         };
@@ -201,8 +161,9 @@
             while (used.figureIndices.has(figureIndex)) figureIndex = (figureIndex + 1) % MAX_FIGURE_ID;
             used.figureIndices.add(figureIndex);
             const figure = generateFigure(tierIndex, figureIndex);
-            if (usedTraceSignatures.has(figure.traceSignature)) continue;
+            if (usedTraceSignatures.has(figure.traceSignature) || usedShapeSignatures.has(figure.shapeSignature)) continue;
             usedTraceSignatures.add(figure.traceSignature);
+            usedShapeSignatures.add(figure.shapeSignature);
             return figure;
         }
         throw new Error(`Retry figure space exhausted for ${TIERS[tierIndex].name}.`);
@@ -222,10 +183,15 @@
         usedTraceSignatures = new Set(Array.isArray(history?.traceSignatures)
             ? history.traceSignatures.filter(signature => typeof signature === 'string' && signature.length > 0)
             : []);
-        if (legacy) {
+        usedShapeSignatures = new Set(Array.isArray(history?.shapeSignatures)
+            ? history.shapeSignatures.filter(signature => typeof signature === 'string' && signature.length > 0)
+            : []);
+        if (legacy || !Array.isArray(history?.shapeSignatures)) {
             runHistory.forEach(({ figureIndices }, tierIndex) => {
                 figureIndices.forEach(figureIndex => {
-                    usedTraceSignatures.add(generateFigure(tierIndex, figureIndex).traceSignature);
+                    const figure = generateFigure(tierIndex, figureIndex);
+                    usedTraceSignatures.add(figure.traceSignature);
+                    usedShapeSignatures.add(figure.shapeSignature);
                 });
             });
         }
@@ -235,7 +201,8 @@
             tiers: runHistory.map(({ figureIndices }) => ({
                 figureIndices: [...figureIndices]
             })),
-            traceSignatures: [...usedTraceSignatures]
+            traceSignatures: [...usedTraceSignatures],
+            shapeSignatures: [...usedShapeSignatures]
         };
     }
     function pointFromEvent(event, canvas) {
@@ -260,9 +227,12 @@
             canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
         }
         const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const size = Math.max(1, Math.min(width, height) - 60);
+        const size = Math.max(1, Math.min(width, height) - FIGURE_PADDING);
         const offsetX = (width - size) / 2, offsetY = (height - size) / 2;
-        const nodes = active.figure.nodes.map(node => ({ x: offsetX + node.x / 400 * size, y: offsetY + node.y / 400 * size }));
+        const nodes = active.figure.nodes.map(node => ({
+            x: offsetX + node.x / FIGURE_FRAME_SIZE * size,
+            y: offsetY + node.y / FIGURE_FRAME_SIZE * size
+        }));
         return { ctx, width, height, nodes };
     }
     function draw() {
@@ -402,9 +372,15 @@
     function getFiguresForLevel(index) {
         return Array.from({ length: 15 }, (_, figureIndex) => generateFigure(index, figureIndex)).map(figure => {
             const analysis = analyzeGraph(figure.nodes, figure.edges);
+            const xValues = figure.nodes.map(node => node.x);
+            const yValues = figure.nodes.map(node => node.y);
             return {
                 nodes: figure.nodes.length,
                 edges: figure.edges.length,
+                drawingExtent: Math.max(
+                    Math.max(...xValues) - Math.min(...xValues),
+                    Math.max(...yValues) - Math.min(...yValues)
+                ) / FIGURE_FRAME_SIZE,
                 oddEndpoints: analysis.oddNodes.length,
                 connected: analysis.connected,
                 articulationPoints: analysis.articulationPoints,

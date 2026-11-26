@@ -469,7 +469,14 @@ resizeCanvas();
 function refreshMenuRecords() {
     Object.keys(THEME_LABELS).forEach(key => {
         const el = document.getElementById(`rec-${key}`);
-        if (el) el.innerHTML = `<span data-i18n="record-prefix">${window.UI18n?.t('record') || 'Record'}</span> : ${themeRecords[key] || 0}`;
+        if (el) {
+            const label = document.createElement('span');
+            label.dataset.i18n = 'record-prefix';
+            label.textContent = window.UI18n?.t('record') || 'Record';
+            const savedRecord = Number(themeRecords[key]);
+            const record = Number.isFinite(savedRecord) && savedRecord >= 0 ? Math.floor(savedRecord) : 0;
+            el.replaceChildren(label, document.createTextNode(` : ${record}`));
+        }
         const win = document.getElementById(`won-${key}`);
         if (win) win.classList.toggle('hidden', !campaignWins[key]);
     });
@@ -489,7 +496,15 @@ function updateResumeRunButton() {
     if (!button) return;
     const available = Boolean(savedRunProgress && savedRunProgress.sessionCanResume !== false);
     button.classList.toggle('hidden', !available);
-    if (available) button.innerHTML = `${window.UI18n?.t('resume') || '▶ Reprendre la partie'}<small>${localizedThemeLabel(savedRunProgress.theme) || 'Partie sauvegardée'} · ${savedRunProgress.score || 0} ${window.UI18n?.t('points') || 'points'}</small>`;
+    if (available) {
+        const resumeLabel = window.UI18n?.t('resume') || '▶ Reprendre la partie';
+        const savedTheme = localizedThemeLabel(savedRunProgress.theme) || 'Partie sauvegardée';
+        const savedScore = Number(savedRunProgress.score);
+        const scoreLabel = Number.isFinite(savedScore) && savedScore >= 0 ? Math.floor(savedScore) : 0;
+        const summary = document.createElement('small');
+        summary.textContent = `${savedTheme} · ${scoreLabel} ${window.UI18n?.t('points') || 'points'}`;
+        button.replaceChildren(document.createTextNode(resumeLabel), summary);
+    }
 }
 
 function localizedThemeLabel(theme) {
@@ -838,11 +853,16 @@ function updateResourceDisplays() {
     if (reviveButton) reviveButton.classList.toggle('hidden', reviveAdUsedThisRun);
     if (retryButton) {
         retryButton.disabled = retryKeys < 1;
-        retryButton.innerText = retryKeys > 0
-            ? `🔑 Continuer · ${retryKeys} clé${retryKeys > 1 ? 's' : ''} Retry`
-            : '🔑 Aucune clé Retry';
+        retryButton.textContent = formatRetryButtonLabel(retryKeys);
     }
     if (retryEmpty) retryEmpty.classList.toggle('hidden', retryKeys > 0);
+}
+
+function formatRetryButtonLabel(count) {
+    const keyCount = Number.isFinite(Number(count)) ? Math.max(0, Math.floor(Number(count))) : 0;
+    if (keyCount === 0) return window.UI18n?.t('retryNoKey') || '🔑 Aucune clé Retry';
+    const label = window.UI18n?.t('retryContinue') || '🔑 Continuer avec une clé Retry';
+    return `${label} · ${keyCount}`;
 }
 
 function openSurvivalSetup() {
@@ -1118,6 +1138,42 @@ function spawnEnemy() {
     });
 
     updateButtons();
+}
+
+function drawMeteorTexture(meteor) {
+    if (meteor.specialType === 'life') return;
+
+    const patterns = [
+        [[-0.34, -0.22, 0.13], [0.29, -0.34, 0.09], [0.2, 0.28, 0.15]],
+        [[-0.25, 0.31, 0.12], [0.31, 0.06, 0.16], [-0.12, -0.39, 0.09]],
+        [[-0.35, 0.04, 0.1], [0.08, -0.28, 0.16], [0.34, 0.3, 0.1]]
+    ];
+    const patternIndex = Math.floor(Math.abs(Math.sin(meteor.x * 12.9898 + meteor.radius * 78.233)) * patterns.length) % patterns.length;
+    const radius = meteor.radius;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(meteor.x, meteor.y, radius, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.beginPath();
+    ctx.ellipse(meteor.x - radius * 0.24, meteor.y - radius * 0.3, radius * 0.48, radius * 0.17, -0.45, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.42)';
+    ctx.lineWidth = Math.max(1, radius * 0.035);
+    for (const [offsetX, offsetY, size] of patterns[patternIndex]) {
+        ctx.beginPath();
+        ctx.arc(meteor.x + radius * offsetX, meteor.y + radius * offsetY, radius * size, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function removeMeteorByReference(meteor, activeEnemies = enemies) {
+    const index = activeEnemies.indexOf(meteor);
+    if (index < 0) return false;
+    activeEnemies.splice(index, 1);
+    return true;
 }
 
 function getPriorityTarget() {
@@ -2365,15 +2421,15 @@ function updateButtons() {
                 : (e.specialType === 'life' ? 20 : (e.isRetryMeteor ? 21 : (e.isStarMeteor ? 16 : getSelectedCannonRank() * 2)));
             ctx.stroke();
             ctx.shadowBlur = 0;
+            drawMeteorTexture(e);
             drawMeteorQuestion(e);
             // Collision avec la ligne de défense / vaisseau en bas
-            if (e.y + e.radius >= getDefenseLineY()) {
+            if (e.y + e.radius >= getDefenseLineY() && removeMeteorByReference(e)) {
                 AudioEngine.playDamage();
                 if (e.isRetryMeteor) AudioEngine.playRetryExplosion(getSelectedCannonRank());
                 else if (e.isStarMeteor || e.specialType === 'gold') AudioEngine.playStarExplosion(getSelectedCannonRank());
                 turret.damageFlash = 0.35;
                 createExplosion(e.x, e.y, '#da3633', e.isRetryMeteor ? 'retry' : (e.isStarMeteor || e.specialType === 'gold' ? 'star' : 'normal'), getSelectedCannonRank());
-                enemies.splice(i, 1);
                 lives--;
                 updateHUD();
                 if (vibrationEnabled) navigator.vibrate?.(150);
@@ -2423,15 +2479,15 @@ function updateButtons() {
                 : (e.specialType === 'life' ? 20 : (e.isRetryMeteor ? 21 : (e.isStarMeteor ? 16 : getSelectedCannonRank() * 2)));
             ctx.stroke();
             ctx.shadowBlur = 0;
+            drawMeteorTexture(e);
             drawMeteorQuestion(e);
             // Collision avec la ligne de défense / vaisseau en bas
-            if (e.y + e.radius >= getDefenseLineY()) {
+            if (e.y + e.radius >= getDefenseLineY() && removeMeteorByReference(e)) {
                 AudioEngine.playDamage();
                 if (e.isRetryMeteor) AudioEngine.playRetryExplosion(getSelectedCannonRank());
                 else if (e.isStarMeteor || e.specialType === 'gold') AudioEngine.playStarExplosion(getSelectedCannonRank());
                 turret.damageFlash = 0.35;
                 createExplosion(e.x, e.y, '#da3633', e.isRetryMeteor ? 'retry' : (e.isStarMeteor || e.specialType === 'gold' ? 'star' : 'normal'), getSelectedCannonRank());
-                enemies.splice(enemies.indexOf(e), 1);
                 lives--;
                 updateHUD();
                 if (vibrationEnabled) navigator.vibrate?.(150);
